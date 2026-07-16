@@ -1,0 +1,8 @@
+{
+  "firestore": [
+    {
+      "database": "ai-studio-orgeducationmana-8f4b46d2-1edd-4c11-b88c-39730d43ae1e",
+      "rules": "firestore.rules"
+    }
+  ]
+}
