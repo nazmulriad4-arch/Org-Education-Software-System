@@ -1,6 +1,24 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Safely obtain the API key without crashing in environments where process is undefined
+let geminiApiKey = "";
+try {
+  if (typeof process !== 'undefined' && process.env) {
+    geminiApiKey = process.env.GEMINI_API_KEY || "";
+  }
+} catch (e) {
+  // ignore
+}
+
+if (!geminiApiKey) {
+  try {
+    geminiApiKey = ((import.meta as any).env?.VITE_GEMINI_API_KEY as string) || "";
+  } catch (e) {
+    // ignore
+  }
+}
+
+const ai = new GoogleGenAI({ apiKey: geminiApiKey || "dummy-key" });
 
 export interface Annotation {
   type: 'underline' | 'tick' | 'cross' | 'text' | 'circle' | 'score';
