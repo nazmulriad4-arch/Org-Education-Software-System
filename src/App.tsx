@@ -1663,15 +1663,26 @@ export default function App() {
     syncUsers();
   }, [usersList, isDbLoaded]);
 
-  // If currently logged-in user is deleted from usersList, log them out immediately
+  // If currently logged-in user is deleted from usersList, log them out immediately. Also sync updated roles/permissions.
   useEffect(() => {
     if (!isDbLoaded || !currentUser) return;
-    const stillExists = usersList.some(u => u.id.toLowerCase() === currentUser.id.toLowerCase());
-    if (!stillExists) {
+    const currentRecord = usersList.find(u => u.id.toLowerCase() === currentUser.id.toLowerCase());
+    if (!currentRecord) {
       setCurrentUser(null);
       localStorage.removeItem('currentUser');
       setIsProfileOpen(false);
       alert("আপনার অ্যাকাউন্টটি স্থায়ীভাবে ডিলিট করা হয়েছে। অনুগ্রহ করে আবার লগ ইন করুন বা সিস্টেম ওনারের সাথে যোগাযোগ করুন।\n\n(Your account has been permanently deleted. Logging out of session.)");
+    } else {
+      // Check if details have changed
+      const hasChanged = 
+        currentRecord.name !== currentUser.name ||
+        currentRecord.role !== currentUser.role ||
+        JSON.stringify(currentRecord.permissions) !== JSON.stringify(currentUser.permissions);
+        
+      if (hasChanged) {
+        setCurrentUser(currentRecord);
+        localStorage.setItem('currentUser', JSON.stringify(currentRecord));
+      }
     }
   }, [usersList, isDbLoaded, currentUser]);
 
@@ -1868,24 +1879,165 @@ export default function App() {
     ],
   };
 
-  const currentSidebarItems = sidebarItemsMap[activeTab];
+  const currentSidebarItems = sidebarItemsMap[activeTab] || [];
+
+  const permittedTabs = useMemo(() => {
+    if (!currentUser) return [];
+    
+    const role = (currentUser.id?.toLowerCase() === 'nazmulriad4@gmail.com' || currentUser.id?.toLowerCase() === 'nazmul.2853@udvash.net') 
+      ? 'Owner' 
+      : (currentUser.role || 'User');
+      
+    if (role === 'Owner') {
+      return ['Exam', 'Team', 'Administration'] as TopNavTab[];
+    }
+    
+    const allTabs = ['Exam', 'Team', 'Administration'] as TopNavTab[];
+    return allTabs.filter(tab => {
+      // If the tab ID is explicitly in permissions
+      if (currentUser.permissions?.includes(tab)) return true;
+      
+      // Or if any item in the tab is permitted
+      const items = sidebarItemsMap[tab] || [];
+      return items.some(item => {
+        if (currentUser.permissions?.includes(item.id)) return true;
+        if (item.subItems) {
+          return item.subItems.some(sub => currentUser.permissions?.includes(sub.id));
+        }
+        return false;
+      });
+    });
+  }, [currentUser]);
 
   const filteredSidebarItems = useMemo(() => {
-    // Show all menus and sub-menus unconditionally (none hidden)
-    const allowedItems = currentSidebarItems;
+    if (!currentUser) return [];
 
-    // Filter by search query
+    const role = (currentUser.id?.toLowerCase() === 'nazmulriad4@gmail.com' || currentUser.id?.toLowerCase() === 'nazmul.2853@udvash.net') 
+      ? 'Owner' 
+      : (currentUser.role || 'User');
+      
+    const isOwner = role === 'Owner';
+    const isUser = role === 'User';
+
+    const allowedItems = currentSidebarItems.map(item => {
+      if (isOwner) return item;
+
+      // Users with 'User' role are strictly blocked from User Management
+      if (isUser && item.id === 'user-management') {
+        return null;
+      }
+
+      const hasItemPermission = currentUser.permissions?.includes(item.id);
+
+      if (item.subItems) {
+        const allowedSub = item.subItems.filter(sub => {
+          if (isUser && sub.id === 'user-management') return false;
+          return currentUser.permissions?.includes(sub.id);
+        });
+        if (allowedSub.length > 0) {
+          return {
+            ...item,
+            subItems: allowedSub
+          };
+        }
+        return hasItemPermission ? { ...item, subItems: [] } : null;
+      }
+
+      return hasItemPermission ? item : null;
+    }).filter((item): item is SidebarItem => item !== null);
+
     return allowedItems.filter(item => 
       item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.subItems?.some(sub => sub.label.toLowerCase().includes(searchQuery.toLowerCase()))
     );
-  }, [searchQuery, currentSidebarItems]);
+  }, [searchQuery, currentSidebarItems, currentUser]);
 
-  // Set default active sidebar item when tab changes
+  // Handle auto-correction and redirection if active page is not permitted
+  useEffect(() => {
+    if (!currentUser || !isDbLoaded) return;
+    
+    const role = (currentUser.id?.toLowerCase() === 'nazmulriad4@gmail.com' || currentUser.id?.toLowerCase() === 'nazmul.2853@udvash.net') 
+      ? 'Owner' 
+      : (currentUser.role || 'User');
+      
+    if (role === 'Owner') return;
+
+    // 1. Is activeTab permitted?
+    if (!permittedTabs.includes(activeTab)) {
+      if (permittedTabs.length > 0) {
+        setActiveTab(permittedTabs[0]);
+        return;
+      }
+    }
+
+    // 2. Is activeSidebarItem permitted within activeTab?
+    const currentItems = sidebarItemsMap[activeTab] || [];
+    const allowed = currentItems.map(item => {
+      if (role === 'User' && item.id === 'user-management') return null;
+      const hasItemPermission = currentUser.permissions?.includes(item.id);
+      if (item.subItems) {
+        const allowedSub = item.subItems.filter(sub => {
+          if (role === 'User' && sub.id === 'user-management') return false;
+          return currentUser.permissions?.includes(sub.id);
+        });
+        if (allowedSub.length > 0) return { ...item, subItems: allowedSub };
+        return hasItemPermission ? { ...item, subItems: [] } : null;
+      }
+      return hasItemPermission ? item : null;
+    }).filter(Boolean) as SidebarItem[];
+
+    if (allowed.length > 0) {
+      const isItemPermitted = allowed.some(i => i.id === activeSidebarItem);
+      if (!isItemPermitted) {
+        const first = allowed[0];
+        setActiveSidebarItem(first.id);
+        setExpandedItemId(first.id);
+        if (first.subItems && first.subItems.length > 0) {
+          setActiveSubItem(first.subItems[0].id);
+        } else {
+          setActiveSubItem(null);
+        }
+      } else {
+        // 3. Is activeSubItem permitted?
+        const currentItem = allowed.find(i => i.id === activeSidebarItem);
+        if (currentItem && currentItem.subItems && currentItem.subItems.length > 0) {
+          const isSubPermitted = currentItem.subItems.some(s => s.id === activeSubItem);
+          if (!isSubPermitted) {
+            setActiveSubItem(currentItem.subItems[0].id);
+          }
+        } else {
+          setActiveSubItem(null);
+        }
+      }
+    }
+  }, [currentUser, isDbLoaded, activeTab, permittedTabs]);
+
+  // Set default active sidebar item when tab changes explicitly by user
   React.useEffect(() => {
-    const items = sidebarItemsMap[activeTab];
-    if (items && items.length > 0) {
-      const firstItem = items[0];
+    if (!currentUser) return;
+    
+    const role = (currentUser.id?.toLowerCase() === 'nazmulriad4@gmail.com' || currentUser.id?.toLowerCase() === 'nazmul.2853@udvash.net') 
+      ? 'Owner' 
+      : (currentUser.role || 'User');
+      
+    const currentItems = sidebarItemsMap[activeTab] || [];
+    const allowed = currentItems.map(item => {
+      if (role === 'User' && item.id === 'user-management') return null;
+      if (role === 'Owner') return item;
+      const hasItemPermission = currentUser.permissions?.includes(item.id);
+      if (item.subItems) {
+        const allowedSub = item.subItems.filter(sub => {
+          if (role === 'User' && sub.id === 'user-management') return false;
+          return currentUser.permissions?.includes(sub.id);
+        });
+        if (allowedSub.length > 0) return { ...item, subItems: allowedSub };
+        return hasItemPermission ? { ...item, subItems: [] } : null;
+      }
+      return hasItemPermission ? item : null;
+    }).filter(Boolean) as SidebarItem[];
+
+    if (allowed && allowed.length > 0) {
+      const firstItem = allowed[0];
       setActiveSidebarItem(firstItem.id);
       setExpandedItemId(firstItem.id);
       if (firstItem.subItems && firstItem.subItems.length > 0) {
@@ -7317,7 +7469,6 @@ export default function App() {
     }
   };
 
-  const permittedTabs = (['Exam', 'Team', 'Administration'] as TopNavTab[]);
 
   if (!currentUser) {
     return (
@@ -7364,7 +7515,7 @@ export default function App() {
                   Password
                 </label>
                 <input 
-                  type="text" 
+                  type="password" 
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   className="flex-1 border border-blue-200 bg-blue-50/20 px-3 py-1.5 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-800 transition-all" 
