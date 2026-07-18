@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { dbGetItems, dbSaveItem, dbDeleteItem } from '../services/firebase';
 import { 
   Calendar, 
   FileText, 
@@ -90,27 +91,170 @@ export default function TeacherPortal({
   const [selectedLecture, setSelectedLecture] = useState('All Lecture');
 
   // Interactive Mock Data States
-  const [scripts, setScripts] = useState([
-    { id: 'SCR-101', studentName: 'Imtiaz Ahmed', roll: '37180701', subject: 'Chemistry [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 18:24', maxMarks: 10, image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=400' },
-    { id: 'SCR-102', studentName: 'Fahima Tabassum', roll: '37180702', subject: 'Physics [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 19:10', maxMarks: 10, image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400' },
-    { id: 'SCR-103', studentName: 'Rafid Al-Hasan', roll: '37180703', subject: 'Higher Mathematics [TW]', examName: 'Daily Exam Chemistry-04', status: 'Pending', submittedDate: '2026-07-03 21:05', maxMarks: 10, image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400' },
-    { id: 'SCR-104', studentName: 'Sadia Rahman', roll: '37180704', subject: 'Biology [OW]', examName: 'Weekly Exam-03', status: 'Evaluated', marks: 8.5, maxMarks: 10, feedback: 'Excellent structural diagram drawing.', submittedDate: '2026-07-02 14:15' }
-  ]);
+  const [scripts, setScripts] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [pendingQuestions, setPendingQuestions] = useState<any[]>([]);
+  const [communityPosts, setCommunityPosts] = useState<any[]>([]);
+  const [isDbLoaded, setIsDbLoaded] = useState(false);
 
-  const [reviews, setReviews] = useState([
-    { id: 'REV-201', studentName: 'Tasnim Alam', roll: '37180715', subject: 'Physics [OW]', examName: 'Weekly Exam-02', originalMarks: 6.0, claimedMarks: 8.0, reason: '৩ নং প্রশ্নের উত্তরের পূর্ণমান দেওয়া হয়নি, দয়া করে আবার বিবেচনা করবেন।', status: 'Pending Student Claim', adminNote: 'Requested manual check for question 3', date: '2026-07-03 10:45' },
-    { id: 'REV-202', studentName: 'Abrar Zahid', roll: '37180722', subject: 'Chemistry [TW]', examName: 'Daily Exam Chemistry-03', originalMarks: 4.5, claimedMarks: 7.0, reason: 'উত্তরের প্রথম অংশ সঠিক হওয়া সত্ত্বেও ভুল দেওয়া হয়েছে।', status: 'Pending Student Claim', adminNote: 'Check part A correctness', date: '2026-07-03 14:12' }
-  ]);
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const defaultScripts = [
+          { id: 'SCR-101', studentName: 'Imtiaz Ahmed', roll: '37180701', subject: 'Chemistry [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 18:24', maxMarks: 10, image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=400' },
+          { id: 'SCR-102', studentName: 'Fahima Tabassum', roll: '37180702', subject: 'Physics [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 19:10', maxMarks: 10, image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400' },
+          { id: 'SCR-103', studentName: 'Rafid Al-Hasan', roll: '37180703', subject: 'Higher Mathematics [TW]', examName: 'Daily Exam Chemistry-04', status: 'Pending', submittedDate: '2026-07-03 21:05', maxMarks: 10, image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400' },
+          { id: 'SCR-104', studentName: 'Sadia Rahman', roll: '37180704', subject: 'Biology [OW]', examName: 'Weekly Exam-03', status: 'Evaluated', marks: 8.5, maxMarks: 10, feedback: 'Excellent structural diagram drawing.', submittedDate: '2026-07-02 14:15' }
+        ];
 
-  const [pendingQuestions, setPendingQuestions] = useState([
-    { id: 'Q-501', studentName: 'Mahir Faisal', subject: 'Chemistry [OW]', questionText: 'তড়িৎ রসায়ন অধ্যায়ে ফ্যারাডের ১ম সূত্রের গাণিতিক ব্যাখ্যায় Z এর মান বের করার সময় আধানের একক কুলম্ব নাকি ফ্যারাডে ব্যবহার করা যুক্তিযুক্ত?', submittedDate: '2026-07-03 17:15', isAnswered: false, answerText: '' },
-    { id: 'Q-502', studentName: 'Nusrat Jahan', subject: 'Physics [TW]', questionText: 'পর্যায়বৃত্ত গতি অধ্যায়ে সরল দোলকের ক্ষেত্রে কৌণিক বিস্তার ৪ ডিগ্রির বেশি হলে কেন দোলনকাল সমীকরণ আর খাটে না? বিস্তারিত বুঝিয়ে দেবেন।', submittedDate: '2026-07-03 22:30', isAnswered: false, answerText: '' }
-  ]);
+        const defaultReviews = [
+          { id: 'REV-201', studentName: 'Tasnim Alam', roll: '37180715', subject: 'Physics [OW]', examName: 'Weekly Exam-02', originalMarks: 6.0, claimedMarks: 8.0, reason: '৩ নং প্রশ্নের উত্তরের পূর্ণমান দেওয়া হয়নি, দয়া করে আবার বিবেচনা করবেন।', status: 'Pending Student Claim', adminNote: 'Requested manual check for question 3', date: '2026-07-03 10:45' },
+          { id: 'REV-202', studentName: 'Abrar Zahid', roll: '37180722', subject: 'Chemistry [TW]', examName: 'Daily Exam Chemistry-03', originalMarks: 4.5, claimedMarks: 7.0, reason: 'উত্তরের প্রথম অংশ সঠিক হওয়া সত্ত্বেও ভুল দেওয়া হয়েছে।', status: 'Pending Student Claim', adminNote: 'Check part A correctness', date: '2026-07-03 14:12' }
+        ];
 
-  const [communityPosts, setCommunityPosts] = useState([
-    { id: 'POST-301', author: 'Dr. Rafiqul Islam', role: 'Senior Chemistry Instructor', content: 'প্রিয় শিক্ষক মন্ডলী, আগামী ৫ জুলাই আমাদের Chemistry [OW] বিষয়ের নতুন লেকচার শিট সরবরাহ করা হবে। সকলকে মূল্যায়নের সময় সংশোধিত সমাধান ফাইল অনুসরণের অনুরোধ রইলো।', likes: 14, comments: 3, date: '2026-07-03 12:00', hasLiked: false },
-    { id: 'POST-302', author: 'Niaz Morshed', role: 'Mathematics Lead', content: 'Engineering Admission programs এর ৩ নং সেটের গণিত প্রশ্নপত্রে একটি প্রিন্টিং ত্রুটি পাওয়া গিয়েছে। দয়া করে সবাইকে ৩ নং প্রশ্নের উত্তর মূল্যায়নকালে বোনাস মার্কস (১.০০) দেওয়ার নির্দেশনা দেওয়া হলো।', likes: 25, comments: 7, date: '2026-07-03 15:30', hasLiked: true }
-  ]);
+        const defaultPendingQuestions = [
+          { id: 'Q-501', studentName: 'Mahir Faisal', subject: 'Chemistry [OW]', questionText: 'তড়িৎ রসায়ন অধ্যায়ে ফ্যারাডের ১ম সূত্রের গাণিতিক ব্যাখ্যায় Z এর মান বের করার সময় আধানের একক কুলম্ব নাকি ফ্যারাডে ব্যবহার করা যুক্তিযুক্ত?', submittedDate: '2026-07-03 17:15', isAnswered: false, answerText: '' },
+          { id: 'Q-502', studentName: 'Nusrat Jahan', subject: 'Physics [TW]', questionText: 'পর্যায়বৃত্ত গতি অধ্যায়ে সরল দোলকের ক্ষেত্রে কৌণিক বিস্তার ৪ ডিগ্রির বেশি হলে কেন দোলনকাল সমীকরণ আর খাটে না? বিস্তারিত বুঝিয়ে দেবেন।', submittedDate: '2026-07-03 22:30', isAnswered: false, answerText: '' }
+        ];
+
+        const defaultCommunityPosts = [
+          { id: 'POST-301', author: 'Dr. Rafiqul Islam', role: 'Senior Chemistry Instructor', content: 'প্রিয় শিক্ষক মন্ডলী, আগামী ৫ জুলাই আমাদের Chemistry [OW] বিষয়ের নতুন লেকচার শিট সরবরাহ করা হবে। সকলকে মূল্যায়নের সময় সংশোধিত সমাধান ফাইল অনুসরণের অনুরোধ রইলো।', likes: 14, comments: 3, date: '2026-07-03 12:00', hasLiked: false },
+          { id: 'POST-302', author: 'Niaz Morshed', role: 'Mathematics Lead', content: 'Engineering Admission programs এর ৩ নং সেটের গণিত প্রশ্নপত্রে একটি প্রিন্টিং ত্রুটি পাওয়া গিয়েছে। দয়া করে সবাইকে ৩ নং প্রশ্নের উত্তর মূল্যায়নকালে বোনাস মার্কস (১.০০) দেওয়ার নির্দেশনা দেওয়া হলো।', likes: 25, comments: 7, date: '2026-07-03 15:30', hasLiked: true }
+        ];
+
+        // 1. Scripts
+        const dbScripts = await dbGetItems('teacher_scripts');
+        if (dbScripts.length === 0) {
+          for (const s of defaultScripts) {
+            await dbSaveItem('teacher_scripts', s.id, s);
+          }
+          setScripts(defaultScripts);
+        } else {
+          setScripts(dbScripts);
+        }
+
+        // 2. Reviews
+        const dbReviews = await dbGetItems('teacher_reviews');
+        if (dbReviews.length === 0) {
+          for (const r of defaultReviews) {
+            await dbSaveItem('teacher_reviews', r.id, r);
+          }
+          setReviews(defaultReviews);
+        } else {
+          setReviews(dbReviews);
+        }
+
+        // 3. Pending Questions
+        const dbQuestions = await dbGetItems('teacher_pending_questions');
+        if (dbQuestions.length === 0) {
+          for (const q of defaultPendingQuestions) {
+            await dbSaveItem('teacher_pending_questions', q.id, q);
+          }
+          setPendingQuestions(defaultPendingQuestions);
+        } else {
+          setPendingQuestions(dbQuestions);
+        }
+
+        // 4. Community Posts
+        const dbPosts = await dbGetItems('teacher_community_posts');
+        if (dbPosts.length === 0) {
+          for (const p of defaultCommunityPosts) {
+            await dbSaveItem('teacher_community_posts', p.id, p);
+          }
+          setCommunityPosts(defaultCommunityPosts);
+        } else {
+          const sortedPosts = [...dbPosts].sort((a, b) => b.id.localeCompare(a.id));
+          setCommunityPosts(sortedPosts);
+        }
+
+        setIsDbLoaded(true);
+      } catch (err) {
+        console.error("Error loading TeacherPortal data from Firebase:", err);
+      }
+    }
+    loadData();
+  }, []);
+
+  // Sync back to Firebase when states change
+  useEffect(() => {
+    if (!isDbLoaded) return;
+    async function syncScripts() {
+      try {
+        const dbScripts = await dbGetItems('teacher_scripts');
+        for (const dbS of dbScripts) {
+          if (!scripts.some(s => s.id === dbS.id)) {
+            await dbDeleteItem('teacher_scripts', dbS.id);
+          }
+        }
+        for (const s of scripts) {
+          await dbSaveItem('teacher_scripts', s.id, s);
+        }
+      } catch (error) {
+        console.error("Error syncing teacher_scripts:", error);
+      }
+    }
+    syncScripts();
+  }, [scripts, isDbLoaded]);
+
+  useEffect(() => {
+    if (!isDbLoaded) return;
+    async function syncReviews() {
+      try {
+        const dbReviews = await dbGetItems('teacher_reviews');
+        for (const dbR of dbReviews) {
+          if (!reviews.some(r => r.id === dbR.id)) {
+            await dbDeleteItem('teacher_reviews', dbR.id);
+          }
+        }
+        for (const r of reviews) {
+          await dbSaveItem('teacher_reviews', r.id, r);
+        }
+      } catch (error) {
+        console.error("Error syncing teacher_reviews:", error);
+      }
+    }
+    syncReviews();
+  }, [reviews, isDbLoaded]);
+
+  useEffect(() => {
+    if (!isDbLoaded) return;
+    async function syncQuestions() {
+      try {
+        const dbQuestions = await dbGetItems('teacher_pending_questions');
+        for (const dbQ of dbQuestions) {
+          if (!pendingQuestions.some(q => q.id === dbQ.id)) {
+            await dbDeleteItem('teacher_pending_questions', dbQ.id);
+          }
+        }
+        for (const q of pendingQuestions) {
+          await dbSaveItem('teacher_pending_questions', q.id, q);
+        }
+      } catch (error) {
+        console.error("Error syncing teacher_pending_questions:", error);
+      }
+    }
+    syncQuestions();
+  }, [pendingQuestions, isDbLoaded]);
+
+  useEffect(() => {
+    if (!isDbLoaded) return;
+    async function syncPosts() {
+      try {
+        const dbPosts = await dbGetItems('teacher_community_posts');
+        for (const dbP of dbPosts) {
+          if (!communityPosts.some(p => p.id === dbP.id)) {
+            await dbDeleteItem('teacher_community_posts', dbP.id);
+          }
+        }
+        for (const p of communityPosts) {
+          await dbSaveItem('teacher_community_posts', p.id, p);
+        }
+      } catch (error) {
+        console.error("Error syncing teacher_community_posts:", error);
+      }
+    }
+    syncPosts();
+  }, [communityPosts, isDbLoaded]);
 
   // Active Evaluator / Review Modal States
   const [evaluatingScript, setEvaluatingScript] = useState<any | null>(null);

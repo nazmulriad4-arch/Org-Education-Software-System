@@ -445,7 +445,7 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('nazmul.2853@udvash.net');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
@@ -7364,11 +7364,10 @@ export default function App() {
                   Password
                 </label>
                 <input 
-                  type="password" 
+                  type="text" 
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   className="flex-1 border border-blue-200 bg-blue-50/20 px-3 py-1.5 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-800 transition-all" 
-                  placeholder="••••••••"
                 />
               </div>
 
@@ -7392,9 +7391,7 @@ export default function App() {
             </form>
           </div>
           
-          <p className="text-[11px] text-gray-400 mt-6">
-            Default credentials for assessment: <strong className="text-gray-500 font-mono">nazmul.2853@udvash.net</strong> / password: <strong className="text-gray-500 font-mono">Bd151332303@</strong> (or <strong className="text-gray-500 font-mono">123456</strong>)
-          </p>
+
         </div>
 
         {/* Footer */}
