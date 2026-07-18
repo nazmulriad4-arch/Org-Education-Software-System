@@ -33,6 +33,11 @@ import {
   Zap,
   Plus,
   Minus,
+  Pencil,
+  Undo2,
+  Redo2,
+  Eraser,
+  RotateCcw,
   FileType,
   ChevronUp,
   Eye,
@@ -502,6 +507,143 @@ export default function App() {
   const [selectedReviewRow, setSelectedReviewRow] = useState<any>(null);
   const [showReviewWorkspace, setShowReviewWorkspace] = useState(false);
   const [showingAdminDetailRow, setShowingAdminDetailRow] = useState<any>(null);
+
+  const [reviewScripts, setReviewScripts] = useState([
+    {
+      id: 'REV-SCRIPT-1',
+      rollNumber: '57210800687',
+      registrationNo: '4297721',
+      subject: 'Bangla',
+      examSubject: '[101] - Bangla 1st Paper',
+      examName: 'Paper Final Live Exam Bangla 1st Paper',
+      course: 'NDC & SJC All Service',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'Bangla',
+      question: '১ টেরাগাম কত পিকোগ্রামের সমান?',
+      uniqueSet: '1',
+      questionSerial: '1',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswer: '১০^২৪ পিকোগ্রাম',
+      sampleAnswerNotes: [
+        '১ টেরাগাম = ১০^১২ গ্রাম',
+        '১ পিকোগ্রাম = ১০^-১২ গ্রাম',
+        '.-. ১ টেরাগাম = ১০^২৪ পিকোগ্রাম; লেখার জন্য ০১ নম্বর ।',
+        '[বি. দ্র. শুধু উত্তর লিখলেও সম্পূর্ণ নম্বর পাবে ।]'
+      ],
+      scriptImage: '/src/assets/images/physics_script_1_1784375451233.jpg',
+      examinerName: '[21192] Fahim (2023)',
+      evaluationTime: '2026-07-17 07:36 PM',
+      annotations: [
+        { type: 'text', text: '০১', top: 40, left: 5, fontSize: '42px', fontColor: 'red', isBold: true, fontFamily: '"Comic Sans MS", cursive' },
+        { type: 'tick', top: 35, left: 12 }
+      ]
+    },
+    {
+      id: 'REV-SCRIPT-2',
+      rollNumber: '42205101365',
+      registrationNo: '5234365',
+      subject: 'Physics',
+      examSubject: '[126] - Physics 1st Paper',
+      examName: 'Paper Final Live Exam Physics 1st Paper',
+      course: "HSC'26 Model Test Online Service [HSC MT - 2026]",
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'Bangla',
+      question: '১ টেরাগাম কত পিকোগ্রামের সমান?',
+      uniqueSet: '1',
+      questionSerial: '1',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswer: '১০^২৪ পিকোগ্রাম',
+      sampleAnswerNotes: [
+        '১ টেরাগাম = ১০^১২ গ্রাম',
+        '১ পিকোগ্রাম = ১০^-১২ গ্রাম',
+        '.-. ১ টেরাগাম = ১০^২৪ পিকোগ্রাম; লেখার জন্য ০১ নম্বর ।',
+        '[বি. দ্র. শুধু উত্তর লিখলেও সম্পূর্ণ নম্বর পাবে ।]'
+      ],
+      scriptImage: '/src/assets/images/physics_script_2_1784375465674.jpg',
+      examinerName: '[21192] Fahim (2023)',
+      evaluationTime: '2026-07-17 07:36 PM',
+      annotations: [
+        { type: 'text', text: '০১', top: 40, left: 5, fontSize: '42px', fontColor: 'red', isBold: true, fontFamily: '"Comic Sans MS", cursive' },
+        { type: 'tick', top: 35, left: 12 },
+        { type: 'line', top: 50, left: 10, width: 70, height: 2, color: 'red', angle: -15 }
+      ]
+    },
+    {
+      id: 'REV-SCRIPT-3',
+      rollNumber: '15200200816',
+      registrationNo: '4755835',
+      subject: 'English',
+      examSubject: '[107] - English Literature',
+      examName: 'Midterm Evaluation English Literature',
+      course: 'HSC Bangla-English Full Course Online [HSC BE O - 2026]',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'English',
+      question: 'Fill in the gap with the right form of verb: The principal and president ______ (come) yet.',
+      uniqueSet: '1',
+      questionSerial: '2',
+      maxMarks: '1.00',
+      obtainedMarks: '0.00',
+      sampleAnswer: "hasn't come",
+      sampleAnswerNotes: [
+        '01 mark for writing "hasn\'t come"'
+      ],
+      scriptImage: 'https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/english-eval-script.png',
+      examinerName: '[10089] Manar (2021)',
+      evaluationTime: '2026-07-17 07:41 PM',
+      annotations: [
+        { type: 'text', text: "২ । didn't come", top: 35, left: 12, fontSize: '24px', fontColor: 'black', isBold: true },
+        { type: 'line', top: 41, left: 11, width: 20, height: 2, color: 'black' },
+        { type: 'circle', top: 31, left: 5, width: 27, height: 16, color: 'red' },
+        { type: 'text', text: "hasn't come", top: 48, left: 34, fontSize: '28px', fontColor: 'red', isBold: true },
+        { type: 'text', text: '00 /', top: 51, left: 11, fontSize: '42px', fontColor: 'red', isBold: true, fontFamily: '"Comic Sans MS", cursive' }
+      ]
+    },
+    {
+      id: 'REV-SCRIPT-4',
+      rollNumber: '41180501037',
+      registrationNo: '4419518',
+      subject: 'Higher Math',
+      examSubject: '[129] - Higher Math 1st Paper',
+      examName: 'Paper Final Live Exam Higher Math 1st Paper',
+      course: 'NDC & SJC All Service',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'Bangla',
+      question: '√3 x + y + 1 = 0 রেখাটি x অক্ষের ধনাত্মক দিকের সাথে কত ডিগ্রি কোণ উৎপন্ন করবে?',
+      uniqueSet: '1',
+      questionSerial: '2',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswerMath: true,
+      sampleAnswerNotes: [
+        'tan θ = -√3 ; নির্ণয় করার জন্য ০.৫ নম্বর।',
+        'θ = tan^-1(-√3) বা, 120° ; নির্ণয় করার জন্য ০.৫ নম্বর।',
+        '[বি. দ্র. শুধু উত্তর লিখলেও সম্পূর্ণ নম্বর পাবে; তবে বিস্তারিত লেখা উত্তম।]'
+      ],
+      scriptImage: 'https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/bangla-eval-script.png',
+      examinerName: '[17304] Rony (2021)',
+      evaluationTime: '2026-07-18 10:18 AM',
+      annotations: [
+        { type: 'text', text: 'm = tan θ', top: 58, left: 8, fontSize: '18px', fontColor: 'black', isBold: true },
+        { type: 'text', text: '.-. θ = 120', top: 58, left: 28, fontSize: '18px', fontColor: 'black', isBold: true },
+        { type: 'text', text: 'o', top: 55, left: 39, fontSize: '11px', fontColor: 'black', isBold: true },
+        { type: 'text', text: '-√3 = tan θ', top: 64, left: 6, fontSize: '18px', fontColor: 'black', isBold: true },
+        { type: 'tick', top: 56, left: 41 },
+        { type: 'line', top: 62, left: 3, width: 23, height: 2, color: 'red', angle: -20 }
+      ]
+    }
+  ]);
+
+  const [activeScriptIdx, setActiveScriptIdx] = useState<number>(0);
   const [reviewObtainedMarks, setReviewObtainedMarks] = useState("1.00");
   const [activeDrawingTool, setActiveDrawingTool] = useState("pencil");
   const [imageScale, setImageScale] = useState(1);
@@ -509,6 +651,7 @@ export default function App() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentPath, setCurrentPath] = useState("");
   const [allPaths, setAllPaths] = useState<string[]>([]);
+  const [initialPathCount, setInitialPathCount] = useState(0);
   const [redoPaths, setRedoPaths] = useState<string[]>([]);
   const [scriptComments, setScriptComments] = useState<{ x: number; y: number; text: string }[]>([]);
   const [reviewViewMode, setReviewViewMode] = useState<'canvas' | 'scanned'>('canvas');
@@ -525,6 +668,7 @@ export default function App() {
       const paths = selectedReviewRow.allPaths || [];
       const comments = selectedReviewRow.scriptComments || [];
       setAllPaths(paths);
+      setInitialPathCount(paths.length);
       setScriptComments(comments);
       setTotalScriptPages(1);
       setCurrentScriptPage(1);
@@ -851,6 +995,188 @@ export default function App() {
     { id: "higherMath", name: "Higher Math", checked: false },
   ]);
   const [modalAllSubjectsChecked, setModalAllSubjectsChecked] = useState<boolean>(false);
+
+  const [adminReviewRows, setAdminReviewRows] = useState([
+    {
+      id: 'ADR-001',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'NDC & SJC All Service',
+      examSubject: '[126] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'Bangla',
+      question: 'Unique Set: 1, Question Serial: 1',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 941,
+      reviewStatus: 'Not Reviewed'
+    },
+    {
+      id: 'ADR-002',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'NDC & SJC All Service',
+      examSubject: '[126] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'English',
+      question: 'Unique Set: 1, Question Serial: 1',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 99,
+      reviewStatus: 'Reviewed',
+      adminId: 'faisal.7402@udvash.net',
+      reviewedTime: '2026-07-17 08:30 PM'
+    },
+    {
+      id: 'ADR-003',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'HCC All Service',
+      examSubject: '[102] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'Bangla',
+      question: 'Unique Set: 1, Question Serial: 1',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 419,
+      reviewStatus: 'Rechecked from Student',
+      adminId: 'Suja.7146@udvash.net',
+      reviewedTime: '2026-07-16 11:20 AM'
+    },
+    {
+      id: 'ADR-004',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'NDC & SJC All Service',
+      examSubject: '[126] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'Bangla',
+      question: 'Unique Set: 1, Question Serial: 2',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 1059,
+      reviewStatus: 'Rechecked from Admin',
+      adminId: 'nazmul.2853@udvash.net',
+      reviewedTime: '2026-07-15 05:45 PM'
+    },
+    {
+      id: 'ADR-005',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'NDC & SJC All Service',
+      examSubject: '[126] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'English',
+      question: 'Unique Set: 1, Question Serial: 2',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 115,
+      reviewStatus: 'Not Reviewed'
+    },
+    {
+      id: 'ADR-006',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'HCC All Service',
+      examSubject: '[102] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'Bangla',
+      question: 'Unique Set: 1, Question Serial: 2',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 488,
+      reviewStatus: 'Reviewed',
+      adminId: 'yeasin.9206@udvash.net',
+      reviewedTime: '2026-07-14 10:15 AM'
+    },
+    {
+      id: 'ADR-007',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'NDC & SJC All Service',
+      examSubject: '[126] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'Bangla',
+      question: 'Unique Set: 1, Question Serial: 3',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 1059,
+      reviewStatus: 'Not Reviewed'
+    },
+    {
+      id: 'ADR-008',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'NDC & SJC All Service',
+      examSubject: '[126] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'English',
+      question: 'Unique Set: 1, Question Serial: 3',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 111,
+      reviewStatus: 'Rechecked from Student',
+      adminId: 'nazmul.2853@udvash.net',
+      reviewedTime: '2026-07-13 04:20 PM'
+    },
+    {
+      id: 'ADR-009',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'HCC All Service',
+      examSubject: '[102] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'Bangla',
+      question: 'Unique Set: 1, Question Serial: 3',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 492,
+      reviewStatus: 'Rechecked from Admin',
+      adminId: 'nazmul.7413@udvash.net',
+      reviewedTime: '2026-07-12 09:10 AM'
+    },
+    {
+      id: 'ADR-010',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'NDC & SJC All Service',
+      examSubject: '[126] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'Bangla',
+      question: 'Unique Set: 1, Question Serial: 4',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 954,
+      reviewStatus: 'Reviewed',
+      adminId: 'faisal.7402@udvash.net',
+      reviewedTime: '2026-07-11 02:30 PM'
+    },
+    {
+      id: 'ADR-011',
+      program: 'College Admission Program',
+      session: '2026',
+      course: 'NDC & SJC All Service',
+      examSubject: '[126] - (Physics)',
+      examType: 'Online Written',
+      evaluationType: 'Regular',
+      version: 'Bangla',
+      question: 'Unique Set: 1, Question Serial: 7',
+      minMarks: '0',
+      maxMarks: '1',
+      totalScript: 1210,
+      reviewStatus: 'Not Reviewed'
+    }
+  ]);
 
   const [reviewRecords, setReviewRecords] = useState([
     {
@@ -2050,7 +2376,1001 @@ export default function App() {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    if (selectedReviewRow) {
+      let matchedIndex = 0;
+      const subjectLower = (selectedReviewRow.subject || selectedReviewRow.examSubject || "").toLowerCase();
+      const questionText = (selectedReviewRow.question || "").toLowerCase();
+      
+      if (subjectLower.includes('physics') || questionText.includes('টেরাগাম') || questionText.includes('900m')) {
+        matchedIndex = 1;
+      } else if (subjectLower.includes('english') || questionText.includes('principal') || selectedReviewRow.version === 'English') {
+        matchedIndex = 2;
+      } else if (subjectLower.includes('math') || questionText.includes('√3') || questionText.includes('x অক্ষের')) {
+        matchedIndex = 3;
+      }
+      
+      setActiveScriptIdx(matchedIndex);
+      setReviewObtainedMarks(reviewScripts[matchedIndex]?.obtainedMarks || "0.00");
+      setForwardToTeacherText("");
+      setShowForwardToTeacher(false);
+      setForwardSingleChecked(true);
+      setForwardMultipleChecked(false);
+    }
+  }, [selectedReviewRow]);
+
+  useEffect(() => {
+    if (showReviewWorkspace && reviewScripts[activeScriptIdx]) {
+      setReviewObtainedMarks(reviewScripts[activeScriptIdx].obtainedMarks);
+    }
+  }, [activeScriptIdx, showReviewWorkspace, reviewScripts]);
+
+  const renderReviewWorkspace = () => {
+    const activeScript = reviewScripts[activeScriptIdx] || selectedReviewRow;
+    const scriptImage = activeScript.scriptImage || (activeScript.version === 'English' || activeScript.examSubject?.toLowerCase().includes('english')
+      ? "https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/english-eval-script.png"
+      : "https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/bangla-eval-script.png");
+
+    const matchUniqueSet = activeScript.question?.match(/Unique Set:\s*(\d+)/i) || activeScript.uniqueSet?.toString().match(/(\d+)/);
+    const uniqueSet = matchUniqueSet ? matchUniqueSet[1] : "1";
+    const matchQSerial = activeScript.question?.match(/Question Serial:\s*(\d+)/i) || activeScript.questionSerial?.toString().match(/(\d+)/);
+    const questionSerial = matchQSerial ? matchQSerial[1] : "2";
+    const fullMarks = activeScript.maxMarks || "1.00";
+
+    const handleCanvasMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
+      if (activeDrawingTool !== 'pencil') return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setIsDrawing(true);
+      setCurrentPath(`M ${x.toFixed(2)} ${y.toFixed(2)}`);
+    };
+
+    const handleCanvasMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+      if (!isDrawing || activeDrawingTool !== 'pencil') return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setCurrentPath(prev => `${prev} L ${x.toFixed(2)} ${y.toFixed(2)}`);
+    };
+
+    const handleCanvasMouseUp = () => {
+      if (!isDrawing || activeDrawingTool !== 'pencil') return;
+      setIsDrawing(false);
+      if (currentPath) {
+        const updatedPaths = [...allPaths, currentPath];
+        setAllPaths(updatedPaths);
+        setPageStore(prev => ({
+          ...prev,
+          [currentScriptPage]: {
+            paths: updatedPaths,
+            comments: scriptComments
+          }
+        }));
+        setActionHistory(prev => [...prev, { type: 'path', value: currentPath }]);
+        setRedoHistory([]);
+        setCurrentPath("");
+      }
+    };
+
+    const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      if (activeDrawingTool !== 'comment') return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      
+      const commentText = prompt("Enter comment text / মন্তব্য লিখুন:");
+      if (commentText && commentText.trim()) {
+        const newComment = { x, y, text: commentText.trim() };
+        const updatedComments = [...scriptComments, newComment];
+        setScriptComments(updatedComments);
+        setPageStore(prev => ({
+          ...prev,
+          [currentScriptPage]: {
+            paths: allPaths,
+            comments: updatedComments
+          }
+        }));
+        setActionHistory(prev => [...prev, { type: 'comment', value: newComment }]);
+        setRedoHistory([]);
+      }
+    };
+
+    const handleUndo = () => {
+      if (actionHistory.length === 0) return;
+      const lastAction = actionHistory[actionHistory.length - 1];
+      setActionHistory(prev => prev.slice(0, -1));
+      setRedoHistory(prev => [...prev, lastAction]);
+
+      if (lastAction.type === 'path') {
+        const updatedPaths = allPaths.filter(p => p !== lastAction.value);
+        setAllPaths(updatedPaths);
+        setPageStore(prev => ({
+          ...prev,
+          [currentScriptPage]: {
+            paths: updatedPaths,
+            comments: scriptComments
+          }
+        }));
+      } else if (lastAction.type === 'comment') {
+        const updatedComments = scriptComments.filter(c => c !== lastAction.value);
+        setScriptComments(updatedComments);
+        setPageStore(prev => ({
+          ...prev,
+          [currentScriptPage]: {
+            paths: allPaths,
+            comments: updatedComments
+          }
+        }));
+      }
+    };
+
+    const handleRedo = () => {
+      if (redoHistory.length === 0) return;
+      const actionToRestore = redoHistory[redoHistory.length - 1];
+      setRedoHistory(prev => prev.slice(0, -1));
+      setActionHistory(prev => [...prev, actionToRestore]);
+
+      if (actionToRestore.type === 'path') {
+        const updatedPaths = [...allPaths, actionToRestore.value];
+        setAllPaths(updatedPaths);
+        setPageStore(prev => ({
+          ...prev,
+          [currentScriptPage]: {
+            paths: updatedPaths,
+            comments: scriptComments
+          }
+        }));
+      } else if (actionToRestore.type === 'comment') {
+        const updatedComments = [...scriptComments, actionToRestore.value];
+        setScriptComments(updatedComments);
+        setPageStore(prev => ({
+          ...prev,
+          [currentScriptPage]: {
+            paths: allPaths,
+            comments: updatedComments
+          }
+        }));
+      }
+    };
+
+    const handleResetAll = () => {
+      if (confirm("Are you sure you want to clear all annotations? / আপনি কি নিশ্চিত যে আপনি সব চিহ্ন মুছে ফেলবেন?")) {
+        setAllPaths([]);
+        setScriptComments([]);
+        setActionHistory([]);
+        setRedoHistory([]);
+        setPageStore(prev => ({
+          ...prev,
+          [currentScriptPage]: { paths: [], comments: [] }
+        }));
+      }
+    };
+
+    const handleToggleSingle = () => {
+      setForwardSingleChecked(true);
+      setForwardMultipleChecked(false);
+    };
+
+    const handleToggleMultiple = () => {
+      setForwardMultipleChecked(true);
+      setForwardSingleChecked(false);
+    };
+
+    const handleBlank = () => {
+      setReviewObtainedMarks("0.00");
+      alert("Marked as blank. Obtained marks set to 0.00");
+    };
+
+    const handleSaveAndExit = () => {
+      if (isNaN(Number(reviewObtainedMarks))) {
+        alert("Please enter a valid number for obtained marks. / অনুগ্রহ করে প্রাপ্ত নম্বরের জন্য একটি সঠিক সংখ্যা লিখুন।");
+        return;
+      }
+      const marksNum = parseFloat(reviewObtainedMarks);
+      const maxMarksNum = parseFloat(activeScript.maxMarks || "1.00");
+      if (marksNum < 0 || marksNum > maxMarksNum) {
+        alert(`Obtained marks must be between 0 and ${maxMarksNum} / প্রাপ্ত নম্বর অবশ্যই 0 এবং ${maxMarksNum}-এর মধ্যে হতে হবে।`);
+        return;
+      }
+
+      // Update in reviewScripts state
+      const updatedReviewScripts = reviewScripts.map((s, idx) => idx === activeScriptIdx ? { ...s, obtainedMarks: reviewObtainedMarks } : s);
+      setReviewScripts(updatedReviewScripts);
+
+      // Also update in reviewRecords mapping
+      const updatedRecords = reviewRecords.map(rec => {
+        if (rec.rollNumber === activeScript.rollNumber && rec.examName === activeScript.examName) {
+          return { ...rec, reviewStatus: 'Reviewed', obtainedMarks: reviewObtainedMarks };
+        }
+        return rec;
+      });
+      setReviewRecords(updatedRecords);
+
+      setStudentReviewRequests(prev => prev.map(req => {
+        if (req.roll === activeScript.rollNumber && req.exam === activeScript.examName) {
+          return { ...req, status: 'Resolved', obtainedMarks: reviewObtainedMarks };
+        }
+        return req;
+      }));
+
+      setAdminForwardedRequests(prev => prev.map(req => {
+        if (req.rollNumber === activeScript.rollNumber && req.exam === activeScript.examName) {
+          return { ...req, status: 'Resolved by Teacher', obtainedMarks: reviewObtainedMarks };
+        }
+        return req;
+      }));
+
+      alert("Review Evaluation Submitted Successfully! (রি-চেক ও মূল্যায়ন সফলভাবে সম্পন্ন হয়েছে)");
+      setShowReviewWorkspace(false);
+      setSelectedReviewRow(null);
+    };
+
+    const handleSkipAndNext = () => {
+      if (isNaN(Number(reviewObtainedMarks))) {
+        alert("Please enter a valid number for obtained marks. / অনুগ্রহ করে প্রাপ্ত নম্বরের জন্য একটি সঠিক সংখ্যা লিখুন।");
+        return;
+      }
+      const marksNum = parseFloat(reviewObtainedMarks);
+      const maxMarksNum = parseFloat(activeScript.maxMarks || "1.00");
+      if (marksNum < 0 || marksNum > maxMarksNum) {
+        alert(`Obtained marks must be between 0 and ${maxMarksNum} / প্রাপ্ত নম্বর অবশ্যই 0 এবং ${maxMarksNum}-এর মধ্যে হতে হবে।`);
+        return;
+      }
+
+      // Save current script's marks
+      const updatedReviewScripts = reviewScripts.map((s, idx) => idx === activeScriptIdx ? { ...s, obtainedMarks: reviewObtainedMarks } : s);
+      setReviewScripts(updatedReviewScripts);
+
+      const updatedRecords = reviewRecords.map(rec => {
+        if (rec.rollNumber === activeScript.rollNumber && rec.examName === activeScript.examName) {
+          return { ...rec, reviewStatus: 'Reviewed', obtainedMarks: reviewObtainedMarks };
+        }
+        return rec;
+      });
+      setReviewRecords(updatedRecords);
+
+      setStudentReviewRequests(prev => prev.map(req => {
+        if (req.roll === activeScript.rollNumber && req.exam === activeScript.examName) {
+          return { ...req, status: 'Resolved', obtainedMarks: reviewObtainedMarks };
+        }
+        return req;
+      }));
+
+      // Check if we are in the 4 sequence list of reviewScripts
+      if (activeScriptIdx < 3) {
+        setActiveScriptIdx(prev => prev + 1);
+      } else {
+        // Find next in reviewRecords as fallback if not in the 4 sequence
+        const currentIndex = reviewRecords.findIndex(r => r.rollNumber === activeScript.rollNumber && r.examName === activeScript.examName);
+        const nextUnreviewedRow = reviewRecords.slice(currentIndex + 1).find(r => r.reviewStatus === 'Not Reviewed');
+        
+        if (nextUnreviewedRow) {
+          setSelectedReviewRow(nextUnreviewedRow);
+        } else {
+          alert("Evaluation saved. No more unreviewed student scripts left. (মূল্যায়ন সংরক্ষিত হয়েছে। আর কোনো রি-চেক বা রিভিউযোগ্য খাতা বাকি নেই।)");
+          setShowReviewWorkspace(false);
+          setSelectedReviewRow(null);
+        }
+      }
+    };
+
+    const handleSubmitForwardToTeacher = () => {
+      if (!forwardToTeacherText.trim()) {
+        alert("Please enter a note for the teacher first. / অনুগ্রহ করে শিক্ষকের জন্য একটি নোট লিখুন।");
+        return;
+      }
+
+      // If Multiple is selected, it represents all scripts for this question seen by this teacher
+      const totalScripts = forwardMultipleChecked ? 124 : 1;
+
+      const newForwardRequest = {
+        id: "FWD-" + Math.floor(Math.random() * 9000 + 1000),
+        examiner: { 
+          id: activeScript.examinerId || "21192", 
+          name: activeScript.examinerName?.replace(/\[.*\]/, '').trim() || "Fahim", 
+          phone: "8801701234567" 
+        },
+        course: activeScript.course || "HSC'26 Model Test Online Service [HSC MT - 2026]",
+        subject: activeScript.subject?.replace(/\[.*\]/, '').trim() || activeScript.examSubject?.replace(/\[.*\]/, '').trim() || "Physics",
+        exam: activeScript.exam || activeScript.examName || "Paper Final Live Exam Physics 1st Paper",
+        examCode: activeScript.examCode || "130 ",
+        adminId: currentUser?.email || "nazmul.2853@udvash.net",
+        note: forwardToTeacherText.trim(),
+        date: new Date().toISOString().replace('T', ' ').slice(0, 16).replace(/-/g, '/'),
+        status: "Pending Teacher Response",
+        organization: "UDVASH",
+        program: activeScript.program || "College Admission Program",
+        session: activeScript.session || "2026",
+        examType: activeScript.examType || "Online Written",
+        version: activeScript.version || "Bangla",
+        questionSerial: questionSerial,
+        uniqueSet: uniqueSet,
+        evaluationType: "Regular",
+        reviewRequest: "Pending",
+        rollNumber: activeScript.rollNumber || "42182201462",
+        minMarks: "0",
+        maxMarks: activeScript.maxMarks || "1.00",
+        reviewCount: totalScripts,
+        isMultiple: forwardMultipleChecked,
+        totalScriptsCount: totalScripts,
+        checkedScriptsCount: 0
+      };
+
+      setAdminForwardedRequests(prev => [newForwardRequest, ...prev]);
+
+      alert(`Submitted Forward to Teacher Request! (${forwardMultipleChecked ? "Multiple scripts" : "Single script"} mode selected)`);
+      
+      setForwardToTeacherText("");
+      setShowForwardToTeacher(false);
+      setShowReviewWorkspace(false);
+      setSelectedReviewRow(null);
+    };
+
+    return (
+      <div className="flex-1 bg-[#f3f4f6] overflow-y-auto p-4 md:p-8 font-sans text-gray-800">
+        {/* Workspace Top Sticky Navigation */}
+        <div className="max-w-[750px] mx-auto flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2">
+            <span className="px-2.5 py-1 bg-red-600 text-white text-[10px] font-extrabold rounded-md uppercase tracking-wide">
+              Recheck Workspace
+            </span>
+            <span className="text-gray-500 text-xs font-semibold font-mono">
+              Roll: {selectedReviewRow.rollNumber || '42182201462'}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setShowReviewWorkspace(false);
+              setSelectedReviewRow(null);
+            }}
+            className="bg-white hover:bg-gray-50 text-gray-700 px-4.5 py-1.5 rounded-lg text-xs font-extrabold border border-gray-300 shadow-xs transition-colors cursor-pointer"
+          >
+            ← Exit Workspace
+          </button>
+        </div>
+
+        {/* Dynamic Interactive Elements Card Stack */}
+        <div className="max-w-[750px] mx-auto space-y-5">
+          
+          {/* Section 1: Question & Sample Answer Card (Matches screenshots exactly) */}
+          <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-xs text-left">
+            <div className="flex justify-between items-center border-b border-gray-100 pb-2.5 mb-3">
+              <span className="text-sm font-bold text-gray-900 font-sans">
+                Question : Unique Set: {uniqueSet}, Question Serial: {questionSerial}
+              </span>
+              <span className="text-sm font-bold text-gray-900 font-sans">
+                Full Marks : {fullMarks}
+              </span>
+            </div>
+            
+            <div className="text-sm md:text-base font-bold text-gray-900 font-sans mb-3 leading-relaxed">
+              {activeScript.question}
+            </div>
+
+            <div className="bg-[#e2f0d9] border border-[#c5e0b4] rounded-md p-4 relative">
+              <div className="absolute top-3 right-3">
+                <button 
+                  type="button"
+                  className="bg-white text-[#1a73e8] border border-[#1a73e8] rounded-md px-2.5 py-1 text-[11px] font-bold shadow-xs hover:bg-[#f8f9fa] transition-colors"
+                >
+                  Sample Answer
+                </button>
+              </div>
+
+              {/* Sample Answer Body */}
+              {activeScript.sampleAnswerFormulas ? (
+                <div className="flex flex-wrap items-center gap-1.5 font-sans font-bold text-sm md:text-base text-gray-900 my-2">
+                  <span className="italic">C</span>
+                  <span>=</span>
+                  <div className="inline-flex flex-col items-center justify-center text-xs px-1 leading-none">
+                    <span className="italic border-b border-gray-900 pb-0.5">r</span>
+                    <span className="italic pt-0.5">k</span>
+                  </div>
+                  <span>=</span>
+                  <div className="inline-flex flex-col items-center justify-center text-xs px-1 leading-none">
+                    <span className="border-b border-gray-900 pb-0.5">900</span>
+                    <span className="pt-0.5 font-sans">9 × 10<sup>9</sup></span>
+                  </div>
+                  <span>= 1 × 10<sup>-7</sup> F</span>
+                </div>
+              ) : activeScript.sampleAnswerMath ? (
+                <div className="font-sans text-xs md:text-sm font-bold text-gray-900 my-2 space-y-1 text-left leading-relaxed">
+                  <div>y = -√3 x - 1 কে y = mx + c এর সাথে তুলনা করে, m = -√3</div>
+                  <div>∴ tan θ = -√3</div>
+                  <div>⇒ θ = tan<sup>-1</sup>(-√3) = 120°</div>
+                </div>
+              ) : (
+                <div className="text-sm md:text-base font-bold text-[#1e4620] font-sans my-2">
+                  {activeScript.sampleAnswer}
+                </div>
+              )}
+
+              <div className="text-xs font-bold text-gray-900 mt-3 border-t border-[#c5e0b4]/60 pt-2">
+                {activeScript.version === 'English' ? 'Mark Distribution:' : 'নম্বর বণ্টন:'}
+              </div>
+              <div className="text-xs text-gray-800 mt-1 space-y-1 font-sans">
+                {activeScript.sampleAnswerNotes.map((note: string, idx: number) => {
+                  if (note.startsWith('[বি. দ্র.') || note.startsWith('[বি. দ্র:') || note.startsWith('[বি.দ্র.')) {
+                    return (
+                      <div key={idx} className="text-[11px] text-gray-600 mt-2 font-sans leading-relaxed">
+                        {note}
+                      </div>
+                    );
+                  }
+                  return <div key={idx}>{note}</div>;
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 1.5: Student's Doubt / Admin's Message (Matches Screenshot) */}
+          {(selectedReviewRow?.studentDoubt || selectedReviewRow?.adminDoubt || selectedReviewRow?.studentDoubtText) && (
+            <div className="bg-white border-2 border-red-500 rounded-lg p-3 shadow-sm text-left">
+              <div className="text-sm font-black text-gray-900 font-sans mb-2">
+                {selectedReviewRow?.isFromStudent ? "Student's Doubt :" : "Admin Note :"}
+              </div>
+              <div className="bg-[#fffbd5] border border-[#e6db55] rounded-md p-4 text-sm font-bold text-gray-800 font-sans leading-relaxed">
+                {selectedReviewRow?.studentDoubt || selectedReviewRow?.adminDoubt || selectedReviewRow?.studentDoubtText}
+              </div>
+            </div>
+          )}
+
+          {/* Section 2: Interactive drawing toolbar & script canvas */}
+          <div className="space-y-3">
+            {/* Toolbar (Matches Screenshot Exactly) */}
+            <div className="flex justify-center">
+              <div className="bg-[#f2f2f2] border-x border-t border-gray-200 flex items-center shadow-sm">
+                {/* Pencil Tool */}
+                <button
+                  type="button"
+                  onClick={() => setActiveDrawingTool('pencil')}
+                  className={`px-4 py-2.5 transition-all flex items-center justify-center border-r border-gray-300 ${activeDrawingTool === 'pencil' ? 'bg-[#c1c1c1]' : 'hover:bg-gray-200'}`}
+                  title="Pencil Tool / কলম"
+                >
+                  <Pencil className="w-6 h-6 text-[#ff0000] fill-[#ff0000]" />
+                </button>
+
+                {/* Text Tool */}
+                <button
+                  type="button"
+                  onClick={() => setActiveDrawingTool('comment')}
+                  className={`px-5 py-2.5 transition-all flex items-center justify-center border-r border-gray-300 ${activeDrawingTool === 'comment' ? 'bg-[#c1c1c1]' : 'hover:bg-gray-200'}`}
+                  title="Add Text / টেক্সট যোগ করুন"
+                >
+                  <span className="text-2xl font-black text-[#ff0000] italic font-serif leading-none select-none">T</span>
+                </button>
+
+                {/* Undo */}
+                <button
+                  type="button"
+                  onClick={handleUndo}
+                  disabled={actionHistory.length === 0}
+                  className="px-5 py-2.5 text-[#999] hover:bg-gray-200 disabled:opacity-30 transition-all border-r border-gray-300"
+                  title="Undo"
+                >
+                  <Undo2 className="w-7 h-7" />
+                </button>
+
+                {/* Redo */}
+                <button
+                  type="button"
+                  onClick={handleRedo}
+                  disabled={redoHistory.length === 0}
+                  className="px-5 py-2.5 text-[#999] hover:bg-gray-200 disabled:opacity-30 transition-all border-r border-gray-300"
+                  title="Redo"
+                >
+                  <Redo2 className="w-7 h-7" />
+                </button>
+
+                {/* Eraser */}
+                <button
+                  type="button"
+                  onClick={() => setActiveDrawingTool('eraser')}
+                  className="px-5 py-2.5 text-[#544f63] hover:bg-gray-200 transition-all border-r border-gray-300"
+                  title="Eraser"
+                >
+                  <Eraser className="w-7 h-7" />
+                </button>
+
+                {/* Reset / Rotate Icon */}
+                <button
+                  type="button"
+                  onClick={handleResetAll}
+                  className="px-5 py-2.5 text-[#544f63] hover:bg-gray-200 transition-all border-r border-gray-300"
+                  title="Reset All"
+                >
+                  <RotateCcw className="w-6 h-6" />
+                </button>
+
+                {/* Zoom In / Plus */}
+                <button
+                  type="button"
+                  onClick={() => setImageScale(prev => Math.min(3, prev + 0.2))}
+                  className="px-5 py-2.5 text-[#544f63] hover:bg-gray-200 transition-all border-r border-gray-300"
+                  title="Zoom In"
+                >
+                  <Plus className="w-7 h-7 stroke-[3]" />
+                </button>
+
+                {/* Zoom Out / Minus */}
+                <button
+                  type="button"
+                  onClick={() => setImageScale(prev => Math.max(0.5, prev - 0.2))}
+                  className="px-4 py-2.5 text-[#544f63] hover:bg-gray-200 transition-all"
+                  title="Zoom Out"
+                >
+                  <Minus className="w-8 h-8 stroke-[4]" />
+                </button>
+              </div>
+            </div>
+
+            {/* Script Paper Canvas Card */}
+            <div className="bg-white border-x border-b border-gray-200 border-t-0 border-dashed border-t-gray-400 p-4 pt-6 flex flex-col items-center justify-center relative overflow-hidden shadow-xs">
+              <div 
+                onClick={handleImageClick}
+                className="relative border border-dashed border-gray-300 bg-white transition-all duration-300 mx-auto"
+                style={{
+                  transform: `rotate(${studentPaperRotate}deg) scale(${imageScale})`,
+                  transformOrigin: 'center center',
+                  width: '100%',
+                  maxWidth: '520px',
+                  aspectRatio: '16/4.5'
+                }}
+              >
+                <img
+                  src={scriptImage}
+                  alt="Student Answer sheet"
+                  className="w-full h-full object-cover select-none pointer-events-none"
+                  referrerPolicy="no-referrer"
+                />
+
+                {/* Custom Handwriting / Overlay Annotations from the student script images */}
+                {activeScript.annotations && activeScript.annotations.map((anno: any, idx: number) => {
+                  if (anno.type === 'text') {
+                    return (
+                      <div 
+                        key={`anno-${idx}`}
+                        className="absolute select-none pointer-events-none font-handwriting leading-none"
+                        style={{
+                          top: `${anno.top}%`,
+                          left: `${anno.left}%`,
+                          fontSize: anno.fontSize || '16px',
+                          color: anno.fontColor || '#dc2626',
+                          fontWeight: anno.isBold ? 'bold' : 'normal',
+                          fontFamily: anno.fontFamily || 'var(--font-handwriting)',
+                          transform: anno.transform || 'translateY(-50%)',
+                          whiteSpace: 'nowrap',
+                          zIndex: 10
+                        }}
+                      >
+                        {anno.text}
+                      </div>
+                    );
+                  }
+                  if (anno.type === 'line') {
+                    return (
+                      <div 
+                        key={`anno-${idx}`}
+                        className="absolute select-none pointer-events-none"
+                        style={{
+                          top: `${anno.top}%`,
+                          left: `${anno.left}%`,
+                          width: `${anno.width}%`,
+                          height: `${anno.height || 2}px`,
+                          backgroundColor: anno.color || '#dc2626',
+                          transform: anno.angle ? `rotate(${anno.angle}deg)` : 'none',
+                          transformOrigin: 'left center',
+                          borderRadius: '1px',
+                          zIndex: 10
+                        }}
+                      />
+                    );
+                  }
+                  if (anno.type === 'circle') {
+                    return (
+                      <div 
+                        key={`anno-${idx}`}
+                        className="absolute select-none pointer-events-none"
+                        style={{
+                          top: `${anno.top}%`,
+                          left: `${anno.left}%`,
+                          width: `${anno.width}%`,
+                          height: `${anno.height}%`,
+                          border: `2.5px solid ${anno.color || '#dc2626'}`,
+                          borderRadius: '50%',
+                          transform: 'rotate(-3deg)',
+                          zIndex: 10
+                        }}
+                      />
+                    );
+                  }
+                  if (anno.type === 'tick') {
+                    return (
+                      <div 
+                        key={`anno-${idx}`}
+                        className="absolute select-none pointer-events-none font-sans font-black text-red-600 leading-none drop-shadow-sm"
+                        style={{
+                          top: `${anno.top}%`,
+                          left: `${anno.left}%`,
+                          fontSize: '32px',
+                          zIndex: 10
+                        }}
+                      >
+                        ✓
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+
+                {/* Responsive SVG Drawing & Overlay Layer */}
+                <svg
+                  viewBox="0 0 100 100"
+                  className="absolute inset-0 w-full h-full select-none"
+                  onMouseDown={handleCanvasMouseDown}
+                  onMouseMove={handleCanvasMouseMove}
+                  onMouseUp={handleCanvasMouseUp}
+                  style={{
+                    cursor: activeDrawingTool === 'pencil' ? 'crosshair' : activeDrawingTool === 'comment' ? 'cell' : 'default',
+                    pointerEvents: 'auto'
+                  }}
+                >
+                  {allPaths.map((pathStr, index) => (
+                    <path
+                      key={index}
+                      d={pathStr}
+                      fill="none"
+                      stroke="#dc2626"
+                      strokeWidth="0.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  ))}
+                  {currentPath && (
+                    <path
+                      d={currentPath}
+                      fill="none"
+                      stroke="#dc2626"
+                      strokeWidth="0.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  )}
+                </svg>
+
+                {/* Pin Comments Container */}
+                <div className="absolute inset-0 pointer-events-none">
+                  {scriptComments.map((comment, index) => (
+                    <div
+                      key={index}
+                      className="absolute group pointer-events-auto"
+                      style={{
+                        left: `${comment.x}%`,
+                        top: `${comment.y}%`,
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                    >
+                      {/* Floating Bubble Pin */}
+                      <div className="w-6 h-6 bg-amber-500 hover:bg-amber-600 border-2 border-white rounded-full flex items-center justify-center text-gray-900 text-[10px] font-black shadow-lg cursor-pointer transform hover:scale-110 transition-all duration-150">
+                        {index + 1}
+                      </div>
+
+                      {/* Tooltip Hover Box */}
+                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900/95 border border-gray-700 text-white p-3 rounded shadow-2xl z-50 text-xs min-w-[200px] leading-relaxed backdrop-blur-xs font-sans">
+                        <div className="font-bold text-amber-400 mb-1">Comment #{index + 1}:</div>
+                        <p className="text-gray-200">{comment.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+            </div>
+          </div>
+
+          {/* Section 3: Student metadata & Evaluation results */}
+          <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-xs text-left space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 text-xs text-gray-700 font-sans">
+              <div>
+                <span className="font-bold">Roll No :</span> {activeScript.rollNumber || '42182201462'}
+              </div>
+              <div className="sm:text-right">
+                <span className="font-bold">Registration No :</span> {activeScript.registrationNo || '5113810'}
+              </div>
+              <div className="col-span-1 sm:col-span-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-gray-100 pt-2.5 mt-1">
+                <div>
+                  <span className="font-bold">Examiner :</span> {activeScript.examinerName || '[21192] Fahim (2023)'} | <span className="font-bold">EvaluationTime :</span> {activeScript.evaluationTime || '2026-07-17 07:36 PM'}
+                  {(activeScript.reviewer || selectedReviewRow?.reviewer || selectedReviewRow?.adminId) && selectedReviewRow?.reviewStatus !== 'Not Reviewed' && (
+                    <div className="text-red-600 font-bold mt-1">
+                      Review By: {activeScript.reviewer || selectedReviewRow?.reviewer || selectedReviewRow?.adminId} ({activeScript.reviewTime || selectedReviewRow?.reviewTime || activeScript.reviewedTime || selectedReviewRow?.reviewedTime})
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setShowImageLog(prev => !prev)}
+                    className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-4 py-1.5 rounded text-xs font-bold transition-all shadow-xs cursor-pointer"
+                  >
+                    Image log
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Image Log Modal (Matches Screenshot Exactly) */}
+            <AnimatePresence>
+              {showImageLog && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 sm:p-6">
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col font-sans"
+                  >
+                    {/* Header */}
+                    <div className="bg-[#002d5b] text-white px-6 py-4 flex items-center justify-between shadow-md">
+                      <h3 className="text-base font-bold tracking-tight">Saq Image Log</h3>
+                      <button onClick={() => setShowImageLog(false)} className="text-white hover:text-gray-200 transition-colors cursor-pointer">
+                        <X className="w-6 h-6" />
+                      </button>
+                    </div>
+
+                    {/* Table Content */}
+                    <div className="flex-1 overflow-auto p-4 sm:p-6 bg-gray-50/50">
+                      <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
+                        <thead>
+                          <tr className="bg-gray-100/80 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
+                            <th className="px-6 py-4 text-center w-[30%]">Image</th>
+                            <th className="px-6 py-4 text-left w-[40%]">Details</th>
+                            <th className="px-6 py-4 text-left w-[30%]">User</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {/* Entry 1: Student Doubt / Admin Note */}
+                          {(selectedReviewRow?.studentDoubt || selectedReviewRow?.adminDoubt || selectedReviewRow?.studentDoubtText) && (
+                            <tr className="hover:bg-gray-50/50 transition-colors">
+                              <td className="px-6 py-6 text-center">
+                                <div className="bg-gray-50 rounded border border-gray-100 p-2 flex justify-center inline-block">
+                                  <img src={activeScript.scriptImage} className="max-h-40 object-contain rounded shadow-sm opacity-80" />
+                                </div>
+                                <div className="mt-2 text-center text-[10px] text-blue-500 font-medium truncate mx-auto max-w-[180px]">
+                                  review_annotated_rev01.png
+                                </div>
+                              </td>
+                              <td className="px-6 py-6 align-top">
+                                <div className={`inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase mb-3 border ${selectedReviewRow?.isFromStudent ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-purple-100 text-purple-700 border-purple-200'}`}>
+                                  {selectedReviewRow?.isFromStudent ? 'STUDENT DOUBT' : 'ADMIN NOTE'}
+                                </div>
+                                <div className="text-xs font-bold text-gray-800 mb-2 leading-relaxed">
+                                  Doubt / Note: <span className="text-purple-700 italic">"{selectedReviewRow?.studentDoubt || selectedReviewRow?.adminDoubt || selectedReviewRow?.studentDoubtText || "খাতাটি পুনঃ মূল্যায়ন করো।"}"</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-y-1.5 text-[11px] text-gray-600 mt-4">
+                                  <div><span className="font-bold">UniqueSet:</span> {activeScript.uniqueSet || '2'}</div>
+                                  <div><span className="font-bold">Question Serial:</span> {activeScript.questionSerial || '12'}</div>
+                                  <div><span className="font-bold">Obtained Marks:</span> <span className="text-blue-600 font-black">{activeScript.obtainedMarks || '1.00'}</span></div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-6 align-top space-y-2">
+                                <div className="text-[11px]"><span className="font-bold text-gray-700">Time:</span> {selectedReviewRow?.reviewTime || '08 Jul 2026 11:30 AM'}</div>
+                                <div className="text-[11px]"><span className="font-bold text-gray-700">Status:</span> Pending Resolution</div>
+                                <div className="text-[11px]"><span className="font-bold text-gray-700">ID:</span> FWD-001</div>
+                                <div className="mt-4">
+                                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Last Operation:</div>
+                                  <span className="text-purple-600 font-bold text-[11px] underline decoration-dotted cursor-pointer">ReviewRequestLogged</span>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+
+                          {/* Entry 2: Evaluated Script */}
+                          <tr className="hover:bg-gray-50/50 transition-colors">
+                            <td className="px-6 py-6 text-center">
+                              <div className="bg-gray-50 rounded border border-gray-100 p-2 flex justify-center inline-block">
+                                <img src={activeScript.scriptImage} className="max-h-40 object-contain rounded shadow-sm" />
+                              </div>
+                              <div className="mt-2 text-center text-[10px] text-blue-500 font-medium truncate mx-auto max-w-[180px]">
+                                anno_2_f46d82d6-b3a5-48db-8ef1-c92e29526190.jpg
+                              </div>
+                            </td>
+                            <td className="px-6 py-6 align-top">
+                              <div className="inline-block bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-black uppercase mb-3 border border-green-200">
+                                EVALUATED SCRIPT
+                              </div>
+                              <div className="text-[11px] text-gray-600 leading-relaxed max-w-xs mb-4">
+                                Graded with red ticks, corrections, annotations and examiner signature.
+                              </div>
+                              <div className="grid grid-cols-2 gap-y-1.5 text-[11px] text-gray-600 mt-4">
+                                <div><span className="font-bold">UniqueSet:</span> {activeScript.uniqueSet || '2'}</div>
+                                <div><span className="font-bold">Question Serial:</span> {activeScript.questionSerial || '12'}</div>
+                                <div><span className="font-bold">Original Marks:</span> <span className="text-green-700 font-black">{activeScript.obtainedMarks || '1.00'}</span></div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-6 align-top space-y-2">
+                              <div className="text-[11px]"><span className="font-bold text-gray-700">Time:</span> {activeScript.evaluationTime || '05 Jul, 2026 07:31 PM'}</div>
+                              <div className="text-[11px]"><span className="font-bold text-gray-700">Examiner:</span> {activeScript.examinerName || 'Junayad [17576]'}</div>
+                              <div className="text-[11px]"><span className="font-bold text-gray-700">Is Marked:</span> Yes</div>
+                              <div className="mt-4">
+                                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Last Operation:</div>
+                                <span className="text-green-600 font-bold text-[11px] underline decoration-dotted cursor-pointer">MarksEntryByTeacher</span>
+                              </div>
+                            </td>
+                          </tr>
+
+                          {/* Entry 3: Raw Script */}
+                          <tr className="hover:bg-gray-50/50 transition-colors">
+                            <td className="px-6 py-6 text-center">
+                              <div className="bg-gray-50 rounded border border-gray-100 p-2 flex justify-center inline-block">
+                                <img src={activeScript.scriptImage} className="max-h-40 object-contain rounded shadow-sm grayscale opacity-70" />
+                              </div>
+                              <div className="mt-2 text-center text-[10px] text-blue-500 font-medium truncate mx-auto max-w-[180px]">
+                                3_62d5c931-19fa-44c9-a324-85fd1408fd1a.jpg
+                              </div>
+                            </td>
+                            <td className="px-6 py-6 align-top">
+                              <div className="inline-block bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-black uppercase mb-3 border border-gray-200">
+                                RAW SCRIPT
+                              </div>
+                              <div className="text-[11px] text-gray-600 leading-relaxed max-w-xs mb-4">
+                                The original answer script uploaded directly from candidate scanning device. No examiner markings exist on this image.
+                              </div>
+                              <div className="grid grid-cols-2 gap-y-1.5 text-[11px] text-gray-600 mt-4">
+                                <div><span className="font-bold">UniqueSet:</span> {activeScript.uniqueSet || '2'}</div>
+                                <div><span className="font-bold">Question Serial:</span> {activeScript.questionSerial || '12'}</div>
+                                <div><span className="font-bold text-gray-700">Marks:</span> 0.00</div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-6 align-top space-y-2">
+                              <div className="text-[11px]"><span className="font-bold text-gray-700">Uploaded Time:</span> 05 Jul, 2026 07:21 PM</div>
+                              <div className="text-[11px]"><span className="font-bold text-gray-700">System Status:</span> Raw Scanned</div>
+                              <div className="text-[11px]"><span className="font-bold text-gray-700">Source:</span> scanned_qmaster_app</div>
+                              <div className="mt-4">
+                                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Last Operation:</div>
+                                <span className="text-gray-600 font-bold text-[11px] underline decoration-dotted cursor-pointer">NewUploaded</span>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="bg-white border-t border-gray-100 px-6 py-4 flex justify-end">
+                      <button 
+                        onClick={() => setShowImageLog(false)}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded shadow-sm text-xs transition-all uppercase tracking-widest cursor-pointer"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
+
+            {/* Obtained Marks Section */}
+            <div className="flex items-center space-x-2 border-t border-gray-100 pt-3">
+              <span className="text-sm font-bold text-gray-900 font-sans">Obtained:</span>
+              <input
+                type="text"
+                value={reviewObtainedMarks}
+                onChange={(e) => setReviewObtainedMarks(e.target.value)}
+                className="w-16 text-center bg-[#e6f4ea] border border-green-600 focus:border-green-800 text-green-900 focus:outline-none rounded py-1 px-1.5 font-bold text-sm font-mono"
+              />
+              <span className="text-sm font-bold text-gray-900 font-sans">/ {fullMarks}</span>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={handleSkipAndNext}
+                className="bg-[#4395d1] hover:bg-[#3484c0] text-white font-bold py-2.5 px-4 rounded text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+              >
+                {allPaths.length > initialPathCount ? "Update & Next" : "Skip & Next"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForwardToTeacher(prev => !prev);
+                  setForwardSingleChecked(true);
+                  setForwardMultipleChecked(false);
+                }}
+                className="bg-[#7030a0] hover:bg-[#5b2782] text-white font-bold py-2.5 px-4 rounded text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+              >
+                Forward to Teacher
+              </button>
+              <button
+                type="button"
+                onClick={handleBlank}
+                className="bg-[#ec971f] hover:bg-[#d58512] text-white font-bold py-2.5 px-4 rounded text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+              >
+                Blank
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveAndExit}
+                className="bg-[#c9302c] hover:bg-[#ac2925] text-white font-bold py-2.5 px-4 rounded text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+              >
+                Exit
+              </button>
+            </div>
+
+            {/* Section 4: Expanded "FORWARD TO TEACHER" Note & Filter Options (Matches Screenshot 2 exactly!) */}
+            {showForwardToTeacher && (
+              <div className="bg-[#f2ebf7]/40 border border-purple-200 rounded-lg p-5 mt-4 text-left transition-all duration-300">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-2 border-b border-purple-100">
+                  <h4 className="text-xs font-extrabold text-[#7030a0] uppercase tracking-wider font-sans">
+                    ADMIN NOTE TO TEACHER
+                  </h4>
+                  
+                  <div className="bg-[#f2ebf7] border border-purple-100 rounded-md p-1 px-2.5 flex items-center space-x-3.5 text-xs text-purple-900 font-sans select-none">
+                    <label className="flex items-center space-x-1.5 cursor-pointer font-bold">
+                      <input
+                        type="checkbox"
+                        checked={forwardSingleChecked}
+                        onChange={handleToggleSingle}
+                        className="w-3.5 h-3.5 text-purple-600 border-purple-300 rounded focus:ring-purple-500 cursor-pointer"
+                      />
+                      <span>Single</span>
+                    </label>
+                    <label className="flex items-center space-x-1.5 cursor-pointer font-bold">
+                      <input
+                        type="checkbox"
+                        checked={forwardMultipleChecked}
+                        onChange={handleToggleMultiple}
+                        className="w-3.5 h-3.5 text-purple-600 border-purple-300 rounded focus:ring-purple-500 cursor-pointer"
+                      />
+                      <span>Multiple</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <textarea
+                    value={forwardToTeacherText}
+                    onChange={(e) => setForwardToTeacherText(e.target.value)}
+                    placeholder="Enter your note for the teacher here... e.g. 'Please review the answer for question 3 again.'"
+                    className="w-full min-h-[100px] p-3 text-xs text-gray-800 bg-white border border-gray-300 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none resize-y"
+                  />
+                  
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForwardToTeacher(false);
+                        setForwardToTeacherText("");
+                      }}
+                      className="px-4 py-1.5 border border-gray-300 rounded text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSubmitForwardToTeacher}
+                      className="px-5 py-1.5 bg-[#7030a0] hover:bg-[#5b2782] text-white rounded text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderContent = () => {
+    if (showReviewWorkspace && selectedReviewRow) {
+      return renderReviewWorkspace();
+    }
+
     if (showingAdminDetailRow) {
       return (
         <div className="flex-1 bg-gray-50/30 overflow-y-auto px-6 py-8 text-left">
@@ -2098,6 +3418,7 @@ export default function App() {
                           onClick={() => {
                             setSelectedReviewRow(showingAdminDetailRow);
                             setShowingAdminDetailRow(null);
+                            setShowReviewWorkspace(true);
                           }}
                           className="bg-[#337ab7] hover:bg-[#286090] text-white px-4 py-1.5 rounded text-[11px] font-bold transition-all shadow-xs"
                         >
@@ -5937,172 +7258,8 @@ export default function App() {
         return true;
       });
 
-      const programWiseSearchData = [
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'NDC & SJC All Service',
-          examSubject: '[126] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'Bangla',
-          question: 'Unique Set: 1, Question Serial: 1',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 941,
-          reviewStatus: 'Not Reviewed'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'NDC & SJC All Service',
-          examSubject: '[126] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'English',
-          question: 'Unique Set: 1, Question Serial: 1',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 99,
-          reviewStatus: 'Reviewed',
-          adminId: 'faisal.7402@udvash.net'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'HCC All Service',
-          examSubject: '[102] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'Bangla',
-          question: 'Unique Set: 1, Question Serial: 1',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 419,
-          reviewStatus: 'Rechecked from Student',
-          adminId: 'Suja.7146@udvash.net'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'NDC & SJC All Service',
-          examSubject: '[126] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'Bangla',
-          question: 'Unique Set: 1, Question Serial: 2',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 1059,
-          reviewStatus: 'Rechecked from Admin',
-          adminId: 'nazmul.2853@udvash.net'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'NDC & SJC All Service',
-          examSubject: '[126] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'English',
-          question: 'Unique Set: 1, Question Serial: 2',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 115,
-          reviewStatus: 'Not Reviewed'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'HCC All Service',
-          examSubject: '[102] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'Bangla',
-          question: 'Unique Set: 1, Question Serial: 2',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 488,
-          reviewStatus: 'Reviewed',
-          adminId: 'yeasin.9206@udvash.net'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'NDC & SJC All Service',
-          examSubject: '[126] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'Bangla',
-          question: 'Unique Set: 1, Question Serial: 3',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 1059,
-          reviewStatus: 'Not Reviewed'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'NDC & SJC All Service',
-          examSubject: '[126] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'English',
-          question: 'Unique Set: 1, Question Serial: 3',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 111,
-          reviewStatus: 'Rechecked from Student',
-          adminId: 'nazmul.2853@udvash.net'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'HCC All Service',
-          examSubject: '[102] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'Bangla',
-          question: 'Unique Set: 1, Question Serial: 3',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 492,
-          reviewStatus: 'Rechecked from Admin',
-          adminId: 'nazmul.7413@udvash.net'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'NDC & SJC All Service',
-          examSubject: '[126] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'Bangla',
-          question: 'Unique Set: 1, Question Serial: 4',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 954,
-          reviewStatus: 'Reviewed',
-          adminId: 'faisal.7402@udvash.net'
-        },
-        {
-          program: 'College Admission Program',
-          session: '2026',
-          course: 'NDC & SJC All Service',
-          examSubject: '[126] - (Physics)',
-          examType: 'Online Written',
-          evaluationType: 'Regular',
-          version: 'Bangla',
-          question: 'Unique Set: 1, Question Serial: 7',
-          minMarks: '0',
-          maxMarks: '1',
-          totalScript: 1210,
-          reviewStatus: 'Not Reviewed'
-        }
-      ];
-
       // Filter rows dynamically based on the form values
-      const filteredSearchRows = programWiseSearchData.filter(row => {
+      const filteredSearchRows = adminReviewRows.filter(row => {
         if (reviewFilters.program !== 'All Program' && row.program !== reviewFilters.program) return false;
         if (reviewFilters.session !== 'All Session' && row.session !== reviewFilters.session) return false;
         if (reviewFilters.version !== 'All Version' && row.version !== reviewFilters.version) return false;
@@ -6118,7 +7275,6 @@ export default function App() {
         if (reviewFilters.reviewStatus !== 'All' && row.reviewStatus !== reviewFilters.reviewStatus) return false;
         return true;
       });
-
       if (reviewFilters.orderBy === 'Question Serial') {
         filteredSearchRows.sort((a, b) => {
           const matchQA = a.question.match(/Question Serial:\s*(\d+)/i);
@@ -6599,16 +7755,29 @@ export default function App() {
                             {row.totalScript}
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <button 
-                              onClick={() => {
-                                setSelectedReviewRow({ ...row, suppressNotes: true });
-                                setShowReviewWorkspace(true);
-                              }}
-                              className="bg-[#4395d1] hover:bg-[#3484c0] text-white text-[11px] font-bold px-3 py-1 rounded transition-colors shadow-xs font-sans whitespace-nowrap"
-                            >
-                              Review All
-                            </button>
-                          </td>
+                              <button 
+                                onClick={() => {
+                                  const subjectLower = ((row as any).subject || row.examSubject || "").toLowerCase();
+                                  const questionText = (row.question || "").toLowerCase();
+                                  let startIdx = 0;
+                                  if (subjectLower.includes('physics') || questionText.includes('900m')) {
+                                    startIdx = 1;
+                                  } else if (subjectLower.includes('english') || questionText.includes('principal') || row.version === 'English') {
+                                    startIdx = 2;
+                                  } else if (subjectLower.includes('math') || questionText.includes('√3') || questionText.includes('x অক্ষের')) {
+                                    startIdx = 3;
+                                  }
+                                  setActiveScriptIdx(startIdx);
+                                  setReviewObtainedMarks(reviewScripts[startIdx]?.obtainedMarks || "0.00");
+                                  
+                                  setSelectedReviewRow({ ...row, suppressNotes: true });
+                                  setShowReviewWorkspace(true);
+                                }}
+                                className="bg-[#4395d1] hover:bg-[#3484c0] text-white text-[11px] font-bold px-3 py-1 rounded transition-colors shadow-xs font-sans whitespace-nowrap"
+                              >
+                                Review All
+                              </button>
+                            </td>
                         </tr>
                       ))
                     )}
@@ -7175,7 +8344,8 @@ export default function App() {
                                         subject: req.subject.replace(/\[.*\]/, '').trim(),
                                         adminCommentText: req.note || "খাতাটি পুনঃ মূল্যায়ন করো।",
                                         adminDoubt: req.note || "খাতাটি পুনঃ মূল্যায়ন করো।",
-                                        isFromStudent: false,
+                                        studentDoubt: req.studentDoubt || "corner e dekhen cross and the likhsi",
+                                        isFromStudent: true,
                                         totalScript: '124',
                                         minMarks: req.minMarks || '0.5',
                                         reviewStatus: req.reviewRequest || req.status || 'Not Reviewed',
@@ -7184,7 +8354,7 @@ export default function App() {
                                         examType: req.examType || 'Online Written',
                                         version: req.version || 'Bangla'
                                       };
-                                      setSelectedReviewRow(constructed);
+                                      setShowingAdminDetailRow(constructed);
                                       setShowReviewWorkspace(false);
                                     }}
                                     className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-2.5 py-1 rounded text-[10.5px] font-bold transition-all shadow-xs"
@@ -7266,7 +8436,8 @@ export default function App() {
                               <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
                                 <div>${req.exam}</div>
                                 <div className="text-[9.5px] text-gray-400 font-mono mt-0.5">${req.examType}</div>
-                              </td>                    <td className="border-r border-gray-200 px-2.5 py-3 text-center">
+                              </td>
+                              <td className="border-r border-gray-200 px-2.5 py-3 text-center">
                                 <span className="inline-block bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded font-bold font-mono text-[10px]">
                                   {req.adminId || 'A-102'}
                                 </span>
@@ -7339,7 +8510,7 @@ export default function App() {
                                         examType: req.examType || 'Online Written',
                                         version: req.version || 'Bangla'
                                       };
-                                      setSelectedReviewRow(constructed);
+                                      setShowingAdminDetailRow(constructed);
                                       setShowReviewWorkspace(false);
                                     }}
                                     className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-2.5 py-1 rounded text-[10.5px] font-bold transition-all shadow-xs"
@@ -7571,7 +8742,13 @@ export default function App() {
             >
               <Menu className="w-5 h-5 text-white" />
             </button>
-            <div className="flex flex-col items-start leading-none group cursor-pointer" onClick={() => setActiveSidebarItem('admin-dash')}>
+            <div className="flex flex-col items-start leading-none group cursor-pointer" onClick={() => {
+              setActiveSidebarItem('admin-dash');
+              setShowReviewWorkspace(false);
+              setSelectedReviewRow(null);
+              setShowForwardToTeacher(false);
+              setShowImageLog(false);
+            }}>
               <span className="text-xl font-bold tracking-tight text-white font-sans">ORG</span>
               <span className="text-[10px] text-blue-200 font-sans">v223.8</span>
             </div>
@@ -7584,6 +8761,10 @@ export default function App() {
                   id={`nav-${tab.toLowerCase()}`}
                   onClick={() => {
                     setActiveTab(tab);
+                    setShowReviewWorkspace(false);
+                    setSelectedReviewRow(null);
+                    setShowForwardToTeacher(false);
+                    setShowImageLog(false);
                     // auto-select first item
                     const items = sidebarItemsMap[tab] || [];
                     if (items.length > 0) {
@@ -7649,6 +8830,10 @@ export default function App() {
                           key={tab}
                           onClick={() => {
                             setActiveTab(tab);
+                            setShowReviewWorkspace(false);
+                            setSelectedReviewRow(null);
+                            setShowForwardToTeacher(false);
+                            setShowImageLog(false);
                             setIsProfileOpen(false);
                             const items = sidebarItemsMap[tab] || [];
                             if (items.length > 0) {
@@ -7721,6 +8906,10 @@ export default function App() {
                       id={`sidebar-item-${item.id}`}
                       onClick={() => {
                         setSelectedDashboardDetail(null);
+                        setShowReviewWorkspace(false);
+                        setSelectedReviewRow(null);
+                        setShowForwardToTeacher(false);
+                        setShowImageLog(false);
                         setActiveSidebarItem(item.id);
                         setExpandedItemId(prev => prev === item.id ? null : item.id);
                         if (item.subItems && item.subItems.length > 0) {
@@ -7752,6 +8941,10 @@ export default function App() {
                               key={sub.id}
                               onClick={() => {
                                 setSelectedDashboardDetail(null);
+                                setShowReviewWorkspace(false);
+                                setSelectedReviewRow(null);
+                                setShowForwardToTeacher(false);
+                                setShowImageLog(false);
                                 setActiveSubItem(sub.id);
                               }}
                               className={`w-full text-left px-3 py-1.5 text-xs rounded transition-colors ${
@@ -7822,6 +9015,10 @@ export default function App() {
                         <button
                           onClick={() => {
                             setSelectedDashboardDetail(null);
+                            setShowReviewWorkspace(false);
+                            setSelectedReviewRow(null);
+                            setShowForwardToTeacher(false);
+                            setShowImageLog(false);
                             setActiveSidebarItem(item.id);
                             setExpandedItemId(prev => prev === item.id ? null : item.id);
                             if (item.subItems && item.subItems.length > 0) {
@@ -7846,6 +9043,10 @@ export default function App() {
                                 key={sub.id}
                                 onClick={() => {
                                   setSelectedDashboardDetail(null);
+                                  setShowReviewWorkspace(false);
+                                  setSelectedReviewRow(null);
+                                  setShowForwardToTeacher(false);
+                                  setShowImageLog(false);
                                   setActiveSubItem(sub.id);
                                   setIsMobileSidebarOpen(false);
                                 }}
