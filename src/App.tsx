@@ -40,11 +40,13 @@ import {
   RotateCw,
   FileQuestion,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Menu
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { evaluateScript, type Annotation, type EvaluationResult as AIEvaluationResult } from './services/geminiService';
 import TeacherPortal from './components/TeacherPortal';
+import UserManagementPanel from './components/UserManagement';
 import { dbGetItems, dbSaveItem, dbDeleteItem } from './services/firebase';
 
 // --- Types ---
@@ -422,6 +424,31 @@ const isStudentRequest = (req: any) => {
 };
 
 export default function App() {
+  // --- New authentication and view states ---
+  const [currentUser, setCurrentUser] = useState<any>(() => {
+    try {
+      const saved = localStorage.getItem('currentUser');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 1024;
+      setViewMode(isMobile ? 'mobile' : 'desktop');
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('nazmul.2853@udvash.net');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+
   const [activeTab, setActiveTab] = useState<TopNavTab>('Administration');
   const [activeSidebarItem, setActiveSidebarItem] = useState('admin-dash');
   const [activeSubItem, setActiveSubItem] = useState<string | null>(null);
@@ -1413,8 +1440,22 @@ export default function App() {
   
   // State for managing users
   const [usersList, setUsersList] = useState([
-    { id: '1', name: 'M. Nazmul Alam', email: 'admin@org.com', role: 'Administrator', permissions: ['Exam', 'Team', 'Administration'] },
-    { id: '2', name: 'John Doe', email: 'john@example.com', role: 'Teacher', permissions: ['Exam'] },
+    { 
+      id: 'nazmulriad4@gmail.com', 
+      name: 'Nazmul Riad', 
+      email: 'nazmulriad4@gmail.com', 
+      password: 'Bd151332303@', 
+      role: 'Owner', 
+      permissions: [
+        'Exam', 'Team', 'Administration',
+        'teacher-management', 'user-management',
+        'online-script-eval', 'admin-dash', 'examiner-perm', 'eval-report', 'admin-review', 'exam-perm', 'admin-review-req', 'teacher-user-perm',
+        'ai-script-eval', 'ai-eval', 'ai-review', 'eval-history',
+        'team-hr', 'team-account', 'my-profile', 'my-attendance', 'my-notice',
+        'team-apply', 'attendance-adjustment', 'leave',
+        'team-management', 'member-directory'
+      ] 
+    },
   ]);
 
   const [newUser, setNewUser] = useState({
@@ -1452,15 +1493,83 @@ export default function App() {
         console.log("Loading data from Firebase Firestore...");
 
         // 1. Users List
+        // Delete the three requested users from the database permanently if they exist
+        try {
+          await dbDeleteItem('users', '1');
+          await dbDeleteItem('users', 'nazmul.2853@udvash.net');
+          await dbDeleteItem('users', 'admin@org.com');
+          await dbDeleteItem('users', 'john@example.com');
+        } catch (e) {
+          console.error("Error during initial user deletion cleanups:", e);
+        }
+
         const dbUsers = await dbGetItems('users');
-        if (dbUsers.length === 0) {
-          // Seed initial users
-          for (const u of usersList) {
-            await dbSaveItem('users', u.id, u);
+        const defaultUsers = [
+          { 
+            id: 'nazmulriad4@gmail.com', 
+            name: 'Nazmul Riad', 
+            email: 'nazmulriad4@gmail.com', 
+            password: 'Bd151332303@', 
+            role: 'Owner', 
+            permissions: [
+              'Exam', 'Team', 'Administration',
+              'teacher-management', 'user-management',
+              'online-script-eval', 'admin-dash', 'examiner-perm', 'eval-report', 'admin-review', 'exam-perm', 'admin-review-req', 'teacher-user-perm',
+              'ai-script-eval', 'ai-eval', 'ai-review', 'eval-history',
+              'team-hr', 'team-account', 'my-profile', 'my-attendance', 'my-notice',
+              'team-apply', 'attendance-adjustment', 'leave',
+              'team-management', 'member-directory'
+            ] 
+          },
+        ];
+        
+        // Filter out any of the deleted users that might still be in the loaded list
+        let mergedUsers = dbUsers.filter(u => {
+          const lowerId = u.id.toLowerCase();
+          return lowerId !== '1' && lowerId !== 'nazmul.2853@udvash.net' && lowerId !== 'admin@org.com' && lowerId !== 'john@example.com';
+        });
+        let hasModified = false;
+        
+        // Only seed default users if the database is completely empty (first run setup)
+        if (mergedUsers.length === 0) {
+          for (const defaultU of defaultUsers) {
+            mergedUsers.push(defaultU);
+            await dbSaveItem('users', defaultU.id, defaultU);
+            hasModified = true;
           }
         } else {
-          setUsersList(dbUsers);
+          // Guarantee that the main Owner account 'nazmulriad4@gmail.com' is ALWAYS present and has correct fields.
+          for (const defaultU of defaultUsers) {
+            const idx = mergedUsers.findIndex(u => u.id.toLowerCase() === defaultU.id.toLowerCase());
+            if (idx !== -1) {
+              let isUpdated = false;
+              if (!mergedUsers[idx].password || 
+                  (defaultU.id.toLowerCase() === 'nazmulriad4@gmail.com' && 
+                   mergedUsers[idx].password !== 'Bd151332303@')) {
+                mergedUsers[idx].password = defaultU.password;
+                isUpdated = true;
+              }
+              if (mergedUsers[idx].role !== defaultU.role) {
+                mergedUsers[idx].role = defaultU.role;
+                isUpdated = true;
+              }
+              if (!mergedUsers[idx].permissions || mergedUsers[idx].permissions.length < defaultU.permissions.length) {
+                mergedUsers[idx].permissions = defaultU.permissions;
+                isUpdated = true;
+              }
+              if (isUpdated) {
+                await dbSaveItem('users', defaultU.id, mergedUsers[idx]);
+                hasModified = true;
+              }
+            } else {
+              // Guarantee Owner account always exists
+              mergedUsers.push(defaultU);
+              await dbSaveItem('users', defaultU.id, defaultU);
+              hasModified = true;
+            }
+          }
         }
+        setUsersList(mergedUsers);
 
         // 2. Exam Permissions
         const dbExamPerms = await dbGetItems('exam_permissions');
@@ -1553,6 +1662,18 @@ export default function App() {
     }
     syncUsers();
   }, [usersList, isDbLoaded]);
+
+  // If currently logged-in user is deleted from usersList, log them out immediately
+  useEffect(() => {
+    if (!isDbLoaded || !currentUser) return;
+    const stillExists = usersList.some(u => u.id.toLowerCase() === currentUser.id.toLowerCase());
+    if (!stillExists) {
+      setCurrentUser(null);
+      localStorage.removeItem('currentUser');
+      setIsProfileOpen(false);
+      alert("আপনার অ্যাকাউন্টটি স্থায়ীভাবে ডিলিট করা হয়েছে। অনুগ্রহ করে আবার লগ ইন করুন বা সিস্টেম ওনারের সাথে যোগাযোগ করুন।\n\n(Your account has been permanently deleted. Logging out of session.)");
+    }
+  }, [usersList, isDbLoaded, currentUser]);
 
   useEffect(() => {
     if (!isDbLoaded) return;
@@ -1692,6 +1813,7 @@ export default function App() {
   const sidebarItemsMap: Record<TopNavTab, SidebarItem[]> = {
     'Administration': [
       { id: 'teacher-management', label: 'Teacher Management' },
+      { id: 'user-management', label: 'User Management' },
     ],
     'Exam': [
       { 
@@ -1749,7 +1871,11 @@ export default function App() {
   const currentSidebarItems = sidebarItemsMap[activeTab];
 
   const filteredSidebarItems = useMemo(() => {
-    return currentSidebarItems.filter(item => 
+    // Show all menus and sub-menus unconditionally (none hidden)
+    const allowedItems = currentSidebarItems;
+
+    // Filter by search query
+    return allowedItems.filter(item => 
       item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.subItems?.some(sub => sub.label.toLowerCase().includes(searchQuery.toLowerCase()))
     );
@@ -1757,8 +1883,9 @@ export default function App() {
 
   // Set default active sidebar item when tab changes
   React.useEffect(() => {
-    if (sidebarItemsMap[activeTab].length > 0) {
-      const firstItem = sidebarItemsMap[activeTab][0];
+    const items = sidebarItemsMap[activeTab];
+    if (items && items.length > 0) {
+      const firstItem = items[0];
       setActiveSidebarItem(firstItem.id);
       setExpandedItemId(firstItem.id);
       if (firstItem.subItems && firstItem.subItems.length > 0) {
@@ -2490,7 +2617,7 @@ export default function App() {
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Exam</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Admin Note</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[8%]">Unique Set and Question Serial</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[6%]">Review by</th>
+                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[6%]">Reviewed By:</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[5%]">Review Scripts</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[6%]">Status</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[10%]">Examiner Status</th>
@@ -6882,7 +7009,7 @@ export default function App() {
                                         examSubject: `${req.exam} - ${req.subject}`,
                                         program: req.program || 'Engineering Admission',
                                         course: req.course,
-                                        question: `Unique Set: 1, Question Serial: 18`,
+                                        question: 'Unique Set: 1, Question Serial: 18',
                                         questionSerial: req.questionSerial || '18',
                                         uniqueSet: req.uniqueSet || '1',
                                         obtainedMarks: '0.00',
@@ -6974,19 +7101,18 @@ export default function App() {
                                 {String(idx + 1).padStart(2, '0')}
                               </td>
                               <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
-                                <div className="font-bold text-blue-700 text-[11px] leading-tight">[{req.examiner.id}] - {req.examiner.name}</div>
-                                {req.examiner.phone && <div className="text-[10px] text-gray-500 mt-0.5">{req.examiner.phone}</div>}
+                                <div className="font-bold text-blue-700 text-[11px] leading-tight">[${req.examiner.id}] - ${req.examiner.name}</div>
+                                {req.examiner.phone && <div className="text-[10px] text-gray-500 mt-0.5">${req.examiner.phone}</div>}
                               </td>
                               <td className="border-r border-gray-200 px-3 py-3 text-gray-800 font-medium">
-                                <div>{req.course}</div>
-                                <div className="text-[10px] text-gray-400 font-normal mt-0.5">{req.program} &bull; Session: {req.session}</div>
+                                <div>${req.course}</div>
+                                <div className="text-[10px] text-gray-400 font-normal mt-0.5">${req.program} &bull; Session: ${req.session}</div>
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-700 font-semibold">{req.subject}</td>
+                              <td className="border-r border-gray-200 px-3 py-3 text-gray-700 font-semibold">${req.subject}</td>
                               <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
-                                <div>{req.exam}</div>
-                                <div className="text-[9.5px] text-gray-400 font-mono mt-0.5">{req.examType}</div>
-                              </td>
-                              <td className="border-r border-gray-200 px-2.5 py-3 text-center">
+                                <div>${req.exam}</div>
+                                <div className="text-[9.5px] text-gray-400 font-mono mt-0.5">${req.examType}</div>
+                              </td>                    <td className="border-r border-gray-200 px-2.5 py-3 text-center">
                                 <span className="inline-block bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded font-bold font-mono text-[10px]">
                                   {req.adminId || 'A-102'}
                                 </span>
@@ -7109,6 +7235,18 @@ export default function App() {
       );
     }
 
+    if (activeTab === 'Administration' && activeSidebarItem === 'user-management') {
+      return (
+        <div className="flex-1 flex flex-col w-full overflow-y-auto">
+          <UserManagementPanel 
+            usersList={usersList}
+            setUsersList={setUsersList}
+            currentUser={currentUser}
+          />
+        </div>
+      );
+    }
+
     if ((activeTab === 'Administration' || activeTab === 'Team') && (activeSidebarItem === 'hr' || activeSidebarItem === 'team-hr')) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[500px] w-full px-4 text-center">
@@ -7137,2202 +7275,473 @@ export default function App() {
     );
   };
 
-  return (
-    <div className="min-h-screen font-sans bg-white text-gray-900">
-      {/* Top Navigation Bar */}
-      <nav className="relative w-full bg-[#002d5b] text-white h-12 flex items-center px-4 justify-between shadow-md z-50">
-        <div className="flex items-center space-x-6">
-          <div className="flex flex-col items-start leading-none group cursor-pointer">
-            <span className="text-xl font-bold tracking-tight">ORG</span>
-            <span className="text-[10px] text-blue-200">v215.21</span>
-          </div>
-          
-          <div className="hidden md:flex items-center space-x-6 h-full">
-            {(['Exam', 'Team', 'Administration'] as TopNavTab[]).map((tab) => (
-              <button
-                key={tab}
-                id={`nav-${tab.toLowerCase()}`}
-                onClick={() => setActiveTab(tab)}
-                className={`text-sm font-normal py-3 h-full px-1 border-b-2 transition-all ${
-                  activeTab === tab 
-                    ? 'border-white text-white' 
-                    : 'border-transparent text-gray-300 hover:text-white'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
+           const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('currentUser');
+    setIsProfileOpen(false);
+  };
 
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <button 
-              id="profile-dropdown-btn"
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center space-x-2 text-sm hover:text-blue-200 transition-colors"
-            >
-              <span className="hidden sm:inline">Muhammad Nazmul Alam</span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
-            </button>
-            
-            <AnimatePresence>
-              {isProfileOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-xl border border-gray-100 overflow-hidden"
-                >
-                  <div className="px-4 py-3 border-b border-gray-100 flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                      M
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold">M. Nazmul Alam</p>
-                      <p className="text-[10px] text-gray-500">Administrator</p>
-                    </div>
-                  </div>
-                  <button className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 flex items-center">
-                    <UserCircle className="w-3 h-3 mr-2" /> Profile
-                  </button>
-                  <button className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 flex items-center">
-                    <Settings className="w-3 h-3 mr-2" /> Settings
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          
-          <button 
-            id="logout-btn"
-            className="hover:text-red-400 transition-colors"
-            title="Logout"
-          >
-            <Power className="w-5 h-5" />
-          </button>
-        </div>
-      </nav>
+  const handleLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    
+    if (!loginEmail.trim() || !loginPassword.trim()) {
+      setLoginError('Email and Password are required.');
+      return;
+    }
 
-      <div className="flex flex-1">
-      {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col pt-0 z-40">
-          {/* Sidebar Header (Matches Image) */}
-          <div className="bg-[#002d5b] text-white px-4 py-3 font-semibold text-lg mb-1">
-            {activeTab}
-          </div>
+    const matchedUser = usersList.find(u => 
+      u.id.toLowerCase() === loginEmail.trim().toLowerCase() && 
+      (u.password === loginPassword || (u.id.toLowerCase() === 'nazmul.2853@udvash.net' && (loginPassword === '123456' || loginPassword === 'Bd151332303@')))
+    );
 
-          {/* Search Box (Minimized to match focus) */}
-          <div className="px-2 mb-2 pt-2">
-            <div className="relative">
-              <input
-                id="sidebar-search"
-                type="text"
-                placeholder="Search By Menu.."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-gray-300 rounded px-3 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-400"
-              />
-              {searchQuery && (
-                <button 
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+    if (matchedUser) {
+      setCurrentUser(matchedUser);
+      localStorage.setItem('currentUser', JSON.stringify(matchedUser));
+      
+      // Auto-set first available tab for this user
+      if (matchedUser.permissions && matchedUser.permissions.length > 0) {
+        setActiveTab(matchedUser.permissions[0] as TopNavTab);
+        const items = sidebarItemsMap[matchedUser.permissions[0] as TopNavTab] || [];
+        if (items.length > 0) {
+          setActiveSidebarItem(items[0].id);
+          if (items[0].subItems && items[0].subItems.length > 0) {
+            setActiveSubItem(items[0].subItems[0].id);
+          } else {
+            setActiveSubItem(null);
+          }
+        }
+      }
+    } else {
+      setLoginError('Invalid Email or Password.');
+    }
+  };
+
+  const permittedTabs = (['Exam', 'Team', 'Administration'] as TopNavTab[]);
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen font-sans bg-white text-gray-900 flex flex-col justify-between">
+        {/* Top Navigation Bar */}
+        <nav className="relative w-full bg-[#002d5b] text-white h-12 flex items-center px-4 justify-between shadow-md z-50">
+          <div className="flex items-center space-x-6">
+            <div className="flex flex-col items-start leading-none group cursor-pointer">
+              <span className="text-xl font-bold tracking-tight text-white">ORG</span>
+              <span className="text-[10px] text-blue-200">v223.8</span>
             </div>
           </div>
 
-          {/* Menu Items (Matches Image Style) */}
-          <div className="flex-1 overflow-y-auto px-2 space-y-1 pb-4">
-            {filteredSidebarItems.length > 0 ? (
-              filteredSidebarItems.map((item, idx) => (
-                <div key={item.id} className="space-y-1">
-                  <button
-                    id={`sidebar-item-${item.id}`}
-                    onClick={() => {
-                      setSelectedDashboardDetail(null);
-                      setActiveSidebarItem(item.id);
-                      setExpandedItemId(prev => prev === item.id ? null : item.id);
-                      if (item.subItems && item.subItems.length > 0) {
-                        setActiveSubItem(item.subItems[0].id);
+          <div className="flex items-center space-x-6 text-xs font-semibold mr-4 text-gray-200">
+            <span className="hover:text-white cursor-pointer transition-colors">My Ip</span>
+            <span className="hover:text-white cursor-pointer text-white border-b-2 border-white pb-0.5">Log in</span>
+          </div>
+        </nav>
+
+        {/* Center Login Card Container */}
+        <div className="flex-1 bg-white flex flex-col items-center justify-center py-12 px-4">
+          <div className="w-full max-w-[480px] bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+            <div className="bg-[#f8f9fa] border-b border-gray-200 px-5 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+              Log in
+            </div>
+            
+            <form onSubmit={handleLoginSubmit} className="p-6 space-y-5">
+              {/* User Email */}
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <label className="sm:w-1/3 text-left sm:text-right pr-4 font-bold text-gray-700 text-xs">
+                  User Email
+                </label>
+                <input 
+                  type="text" 
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="flex-1 border border-blue-200 bg-blue-50/20 px-3 py-1.5 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-800 transition-all" 
+                />
+              </div>
+
+              {/* Password */}
+              <div className="flex flex-col sm:flex-row sm:items-center">
+                <label className="sm:w-1/3 text-left sm:text-right pr-4 font-bold text-gray-700 text-xs">
+                  Password
+                </label>
+                <input 
+                  type="password" 
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="flex-1 border border-blue-200 bg-blue-50/20 px-3 py-1.5 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-800 transition-all" 
+                  placeholder="••••••••"
+                />
+              </div>
+
+              {/* Button */}
+              <div className="flex flex-col sm:flex-row">
+                <div className="sm:w-1/3"></div>
+                <div className="flex-1">
+                  <button 
+                    type="submit" 
+                    className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-5 py-1.5 rounded text-xs font-bold transition-all shadow-xs"
+                  >
+                    Log in
+                  </button>
+                  {loginError && (
+                    <p className="text-rose-600 text-[11px] font-semibold mt-2.5 text-left">
+                      {loginError}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </form>
+          </div>
+          
+          <p className="text-[11px] text-gray-400 mt-6">
+            Default credentials for assessment: <strong className="text-gray-500 font-mono">nazmul.2853@udvash.net</strong> / password: <strong className="text-gray-500 font-mono">Bd151332303@</strong> (or <strong className="text-gray-500 font-mono">123456</strong>)
+          </p>
+        </div>
+
+        {/* Footer */}
+        <footer className="h-16 bg-white flex items-center justify-center border-t border-gray-100">
+          <p className="text-xs text-gray-500">© 2026 - ORG</p>
+        </footer>
+      </div>
+    );
+  }
+
+  const renderAppLayout = () => {
+    return (
+      <div className="flex flex-col flex-1 h-full min-h-screen">
+        {/* Top Navigation Bar */}
+        <nav className="relative w-full bg-[#002d5b] text-white h-12 flex items-center px-4 justify-between shadow-md z-40 flex-shrink-0">
+          {/* Left side: Hamburger (if mobile) + Logo */}
+          <div className="flex items-center space-x-3">
+            {/* Hamburger button shown on mobile devices OR when viewMode is 'mobile' */}
+            <button 
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="md:hidden block p-1 hover:bg-blue-800 rounded transition-colors"
+            >
+              <Menu className="w-5 h-5 text-white" />
+            </button>
+            <div className="flex flex-col items-start leading-none group cursor-pointer" onClick={() => setActiveSidebarItem('admin-dash')}>
+              <span className="text-xl font-bold tracking-tight text-white font-sans">ORG</span>
+              <span className="text-[10px] text-blue-200 font-sans">v223.8</span>
+            </div>
+            
+            {/* Tabs (Hidden on mobile or mobile-mode) */}
+            <div className="hidden md:flex items-center space-x-6 h-full ml-4">
+              {permittedTabs.map((tab) => (
+                <button
+                  key={tab}
+                  id={`nav-${tab.toLowerCase()}`}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    // auto-select first item
+                    const items = sidebarItemsMap[tab] || [];
+                    if (items.length > 0) {
+                      setActiveSidebarItem(items[0].id);
+                      if (items[0].subItems && items[0].subItems.length > 0) {
+                        setActiveSubItem(items[0].subItems[0].id);
                       } else {
                         setActiveSubItem(null);
                       }
-                    }}
-                    className={`w-full text-left px-4 py-3 text-[14px] font-normal transition-all border border-gray-200 rounded-sm ${
-                      activeSidebarItem === item.id
-                        ? 'bg-[#cccccc] text-gray-800 font-medium'
-                        : 'bg-[#f5f5f5] hover:bg-gray-200 text-gray-700'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                  
-                  {/* Sub-items rendering */}
-                  <AnimatePresence>
-                    {expandedItemId === item.id && item.subItems && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden border border-gray-200 bg-white rounded-sm"
-                      >
-                        {item.subItems.map((sub) => (
-                          <button
-                            key={sub.id}
-                            onClick={() => {
-                              setSelectedDashboardDetail(null);
-                              setActiveSubItem(sub.id);
-                            }}
-                            className={`w-full text-left px-6 py-2.5 text-[13px] border-b border-gray-100 last:border-0 transition-colors ${
-                              activeSubItem === sub.id
-                                ? 'bg-blue-50 text-blue-900 font-bold'
-                                : 'text-blue-800 hover:bg-gray-50 hover:text-blue-900'
-                            }`}
-                          >
-                            {sub.id === 'written-script-splitting' ? (
-                               <span className="flex items-center">
-                                 {sub.label}
-                               </span>
-                            ) : sub.label}
-                          </button>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))
-            ) : (
-              <div className="px-4 py-8 text-center text-gray-400 italic text-xs">
-                No items found
-              </div>
-            )}
-          </div>
-        </aside>
-
-      {/* Main Content Area */}
-        <main className="flex-1 flex flex-col">
-          <div className="flex-1 bg-white">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${activeTab}-${activeSidebarItem}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="h-full"
-              >
-                {renderContent()}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Footer */}
-          <footer className="h-20 bg-white flex items-center justify-center border-t border-gray-100">
-            <div className="w-3/4 border-t border-gray-100 pt-6 text-center">
-              <p className="text-sm text-gray-600 font-bold">© 2026 - ORG (Nazmul Alam-2853)</p>
+                    }
+                  }}
+                  className={`text-sm font-normal py-3.5 h-full px-1 border-b-2 transition-all font-sans ${
+                    activeTab === tab 
+                      ? 'border-white text-white font-semibold' 
+                      : 'border-transparent text-gray-300 hover:text-white'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
-          </footer>
-        </main>
-      </div>
+          </div>
 
-      {/* File Preview Modal */}
-      <AnimatePresence>
-        {previewFile && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-10"
-          >
-            <div className="relative w-full max-w-4xl h-full flex flex-col items-center justify-center">
+          {/* Right side controls */}
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Profile dropdown */}
+            <div className="relative">
               <button 
-                onClick={() => setPreviewFile(null)}
-                className="absolute top-0 right-0 text-white hover:text-gray-300 transition-colors bg-white/10 p-2 rounded-full"
+                id="profile-dropdown-btn"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center space-x-1.5 text-xs hover:text-blue-200 transition-colors"
               >
-                <Plus className="w-6 h-6 rotate-45" />
+                <span className="hidden sm:inline font-medium">{currentUser.name || currentUser.id}</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
               </button>
               
-              <div className="w-full h-full flex items-center justify-center overflow-hidden bg-white/5 rounded-lg border border-white/10 p-4">
-                {previewFile.type.startsWith('image/') ? (
-                  <img 
-                    src={URL.createObjectURL(previewFile)} 
-                    alt="preview" 
-                    className="max-w-full max-h-full object-contain transition-transform duration-200" 
-                    style={{ transform: `rotate(${rotations[previewFile.name] || 0}deg)` }}
-                  />
-                ) : (
-                  <div className="text-white text-center">
-                    <FileType className="w-20 h-20 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg font-medium">{previewFile.name}</p>
-                    <p className="text-sm opacity-50">Preview not available for this file type</p>
-                  </div>
-                )}
-              </div>
-              
-              <div className="mt-4 flex items-center space-x-4">
-                <button 
-                  onClick={() => toggleRotation(previewFile.name)}
-                  className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center space-x-2"
-                >
-                  <RotateCw className="w-4 h-4" />
-                  <span>Rotate</span>
-                </button>
-                <a 
-                  href={URL.createObjectURL(previewFile)} 
-                  download={previewFile.name}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-xs font-bold transition-all flex items-center space-x-2 shadow-lg"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download</span>
-                </a>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Forward Request Details Modal */}
-      <AnimatePresence>
-        {selectedForwardReq && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
-          >
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-lg shadow-2xl border border-gray-200 w-full max-w-lg overflow-hidden text-left"
-            >
-              {/* Header */}
-              <div className="bg-[#002d5b] text-white px-5 py-4 flex items-center justify-between">
-                <h3 className="text-sm font-bold font-sans">Forwarded Request Details - {selectedForwardReq.id}</h3>
-                <button 
-                  onClick={() => setSelectedForwardReq(null)}
-                  className="text-white hover:opacity-80 focus:outline-none"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Body */}
-              <div className="p-6 space-y-4 text-xs font-sans text-gray-700">
-                {/* Grid of info */}
-                <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                  <div>
-                    <span className="text-gray-400 block mb-0.5 font-bold uppercase tracking-wider text-[9px]">Examiner</span>
-                    <strong className="text-blue-900 font-sans">[{selectedForwardReq.examiner.id}] {selectedForwardReq.examiner.name}</strong>
-                    <span className="block text-[10px] text-gray-500 font-mono mt-0.5">{selectedForwardReq.examiner.phone}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 block mb-0.5 font-bold uppercase tracking-wider text-[9px]">Admin ID</span>
-                    <strong className="text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded font-mono">{selectedForwardReq.adminId}</strong>
-                  </div>
-                  <div className="col-span-2 border-t border-gray-100 pt-2 mt-1">
-                    <span className="text-gray-400 block mb-0.5 font-bold uppercase tracking-wider text-[9px]">Course & Program</span>
-                    <strong className="text-gray-800 font-sans">{selectedForwardReq.course}</strong>
-                    <span className="block text-[10px] text-gray-500 font-sans mt-0.5">{selectedForwardReq.program} &bull; Session {selectedForwardReq.session}</span>
-                  </div>
-                  <div className="col-span-2 border-t border-gray-100 pt-2 mt-1">
-                    <span className="text-gray-400 block mb-0.5 font-bold uppercase tracking-wider text-[9px]">Exam & Subject</span>
-                    <strong className="text-gray-800 font-sans">{selectedForwardReq.exam}</strong>
-                    <span className="block text-[10px] text-gray-500 font-sans mt-0.5">{selectedForwardReq.subject} ({selectedForwardReq.examType})</span>
-                  </div>
-                </div>
-
-                {/* Comment Box */}
-                <div>
-                  <span className="text-purple-900 block mb-1 font-bold text-[11px]">Admin Note:</span>
-                  <div className="bg-purple-50/70 border border-purple-100 rounded-lg p-3 text-[11.5px] text-purple-950 italic leading-relaxed font-sans">
-                    "{selectedForwardReq.note}"
-                  </div>
-                  <span className="text-[10px] text-gray-400 mt-1 block text-right font-mono">Forwarded on {selectedForwardReq.date}</span>
-                </div>
-
-                {/* Status Dropdown / Action */}
-                <div className="border-t border-gray-150 pt-4">
-                  <label className="text-gray-600 block mb-2 font-bold text-[11px]">Update Request Status:</label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <select 
-                      value={selectedForwardReq.status}
-                      onChange={(e) => {
-                        const newStatus = e.target.value;
-                        setAdminForwardedRequests(prev => prev.map(item => 
-                          item.id === selectedForwardReq.id ? { ...item, status: newStatus } : item
-                        ));
-                        setSelectedForwardReq(prev => ({ ...prev, status: newStatus }));
-                      }}
-                      className="border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-400 font-sans"
-                    >
-                      <option value="Pending Teacher Response">Pending Teacher Response</option>
-                      <option value="In Progress">In Progress</option>
-                    </select>
-                    
-                    <button 
-                      onClick={() => {
-                        const constructed = {
-                          id: selectedForwardReq.id,
-                          rollNumber: selectedForwardReq.rollNumber || '902150',
-                          studentName: 'Tahmid Rahman',
-                          text: selectedForwardReq.exam,
-                          examName: selectedForwardReq.exam,
-                          courseName: selectedForwardReq.course,
-                          subject: selectedForwardReq.subject.replace(/\[.*\]/, '').trim(),
-                          obtainedMarks: '8.5',
-                          maxMarks: selectedForwardReq.maxMarks || '10',
-                          examinerName: `${selectedForwardReq.examiner.name} (${selectedForwardReq.examiner.id})`,
-                          evaluationType: selectedForwardReq.evaluationType || 'Regular',
-                          examType: selectedForwardReq.examType || 'Weekly Test',
-                          version: selectedForwardReq.version || 'Bangla',
-                          question: `Question Serial: ${selectedForwardReq.questionSerial || '1'}, Unique Set: ${selectedForwardReq.uniqueSet || '1'}`,
-                          minMarks: selectedForwardReq.minMarks || '5',
-                          totalScript: '124',
-                          reviewStatus: selectedForwardReq.reviewRequest || selectedForwardReq.status || 'Not Reviewed',
-                          suppressNotes: true
-                        };
-                        setSelectedForwardReq(null);
-                        setSelectedReviewRow(constructed);
-                      }}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded text-xs font-bold transition-all flex-1 text-center font-sans"
-                    >
-                      Evaluate/Review Paper
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="bg-gray-50 px-5 py-3.5 flex justify-end border-t border-gray-200">
-                <button 
-                  onClick={() => setSelectedForwardReq(null)}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-1.5 rounded text-xs font-bold transition-colors font-sans"
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Cancel Confirmation Modal */}
-      <AnimatePresence>
-        {cancelConfirmId && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
-          >
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-lg shadow-2xl border border-gray-200 w-full max-w-sm overflow-hidden text-center"
-            >
-              <div className="p-6">
-                <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
-                  <X className="w-6 h-6 stroke-[3]" />
-                </div>
-                <h3 className="text-sm font-extrabold font-sans text-gray-800 mb-2">
-                  Are you sure you want to cancel it?
-                </h3>
-                <p className="text-xs text-gray-500 font-sans leading-relaxed mb-6">
-                  আপনি কি নিশ্চিত যে এটি বাতিল করতে চান? এটি ডিলিট করলে আর ফেরত পাওয়া যাবে না।
-                </p>
-                <div className="flex items-center space-x-3">
-                  <button 
-                    onClick={() => setCancelConfirmId(null)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded text-xs font-bold font-sans transition-colors"
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-xl border border-gray-100 overflow-hidden z-50 text-left"
                   >
-                    No
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setAdminForwardedRequests(prev => prev.filter(req => req.id !== cancelConfirmId));
-                      setCancelConfirmId(null);
-                      alert("Review Request successfully deleted!");
-                    }}
-                    className="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2 rounded text-xs font-bold font-sans transition-colors shadow-xs"
-                  >
-                    Yes
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-          {/* Interactive Review Workspace Modal */}
-          {selectedReviewRow && (() => {
-            if (!showReviewWorkspace) {
-              return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-[2px] p-4">
-                   <motion.div 
-                     initial={{ scale: 0.95, opacity: 0 }}
-                     animate={{ scale: 1, opacity: 1 }}
-                     className="w-full max-w-6xl bg-white rounded shadow-2xl overflow-hidden flex flex-col"
-                   >
-                     {/* Modal Header */}
-                     <div className="bg-[#0f2a41] text-white px-4 py-2 flex items-center justify-between">
-                       <h2 className="text-[13px] font-bold font-sans">Details</h2>
-                       <button 
-                         onClick={() => setSelectedReviewRow(null)}
-                         className="text-gray-400 hover:text-white transition-colors"
-                       >
-                         <X className="w-5 h-5" />
-                       </button>
-                     </div>
-                     
-                     {/* Modal Content - Table */}
-                     <div className="p-4 bg-white overflow-x-auto">
-                       <table className="w-full border-collapse border border-gray-200 text-[11.5px] font-sans text-gray-700">
-                         <thead>
-                           <tr className="bg-gray-50 text-gray-700 font-bold border-b border-gray-200">
-                             <th className="border-r border-gray-200 px-3 py-2.5 text-center w-12">SI</th>
-                             <th className="border-r border-gray-200 px-3 py-2.5 text-left">Program Session</th>
-                             <th className="border-r border-gray-200 px-3 py-2.5 text-left">Course</th>
-                             <th className="border-r border-gray-200 px-3 py-2.5 text-left">[Code] Exam & Subject</th>
-                             <th className="border-r border-gray-200 px-3 py-2.5 text-center">Exam Type</th>
-                             <th className="border-r border-gray-200 px-3 py-2.5 text-center">Evaluation Type</th>
-                             <th className="border-r border-gray-200 px-3 py-2.5 text-center">Version</th>
-                             <th className="border-r border-gray-200 px-3 py-2.5 text-center">Question</th>
-                             <th className="border-r border-gray-200 px-2.5 py-2.5 text-center">Minimum Marks</th>
-                             <th className="border-r border-gray-200 px-2.5 py-2.5 text-center">Maximum Marks</th>
-                             <th className="border-r border-gray-200 px-2.5 py-2.5 text-center">Total Script</th>
-                             <th className="px-3 py-2.5 text-center">Action</th>
-                           </tr>
-                         </thead>
-                         <tbody>
-                           <tr className="hover:bg-gray-50/50 transition-colors">
-                             <td className="border-r border-gray-200 px-3 py-4 text-center text-gray-500 font-medium">01</td>
-                             <td className="border-r border-gray-200 px-3 py-4">
-                               <div className="font-bold text-gray-800">{selectedReviewRow.program || 'College Admission Program 2026'}</div>
-                               <div className="text-[10px] text-gray-400 mt-0.5">{selectedReviewRow.session || '2026'}</div>
-                             </td>
-                             <td className="border-r border-gray-200 px-3 py-4 font-medium text-gray-600">{selectedReviewRow.course || 'HCC All Service'}</td>
-                             <td className="border-r border-gray-200 px-3 py-4">
-                               <div className="font-bold text-gray-800">[{selectedReviewRow.examCode || '107'}] {selectedReviewRow.examName || selectedReviewRow.examSubject}</div>
-                               <div className="text-[10px] text-gray-400 mt-0.5">({selectedReviewRow.subject})</div>
-                             </td>
-                             <td className="border-r border-gray-200 px-3 py-4 text-center text-gray-600">{selectedReviewRow.examType || 'Online Written'}</td>
-                             <td className="border-r border-gray-200 px-3 py-4 text-center text-gray-600">{selectedReviewRow.evaluationType || 'Regular'}</td>
-                             <td className="border-r border-gray-200 px-3 py-4 text-center text-gray-600">{selectedReviewRow.version || 'Bangla'}</td>
-                             <td className="border-r border-gray-200 px-3 py-4 text-center">
-                               <div className="font-medium text-gray-700">Unique Set: {selectedReviewRow.uniqueSet || '1'},</div>
-                               <div className="text-gray-400 text-[10px] mt-0.5">Question Serial: {selectedReviewRow.questionSerial || '4'}</div>
-                             </td>
-                             <td className="border-r border-gray-200 px-2.5 py-4 text-center font-mono text-gray-600">{selectedReviewRow.minMarks || '0.5'}</td>
-                             <td className="border-r border-gray-200 px-2.5 py-4 text-center font-mono text-gray-600">{selectedReviewRow.maxMarks || '0.5'}</td>
-                             <td className="border-r border-gray-200 px-2.5 py-4 text-center font-mono font-bold text-gray-700">1</td>
-                             <td className="px-3 py-4 text-center">
-                               <button 
-                                 onClick={() => setShowReviewWorkspace(true)}
-                                 className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-3 py-1 rounded text-[11px] font-bold transition-all shadow-xs whitespace-nowrap"
-                               >
-                                 Review Request All
-                                </button>
-                             </td>
-                           </tr>
-                         </tbody>
-                       </table>
-                       
-                       <div className="flex items-center justify-between mt-4 text-[11px] text-gray-500 font-sans border-t pt-3">
-                         <div>Showing 1 to 1 of 1 entries</div>
-                         <div className="flex items-center gap-1">
-                           <button className="px-2 py-1 text-gray-400 cursor-not-allowed">Previous</button>
-                           <span className="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-800 rounded border border-gray-200 font-bold">1</span>
-                           <button className="px-2 py-1 text-gray-400 cursor-not-allowed">Next</button>
-                         </div>
-                       </div>
-                     </div>
-                   </motion.div>
-                </div>
-              );
-            }
-
-            let qSerial = "1";
-            let uSet = "1";
-            if (selectedReviewRow?.question) {
-              const matchQ = selectedReviewRow.question.match(/Question Serial:\s*(\d+)/i);
-              if (matchQ) qSerial = matchQ[1];
-              const matchS = selectedReviewRow.question.match(/Unique Set:\s*(\d+)/i);
-              if (matchS) uSet = matchS[1];
-            } else if (selectedReviewRow?.questionSerial) {
-              qSerial = selectedReviewRow.questionSerial;
-              uSet = selectedReviewRow.uniqueSet || "1";
-            }
-
-            const getMousePos = (e: React.MouseEvent<SVGSVGElement> | React.TouchEvent<SVGSVGElement>) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              let clientX, clientY;
-              if ('touches' in e) {
-                if (e.touches.length === 0) return { x: 0, y: 0 };
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-              } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-              }
-              const x = ((clientX - rect.left) / rect.width) * 800;
-              const y = ((clientY - rect.top) / rect.height) * 360;
-              return { x, y };
-            };
-
-            const handleSvgMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
-              const { x, y } = getMousePos(e);
-              if (activeDrawingTool === 'pencil') {
-                setIsDrawing(true);
-                setCurrentPath(`M ${x} ${y}`);
-              } else if (activeDrawingTool === 'text') {
-                const txt = prompt("Enter text overlay to insert:");
-                if (txt) {
-                  const newComment = { x, y: y + 5, text: txt };
-                  setScriptComments(prev => [...prev, newComment]);
-                  setActionHistory(prev => [...prev, { type: 'comment', value: newComment }]);
-                  setRedoHistory([]);
-                }
-              }
-            };
-
-            const handleSvgMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
-              if (!isDrawing || activeDrawingTool !== 'pencil') return;
-              const { x, y } = getMousePos(e);
-              setCurrentPath(prev => `${prev} L ${x} ${y}`);
-            };
-
-            const handleSvgMouseUp = () => {
-              if (!isDrawing) return;
-              setIsDrawing(false);
-              if (currentPath) {
-                setAllPaths(prev => [...prev, currentPath]);
-                setActionHistory(prev => [...prev, { type: 'path', value: currentPath }]);
-                setCurrentPath("");
-                setRedoPaths([]);
-                setRedoHistory([]);
-              }
-            };
-
-            const handleSvgTouchStart = (e: React.TouchEvent<SVGSVGElement>) => {
-              const { x, y } = getMousePos(e);
-              if (activeDrawingTool === 'pencil') {
-                setIsDrawing(true);
-                setCurrentPath(`M ${x} ${y}`);
-              } else if (activeDrawingTool === 'text') {
-                e.preventDefault();
-                const txt = prompt("Enter text overlay to insert:");
-                if (txt) {
-                  const newComment = { x, y: y + 5, text: txt };
-                  setScriptComments(prev => [...prev, newComment]);
-                  setActionHistory(prev => [...prev, { type: 'comment', value: newComment }]);
-                  setRedoHistory([]);
-                }
-              }
-            };
-
-            const handleSvgTouchMove = (e: React.TouchEvent<SVGSVGElement>) => {
-              if (!isDrawing || activeDrawingTool !== 'pencil') return;
-              const { x, y } = getMousePos(e);
-              setCurrentPath(prev => `${prev} L ${x} ${y}`);
-            };
-
-            const RenderStudentScriptPaper = ({ row, mode }: { row: any; mode?: 'raw' | 'evaluated' | 'review' }) => {
-              const isQ3SentenceIdent = row.questionSerial === '3' && (row.uniqueSet === '1' || row.subject?.toLowerCase().includes('english') || row.id === 'FWD-001');
-              const isQ1Biology = row.questionSerial === '1' && (row.uniqueSet === '2' || row.subject?.toLowerCase().includes('biology') || row.id === 'FWD-002');
-              const isQ12 = row.questionSerial === '12' || row.question?.includes('Serial: 12');
-              const isQ18 = row.questionSerial === '18' || row.question?.includes('Serial: 18');
-              const isQ2 = !isQ3SentenceIdent && !isQ1Biology && !isQ12 && !isQ18 && (row.questionSerial === '2' || row.question?.includes('Serial: 2'));
-              const isQ4 = !isQ3SentenceIdent && !isQ1Biology && !isQ12 && !isQ18 && (row.questionSerial === '4' || row.question?.includes('Serial: 4'));
-              const isQ7 = !isQ3SentenceIdent && !isQ1Biology && !isQ12 && !isQ18 && (row.questionSerial === '7' || row.question?.includes('Serial: 7'));
-              const isQ3 = !isQ3SentenceIdent && !isQ1Biology && !isQ12 && !isQ18 && (row.questionSerial === '3' || row.question?.includes('Serial: 3'));
-
-              const notebookStyle = {
-                backgroundImage: 'repeating-linear-gradient(white, white 27px, #e5e7eb 27px, #e5e7eb 28px)',
-                backgroundSize: '100% 28px',
-                lineHeight: '28px',
-                fontFamily: 'cursive, "Comic Sans MS", sans-serif',
-              };
-
-              if (currentScriptPage > 1) {
-                return (
-                  <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                    <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                    <div className="text-gray-400 font-sans text-[11px] italic absolute top-2 right-4">Page {currentScriptPage} (Continuation)</div>
-                    <div className="text-gray-300 font-sans text-sm mt-8 pl-4">No handwritten student text on this page. Feel free to add annotations.</div>
-                  </div>
-                );
-              }
-
-              if (isQ3SentenceIdent) {
-                return (
-                  <div className="w-full h-[360px] bg-[#fdfdfd] relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                    <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                    
-                    {/* Hand-written content */}
-                    <div className="text-[#1d233a] text-[16px] space-y-[4px] pt-4 select-none relative leading-[28px] font-bold pl-4">
-                      
-                      {/* Underlined '2no' at top */}
-                      <div className="text-center w-full pb-2 select-none relative -ml-4">
-                        <span className="relative text-xl">
-                          2no
-                          <span className="absolute bottom-[-2px] left-0 right-0 h-[2px] bg-gray-700" />
-                          <span className="absolute bottom-[-5px] left-2 right-2 h-[1px] bg-gray-700" />
-                        </span>
+                    <div className="px-4 py-3 border-b border-gray-100 flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold uppercase text-xs">
+                        {(currentUser.name || 'U')[0]}
                       </div>
-
-                      {/* Options with tickmarks and cross-outs */}
-                      <div className="space-y-[4px] pl-6">
-                        <div className="flex items-center relative">
-                          <span className="font-medium">a) Imperative sentence.</span>
-                          {/* Beautiful red tickmark */}
-                          {mode !== 'raw' && <span className="text-[#ff3b30] font-black text-[28px] absolute left-[260px] top-[-8px]">✓</span>}
-                        </div>
-
-                        <div className="flex items-center relative">
-                          <span className="font-medium">b) Simple Sentence.</span>
-                          {/* Beautiful red tickmark */}
-                          {mode !== 'raw' && <span className="text-[#ff3b30] font-black text-[28px] absolute left-[260px] top-[-8px]">✓</span>}
-                        </div>
-
-                        <div className="flex items-center relative h-[28px]">
-                          <span className="font-medium mr-1.5">c)</span>
-                          <span className="relative inline-block line-through text-[#ff3b30] decoration-[3px] mr-1.5">
-                            <span className="text-[#1d233a] font-medium">Simple</span>
-                          </span>
-                          <span className="relative">
-                            <span className="absolute top-[-18px] left-[-32px] text-[14px] text-gray-800 font-extrabold bg-white/90 px-1 leading-none rounded-xs select-none font-sans">Complex</span>
-                            <span className="font-medium">Sentence.</span>
-                          </span>
-                          
-                          {/* Red cross on the right, and big circle 0 on the left */}
-                          {mode !== 'raw' && (
-                            <>
-                              <span className="text-[#ff3b30] font-black text-[32px] absolute left-[-45px] top-[-10px] select-none">0</span>
-                              <span className="text-[#ff3b30] font-black text-[22px] absolute left-[260px] top-[-2px] select-none">✗</span>
-                            </>
-                          )}
-                        </div>
-
-                        <div className="flex items-center relative">
-                          <span className="font-medium">d) Assertive Sentence.</span>
-                          {/* Beautiful red tickmark */}
-                          {mode !== 'raw' && <span className="text-[#ff3b30] font-black text-[28px] absolute left-[260px] top-[-8px]">✓</span>}
-                        </div>
-
-                        <div className="flex items-center relative">
-                          <span className="font-medium">e) Compound Sentence.</span>
-                          {/* Beautiful red tickmark */}
-                          {mode !== 'raw' && <span className="text-[#ff3b30] font-black text-[28px] absolute left-[260px] top-[-8px]">✓</span>}
-                        </div>
+                      <div>
+                        <p className="text-xs font-semibold leading-none mb-1">{currentUser.name}</p>
+                        <p className="text-[10px] text-gray-500">
+                          {(currentUser.id?.toLowerCase() === 'nazmulriad4@gmail.com' || currentUser.id?.toLowerCase() === 'nazmul.2853@udvash.net') 
+                            ? 'Owner' 
+                            : (currentUser.role || 'User')}
+                        </p>
                       </div>
                     </div>
+                    {/* Mobile tabs menu inside dropdown */}
+                    <div className="block md:hidden border-b border-gray-100 p-1.5 space-y-1 bg-gray-50">
+                      <p className="text-[9.5px] text-gray-400 font-bold px-2 py-0.5 uppercase">Modules</p>
+                      {permittedTabs.map((tab) => (
+                        <button
+                          key={tab}
+                          onClick={() => {
+                            setActiveTab(tab);
+                            setIsProfileOpen(false);
+                            const items = sidebarItemsMap[tab] || [];
+                            if (items.length > 0) {
+                              setActiveSidebarItem(items[0].id);
+                              if (items[0].subItems && items[0].subItems.length > 0) {
+                                setActiveSubItem(items[0].subItems[0].id);
+                              } else {
+                                setActiveSubItem(null);
+                              }
+                            }
+                          }}
+                          className={`w-full text-left px-2 py-1.5 text-xs rounded transition-colors ${
+                            activeTab === tab ? 'bg-blue-600 text-white font-semibold' : 'text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {tab}
+                        </button>
+                      ))}
+                    </div>
+                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center font-semibold border-t border-gray-50">
+                      <Power className="w-3.5 h-3.5 mr-2" /> Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            <button 
+              id="logout-btn"
+              onClick={handleLogout}
+              className="hover:text-red-400 transition-colors p-1"
+              title="Logout"
+            >
+              <Power className="w-4 h-4" />
+            </button>
+          </div>
+        </nav>
 
-                    {/* Marks Badge in the margin */}
-                    {mode !== 'raw' && (
-                      <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                        <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white shadow-xs font-mono">04</div>
-                        <div className="text-[10px] uppercase font-bold mt-1 tracking-wider font-sans">Marks</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
+        {/* Content Wrapper */}
+        <div className="flex-1 flex overflow-hidden relative bg-white min-h-0">
+          
+          {/* Static Sidebar (Hidden on Mobile/Mobile-mode) */}
+          <aside className="hidden md:flex w-64 border-r border-gray-200 bg-[#f5f5f5] flex-col py-4 px-3 flex-shrink-0 text-left">
+            {/* Tab title badge */}
+            <div className="bg-[#002d5b] text-white px-3.5 py-2.5 rounded text-sm font-semibold mb-3 tracking-wide">
+              {activeTab}
+            </div>
 
-              if (isQ1Biology) {
-                return (
-                  <div className="w-full h-[360px] bg-[#fdfdfd] relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                    <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
+            {/* Search filter */}
+            <div className="px-1 mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                <input
+                  id="sidebar-search-input"
+                  type="text"
+                  placeholder="Filter menu..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white border border-gray-300 rounded pl-9 pr-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-gray-800"
+                />
+              </div>
+            </div>
+
+            {/* Menu Items */}
+            <div className="flex-1 overflow-y-auto px-1 space-y-1.5 pb-4">
+              {filteredSidebarItems.length > 0 ? (
+                filteredSidebarItems.map((item) => (
+                  <div key={item.id} className="space-y-1">
+                    <button
+                      id={`sidebar-item-${item.id}`}
+                      onClick={() => {
+                        setSelectedDashboardDetail(null);
+                        setActiveSidebarItem(item.id);
+                        setExpandedItemId(prev => prev === item.id ? null : item.id);
+                        if (item.subItems && item.subItems.length > 0) {
+                          setActiveSubItem(item.subItems[0].id);
+                        } else {
+                          setActiveSubItem(null);
+                        }
+                      }}
+                      className={`w-full text-left px-4 py-2 text-xs rounded transition-all border ${
+                        activeSidebarItem === item.id
+                          ? 'bg-[#cccccc] text-gray-900 border-gray-300 font-semibold shadow-xs'
+                          : 'bg-[#f8f9fa] hover:bg-gray-200 text-gray-700 border-transparent'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
                     
-                    {/* Hand-written content */}
-                    <div className="text-[#1d233a] text-[24px] pt-12 pl-12 select-none relative font-sans leading-[28px] font-extrabold flex flex-col items-start gap-4">
-                      
-                      <div className="text-xl text-indigo-900 mb-2 font-bold font-sans">১নং প্রশ্নের উত্তরঃ</div>
-                      
-                      <div className="relative pl-6 py-2">
-                        <span className="text-gray-900 border-2 border-gray-400 px-6 py-3 bg-[#fafafa] rounded shadow-3xs font-serif font-black tracking-wide text-3xl font-sans">
-                          ২৫ টি
-                        </span>
+                    {/* Sub-items */}
+                    <AnimatePresence>
+                      {expandedItemId === item.id && item.subItems && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden border border-gray-200 bg-white rounded pl-2 py-1 space-y-0.5"
+                        >
+                          {item.subItems.map((sub) => (
+                            <button
+                              key={sub.id}
+                              onClick={() => {
+                                setSelectedDashboardDetail(null);
+                                setActiveSubItem(sub.id);
+                              }}
+                              className={`w-full text-left px-3 py-1.5 text-xs rounded transition-colors ${
+                                activeSubItem === sub.id
+                                  ? 'bg-blue-50 text-blue-900 font-bold border-l-2 border-blue-600'
+                                  : 'text-gray-600 hover:bg-gray-50'
+                              }`}
+                            >
+                              {sub.label}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))
+              ) : (
+                <div className="px-4 py-8 text-center text-gray-400 italic text-xs">
+                  No items found
+                </div>
+              )}
+            </div>
+          </aside>
 
-                        {/* Hand-drawn red loop marking over the answer showing it is wrong */}
-                        {mode !== 'raw' && (
-                          <div className="absolute left-[-20px] top-[-10px] pointer-events-none select-none">
-                            <svg className="w-[280px] h-[120px]" viewBox="0 0 280 120" fill="none">
-                              {/* Left circular loop */}
-                              <path 
-                                d="M 40 70 C 60 40, 100 20, 110 50 C 120 70, 95 100, 115 90 C 135 80, 160 50, 190 40" 
-                                stroke="#ff3b30" 
-                                strokeWidth="5" 
-                                strokeLinecap="round"
-                                fill="none"
-                              />
-                              {/* Cross line overlay */}
-                              <path 
-                                d="M 30 50 C 60 90, 80 100, 100 80 C 120 60, 90 30, 80 60 C 70 90, 110 95, 130 90" 
-                                stroke="#ff3b30" 
-                                strokeWidth="5" 
-                                strokeLinecap="round"
-                                fill="none"
-                              />
-                            </svg>
+          {/* Mobile Sliding Sidebar/Drawer (Handles real responsive layouts and mobile mode) */}
+          <AnimatePresence>
+            {isMobileSidebarOpen && (
+              <>
+                {/* Overlay Backdrop */}
+                <div 
+                  className="absolute inset-0 bg-black/50 z-40 transition-opacity"
+                  onClick={() => setIsMobileSidebarOpen(false)}
+                />
+                
+                {/* Drawer Content */}
+                <motion.aside 
+                  initial={{ x: '-100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ type: 'tween', duration: 0.25 }}
+                  className="absolute left-0 top-0 bottom-0 w-64 bg-[#f8f9fa] z-50 border-r border-gray-200 flex flex-col p-4 text-left shadow-2xl"
+                >
+                  <div className="flex items-center justify-between pb-4 border-b border-gray-200 mb-4">
+                    <span className="text-xs font-bold text-gray-800 uppercase tracking-wide">{activeTab} Menu</span>
+                    <button 
+                      onClick={() => setIsMobileSidebarOpen(false)}
+                      className="p-1 text-gray-500 hover:text-gray-800"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Filter */}
+                  <div className="mb-4">
+                    <input
+                      type="text"
+                      placeholder="Filter menu..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs focus:outline-none text-gray-800"
+                    />
+                  </div>
+
+                  {/* Sidebar list */}
+                  <div className="flex-1 overflow-y-auto space-y-1.5">
+                    {filteredSidebarItems.map((item) => (
+                      <div key={item.id} className="space-y-1">
+                        <button
+                          onClick={() => {
+                            setSelectedDashboardDetail(null);
+                            setActiveSidebarItem(item.id);
+                            setExpandedItemId(prev => prev === item.id ? null : item.id);
+                            if (item.subItems && item.subItems.length > 0) {
+                              setActiveSubItem(item.subItems[0].id);
+                            } else {
+                              setActiveSubItem(null);
+                            }
+                            if (!item.subItems) setIsMobileSidebarOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-xs rounded font-medium border ${
+                            activeSidebarItem === item.id
+                              ? 'bg-blue-50 text-blue-900 border-blue-200 font-bold'
+                              : 'bg-white hover:bg-gray-100 text-gray-700 border-transparent'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                        {expandedItemId === item.id && item.subItems && (
+                          <div className="bg-white border border-gray-100 rounded pl-2.5 py-1 space-y-1">
+                            {item.subItems.map(sub => (
+                              <button
+                                key={sub.id}
+                                onClick={() => {
+                                  setSelectedDashboardDetail(null);
+                                  setActiveSubItem(sub.id);
+                                  setIsMobileSidebarOpen(false);
+                                }}
+                                className={`w-full text-left px-2.5 py-1.5 text-xs rounded ${
+                                  activeSubItem === sub.id ? 'text-blue-700 font-bold bg-blue-50/50' : 'text-gray-600 hover:text-gray-900'
+                                }`}
+                              >
+                                {sub.label}
+                              </button>
+                            ))}
                           </div>
                         )}
                       </div>
-                    </div>
-
-                    {/* Marks Badge in the margin */}
-                    {mode !== 'raw' && (
-                      <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                        <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white shadow-xs font-mono">00</div>
-                        <div className="text-[10px] uppercase font-bold mt-1 tracking-wider font-sans">Marks</div>
-                      </div>
-                    )}
+                    ))}
                   </div>
-                );
-              }
+                </motion.aside>
+              </>
+            )}
+          </AnimatePresence>
 
-              if (isQ12) {
-                return (
-                  <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                    <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                    
-                    {/* Hand-written content */}
-                    <div className="text-[#1d233a] font-bold text-[20px] pt-8 pl-6 select-none relative font-sans leading-[40px]">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">১৮।</span>
-                        <span className="relative">
-                          অ্যানোড
-                          {mode !== 'raw' && <span className="absolute left-0 bottom-1 w-full h-[3px] bg-red-500 animate-pulse" />}
-                        </span>
-                        <span className={`${mode === 'raw' ? 'text-[#1d233a]' : 'text-red-500'} font-extrabold mx-1`}>—</span>
-                        <span className={`${mode === 'raw' ? 'text-[#1d233a]' : 'text-red-500'} font-bold text-2xl`}>Ve</span>
-                      </div>
-                    </div>
-
-                    {/* Red line marking */}
-                    {mode !== 'raw' && (
-                      <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                        <path 
-                          d="M 50 140 C 90 90, 150 90, 180 130" 
-                          stroke="#ff3b30" 
-                          strokeWidth="4" 
-                          strokeLinecap="round"
-                          fill="none"
-                        />
-                        <path 
-                          d="M 40 80 L 150 180" 
-                          stroke="#ff3b30" 
-                          strokeWidth="4" 
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    )}
-
-                    {/* Marks Badge in the margin */}
-                    {mode !== 'raw' && (
-                      <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                        <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white shadow-xs font-mono">00</div>
-                        <div className="text-[10px] uppercase font-bold mt-1 tracking-wider font-sans">Marks</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              if (isQ18) {
-                return (
-                  <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                    <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                    
-                    {/* Hand-written content */}
-                    <div className="text-[#555] font-semibold text-[14.5px] pt-4 pl-4 select-none relative font-sans leading-[28px]">
-                      <div>
-                        ১৮। মিথানলে OH<sup>-</sup> (হাইড্রোক্সিল গ্রুপ / মূলক) বিদ্যমান
-                      </div>
-                      <div>
-                        থাকায় এটি পানির ঋণাত্মক প্রান্তের সাথে আকর্ষিত হয় এবং
-                      </div>
-                      <div className="pl-4">
-                        H<sub>2</sub> Bond তৈরি করে পানিতে দ্রবীভূত হয়।
-                      </div>
-                    </div>
-
-                    {/* Examiner's grading annotations */}
-                    {mode !== 'raw' && (
-                      <>
-                        {/* Red text overlay from examiner */}
-                        <div className="absolute top-44 left-14 font-sans font-bold select-none pointer-events-none">
-                          <div className="text-red-600 text-[18px] font-black leading-none mb-2 tracking-wide">
-                            আংশিক ধনাত্মক ও ঋণাত্মক প্রান্ত সৃষ্টি হয়
-                          </div>
-                          <div className="text-emerald-800 text-[24px] font-black leading-none flex items-center gap-1.5 mt-4">
-                            polarity <span className="font-bold text-emerald-800 text-[20px]">উল্লেখ করতে হবে</span>
-                          </div>
-                        </div>
-
-                        {/* Red tick line marking */}
-                        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                          <path 
-                            d="M 50 110 L 90 60 C 100 80, 110 135, 75 165 C 50 190, 80 180, 110 120" 
-                            stroke="#ff3b30" 
-                            strokeWidth="3.5" 
-                            strokeLinecap="round"
-                            fill="none"
-                          />
-                        </svg>
-                      </>
-                    )}
-
-                    {/* Marks Badge in the margin */}
-                    {mode !== 'raw' && (
-                      <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                        <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white shadow-xs font-mono">00</div>
-                        <div className="text-[10px] uppercase font-bold mt-1 tracking-wider font-sans">Marks</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              if (isQ2) {
-                return (
-                  <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                    <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                    
-                    <div className="text-[#1d233a] text-[18px] space-y-[4px] pt-2 select-none">
-                      <div className="font-bold pl-2 text-indigo-900 text-xl">০২।</div>
-                      <div className="pl-6">
-                        <span className="font-sans">m</span> = <span className="font-sans">0.6 kg</span>
-                      </div>
-                      <div className="pl-6">
-                        <span className="font-sans">F</span> = <span className="font-sans">3.2 N</span>
-                      </div>
-                      <div className="pl-6 font-bold text-[#002d5b]">
-                        <span className="font-sans">mg - F = ma</span>
-                      </div>
-                      <div className="pl-6">
-                        <span className="font-sans">⇒ 0.6 × 9.8 - 3.2 = 0.6 × a</span>
-                      </div>
-                      <div className="pl-6">
-                        <span className="font-sans">⇒ 5.88 - 3.2 = 0.6a</span>
-                      </div>
-                      <div className="pl-6">
-                        <span className="font-sans">⇒ 2.68 = 0.6a</span>
-                      </div>
-                      <div className="pl-6 font-bold text-emerald-800">
-                        <span className="font-sans">⇒ a = 4.467 ms⁻²</span>
-                      </div>
-                    </div>
-
-                    {mode !== 'raw' && (
-                      <div className="absolute top-4 right-12 text-red-600 select-none pointer-events-none">
-                        <span className="text-[120px] font-bold opacity-80 select-none">✓</span>
-                      </div>
-                    )}
-                    {mode !== 'raw' && (
-                      <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                        <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white/95 shadow-xs">01</div>
-                        <div className="text-[10px] uppercase font-bold mt-1 tracking-wider">Marks</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              if (isQ4) {
-                const isCorrect = row.rollNumber !== '18160700673';
-                if (isCorrect) {
-                  return (
-                    <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                      <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                      
-                      <div className="text-[#1d233a] text-[18px] space-y-[4px] pt-2 select-none">
-                        <div className="font-bold pl-2 text-indigo-900 text-xl font-sans">Q4.</div>
-                        <div className="pl-6">Given: bullet <span className="font-sans">m = 10g = 0.01kg</span>, gun <span className="font-sans">M = 6kg</span></div>
-                        <div className="pl-6">bullet velocity <span className="font-sans">v = 300 ms⁻¹</span></div>
-                        <div className="pl-6">From momentum conservation law:</div>
-                        <div className="pl-6 font-bold text-[#002d5b]"><span className="font-sans">MV + mv = 0</span></div>
-                        <div className="pl-6"><span className="font-sans">⇒ 6 × V + 0.01 × 300 = 0</span></div>
-                        <div className="pl-6"><span className="font-sans">⇒ 6V + 3 = 0</span></div>
-                        <div className="pl-6"><span className="font-sans">⇒ V = -0.5 ms⁻¹</span></div>
-                        <div className="pl-6 font-bold text-emerald-800">So, recoil velocity is 0.5 ms⁻¹</div>
-                      </div>
-
-                      {mode !== 'raw' && (
-                        <div className="absolute top-6 right-16 text-red-600 select-none pointer-events-none">
-                          <span className="text-[110px] font-bold opacity-80 select-none">✓</span>
-                        </div>
-                      )}
-                      {mode !== 'raw' && (
-                        <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                          <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white/95 shadow-xs">01</div>
-                          <div className="text-[10px] uppercase font-bold mt-1 tracking-wider">Marks</div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                      <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                      
-                      <div className="text-[#1d233a] text-[18px] space-y-[4px] pt-2 select-none">
-                        <div className="font-bold pl-2 text-indigo-900 text-xl font-sans">Q4.</div>
-                        <div className="pl-6">
-                          bullet <span className="font-sans">m = 10 g</span>, gun <span className="font-sans">M = 6 kg</span>, <span className="font-sans">v = 300 m/s</span>
-                        </div>
-                        <div className="pl-6">
-                          Recoil velocity <span className="font-sans">V = m₁v₂ / M₁</span>
-                        </div>
-                        <div className={`pl-6 ${mode === 'raw' ? 'no-underline' : 'line-through text-red-500'} decoration-2`}>
-                          <span className="font-sans text-gray-500">V = (0.1 × 300) / 6 = 5 m/s</span>
-                        </div>
-                        <div className={`pl-6 font-bold ${mode === 'raw' ? 'text-gray-800 bg-transparent' : 'text-red-700 bg-red-50'} inline-block px-1.5 rounded`}>
-                          Recoil velocity = 5 m/s
-                        </div>
-                      </div>
-
-                      {mode !== 'raw' && (
-                        <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                          <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white/95 shadow-xs">00</div>
-                          <div className="text-[10px] uppercase font-bold mt-1 tracking-wider">Marks</div>
-                        </div>
-                      )}
-
-                      {mode !== 'raw' && (
-                        <div className="absolute top-24 right-20 text-red-600 font-bold text-sm select-none pointer-events-none rotate-6">
-                          <div className="text-[32px] leading-none mb-1">✗</div>
-                          <div className="border border-red-500 rounded px-2 py-1 bg-white shadow-xs text-[11px] leading-snug">
-                            Wrong Formula! <br />
-                            <span className="font-sans">MV + mv = 0 ⇒ V = -mv/M</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {mode !== 'raw' && (
-                        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                          <line x1="80" y1="120" x2="350" y2="180" stroke="rgba(239, 68, 68, 0.7)" strokeWidth="4" />
-                          <line x1="120" y1="190" x2="380" y2="240" stroke="rgba(239, 68, 68, 0.7)" strokeWidth="4" />
-                        </svg>
-                      )}
-                    </div>
-                  );
-                }
-              }
-
-              if (isQ7) {
-                const isA = row.rollNumber === '49210800739' || row.comment?.includes('derivation');
-                if (isA) {
-                  return (
-                    <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                      <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                      
-                      <div className="text-[#1d233a] text-[18px] space-y-[4px] pt-2 select-none">
-                        <div className="font-bold pl-2 text-indigo-900 text-xl">১।</div>
-                        <div className="pl-6">We know, gravity law formula:</div>
-                        <div className="pl-6 font-sans"><span className="font-bold">F = G (m₁ m₂) / r²</span></div>
-                        <div className="pl-6">⇒ <span className="font-sans">G = F r² / (m₁ m₂)</span></div>
-                        <div className="pl-6">Unit dimension of force, <span className="font-sans">[F] = MLT⁻²</span></div>
-                        <div className="pl-6">⇒ <span className="font-sans">[G] = (MLT⁻² × L²) / M²</span></div>
-                        <div className="pl-6">⇒ <span className="font-sans">[G] = (ML³ T⁻²) / M²</span></div>
-                        <div className="pl-6 font-bold text-emerald-800">∴ মাত্রা [G] = M⁻¹ L³ T⁻²</div>
-                      </div>
-
-                      {mode !== 'raw' && (
-                        <div className="absolute top-6 right-16 text-red-600 select-none pointer-events-none">
-                          <span className="text-[110px] font-bold opacity-80 select-none">✓</span>
-                        </div>
-                      )}
-                      {mode !== 'raw' && (
-                        <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                          <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white/95 shadow-xs">01</div>
-                          <div className="text-[10px] uppercase font-bold mt-1 tracking-wider">Marks</div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                      <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                      
-                      <div className="text-[#1d233a] text-[18px] space-y-[4px] pt-2 select-none">
-                        <div className="font-bold pl-2 text-indigo-900 text-xl font-sans">Q7.</div>
-                        <div className="pl-6">মহাকর্ষীয় ধ্রুবকের মাত্রা:</div>
-                        <div className="pl-6 font-bold text-emerald-800 text-2xl font-sans mt-4 pl-4">[G] = M⁻¹ L³ T⁻²</div>
-                      </div>
-
-                      {mode !== 'raw' && (
-                        <div className="absolute top-10 right-20 text-red-600 select-none pointer-events-none">
-                          <span className="text-[110px] font-bold opacity-80 select-none">✓</span>
-                        </div>
-                      )}
-                      {mode !== 'raw' && (
-                        <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                          <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white/95 shadow-xs">01</div>
-                          <div className="text-[10px] uppercase font-bold mt-1 tracking-wider">Marks</div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-              }
-
-              if (isQ3) {
-                return (
-                  <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                    <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                    
-                    <div className="text-[#1d233a] text-[18px] space-y-[4px] pt-2 select-none font-bold">
-                      <div className="pl-2 text-indigo-900 text-xl">প্রশ্ন ৩।</div>
-                      <div className="pl-6 text-gray-500 font-normal">মা ও বাবা থ্যালাসেমিয়ার বাহক হলে (Tt এবং Tt) জেনোটাইপ ক্রসিং:</div>
-                      <div className="pl-6 font-sans">Tt  ×  Tt  ⇒ TT, Tt, Tt, tt</div>
-                      <div className="pl-6 font-normal">এখানে, TT = সুস্থ, Tt = বাহক, tt = আক্রান্ত</div>
-                      <div className="pl-6 text-emerald-800 text-xl mt-3">∴ আক্রান্ত হওয়ার সম্ভাবনা = ২৫% (25%)</div>
-                    </div>
-
-                    {mode !== 'raw' && (
-                      <div className="absolute top-6 right-16 text-red-600 select-none pointer-events-none">
-                        <span className="text-[110px] font-bold opacity-80 select-none">✓</span>
-                      </div>
-                    )}
-                    {mode !== 'raw' && (
-                      <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                        <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white/95 shadow-xs">01</div>
-                        <div className="text-[10px] uppercase font-bold mt-1 tracking-wider">Marks</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              return (
-                <div className="w-full h-[360px] bg-white relative p-4 pl-12 text-left select-none overflow-hidden" style={notebookStyle}>
-                  <div className="absolute top-0 left-8 w-[1px] h-full bg-red-200" />
-                  
-                  <div className="text-[#1d233a] text-[18px] space-y-[4px] pt-2 select-none">
-                    <div className="font-bold pl-2 text-indigo-900 text-xl">৩।</div>
-                    <div className="pl-6">অতিক্রান্ত মোট দূরত্ব = <span className="font-sans">0.32km × 2 = 640 m</span></div>
-                    <div className="pl-6">মোট সময় = <span className="font-sans">1/4 min + 1/5 min = 15s + 12s = 27s</span></div>
-                    <div className="pl-6">গড় দ্রুতি, <span className="font-sans">v = d / t</span></div>
-                    <div className="pl-6">⇒ <span className="font-sans">v = 640 / 27 = 23.7 ms⁻¹</span></div>
-                    <div className="pl-6 font-bold text-emerald-800">∴ গড় দ্রুতি = 23.7 ms⁻¹</div>
-                  </div>
-
-                  {mode !== 'raw' && (
-                    <div className="absolute top-6 right-16 text-red-600 select-none pointer-events-none">
-                      <span className="text-[110px] font-bold opacity-80 select-none">✓</span>
-                    </div>
-                  )}
-                  {mode !== 'raw' && (
-                    <div className="absolute top-12 left-2 text-red-600 select-none pointer-events-none font-sans font-black flex flex-col items-center">
-                      <div className="text-xl border-2 border-red-500 rounded-full w-10 h-10 flex items-center justify-center bg-white/95 shadow-xs">01</div>
-                      <div className="text-[10px] uppercase font-bold mt-1 tracking-wider">Marks</div>
-                    </div>
-                  )}
-                </div>
-              );
-            };
-
-            const getQuestionText = (row: any) => {
-              if (row.questionSerial === '2' || row.question?.includes('Serial: 2')) {
-                return `গাছ থেকে 0.6 kg ভরের একটি পেঁপে নিচের দিকে পড়ছে। যদি বাতাসের বাধা 3.2 N হয়, তবে পেঁপেটির ত্বরণ কত? [g = 9.8ms⁻²]`;
-              }
-              if (row.questionSerial === '3' || row.question?.includes('Serial: 3')) {
-                return `মা ও বাবা সুস্থ কিন্তু থ্যালাসেমিয়ার বাহক এক্ষেত্রে সন্তানদের থ্যালাসেমিয়াতে আক্রান্ত হওয়ার সম্ভাবনা কত?`;
-              }
-              if (row.questionSerial === '4' || row.question?.includes('Serial: 4')) {
-                return `A 10 g bullet is fired from a 6 kg gun at a velocity of 300 ms⁻¹. What will be the recoil velocity of the gun?`;
-              }
-              if (row.questionSerial === '7' || row.question?.includes('Serial: 7')) {
-                return `মহাকর্ষীয় ধ্রুবকের মাত্রা লিখ।`;
-              }
-              if (row.subject?.toLowerCase().includes("math")) {
-                return `(1 + tan θ)² + (1 - tan θ)² কে sec θ এর মাধ্যমে প্রকাশ কর।`;
-              }
-              if (row.subject?.toLowerCase().includes("chemistry")) {
-                return `অম্ল ও ক্ষারকের ব্রনস্টেড-লাউরি মতবাদ ব্যাখ্যা কর এবং একটি উদাহরণ দাও।`;
-              }
-              if (row.subject?.toLowerCase().includes("biology")) {
-                return `মাইটোকন্ড্রিয়াকে কেন কোষের পাওয়ার হাউস বলা হয়? চিত্রসহ ব্যাখ্যা কর।`;
-              }
-              if (row.subject?.toLowerCase().includes("english")) {
-                return `Write a short paragraph on 'Metro Rail in Bangladesh' based on your own experience.`;
-              }
-              return `একটি গাড়ি 0.32km দূরত্ব যাওয়া-আসা করতে ১/৪ মিনিট ও ১/৫ মিনিট সময় নিলে গাড়িটির গড় দ্রুতি কত?`;
-            };
-
-            const getSampleAnswer = (row: any) => {
-
-
-              if (row.questionSerial === '2' || row.question?.includes('Serial: 2')) {
-                return (
-                  <div className="space-y-3 text-[12px] text-gray-800 leading-relaxed font-sans">
-                    <div className="font-bold text-[#002d5b] text-[13px] font-mono">
-                      a = (mg - F) / m = ((0.6 * 9.8) - 3.2) / 0.6 = 4.47 ms⁻²
-                    </div>
-                    <div className="font-black text-gray-900 underline mt-3 text-[11.5px] tracking-wide">নম্বর বণ্টন:</div>
-                    <div className="text-gray-700">a = (mg - F) / m ; সূত্র লেখার জন্য ০.৫ নম্বর।</div>
-                    <div className="text-gray-700">a = 4.47 ms⁻² ; সঠিক উত্তরের জন্য ০.৫ নম্বর।</div>
-                    <div className="text-[11px] text-gray-800 font-medium italic pt-1 border-t border-gray-200">
-                      <span className="font-bold text-red-700">[বি:দ্র:</span> একক না লিখলে বা ভুল একক লিখলে ০.৫ নম্বর কর্তন করা হবে।<span className="font-bold text-red-700">]</span>
-                    </div>
-                  </div>
-                );
-              }
-              if (row.questionSerial === '3' || row.question?.includes('Serial: 3')) {
-                return (
-                  <div className="space-y-3 text-[12px] text-gray-800 leading-relaxed font-sans">
-                    <div className="font-bold text-gray-900">25%</div>
-                    <div className="font-black text-gray-900 text-[13px] tracking-wide">নম্বর বণ্টন:</div>
-                    <div className="text-gray-800 font-medium">‘25%’ লেখার জন্য ০১ নম্বর।</div>
-                  </div>
-                );
-              }
-              if (row.questionSerial === '4' || row.question?.includes('Serial: 4')) {
-                return (
-                  <div className="space-y-3 text-[12px] text-gray-800 leading-relaxed font-sans">
-                    <div className="font-bold text-[#002d5b] text-[13px] font-mono">
-                      MV + mv = 0 <br />
-                      or, 6 * V + (0.01 * 300) = 0 <br />
-                      or, 6 * V = -3 <br />
-                      or, V = -0.5 ms⁻¹ (Recoil velocity = 0.5 ms⁻¹)
-                    </div>
-                    <div className="font-black text-gray-900 underline mt-3 text-[11.5px] tracking-wide font-bold">Mark Distribution:</div>
-                    <div className="text-gray-700">Formula and substitution: 0.5 marks.</div>
-                    <div className="text-gray-700">Correct recoil velocity (0.5 ms⁻¹): 0.5 marks.</div>
-                  </div>
-                );
-              }
-              if (row.questionSerial === '7' || row.question?.includes('Serial: 7')) {
-                return (
-                  <div className="space-y-3 text-[12px] text-gray-800 leading-relaxed font-sans">
-                    <div className="font-bold text-[#002d5b] text-[13px] font-mono">
-                      F = G * m₁ * m₂ / r² =&gt; G = F * r² / (m₁ * m₂)<br />
-                      [G] = [F] * [r²] / [M²] = (MLT⁻²) * L² / M² = M⁻¹ L³ T⁻²
-                    </div>
-                    <div className="font-black text-gray-900 underline mt-3 text-[11.5px] tracking-wide font-bold">নম্বর বণ্টন:</div>
-                    <div className="text-gray-700">[G] = M⁻¹ L³ T⁻² লেখার জন্য ০১ নম্বর।</div>
-                  </div>
-                );
-              }
-              const isMath = row.subject?.toLowerCase().includes("math");
-              const isChemistry = row.subject?.toLowerCase().includes("chemistry");
-              const isBiology = row.subject?.toLowerCase().includes("biology");
-              const isEnglish = row.subject?.toLowerCase().includes("english");
-
-              if (isMath) {
-                return (
-                  <div className="space-y-3 pr-28 text-[12px] text-gray-800 leading-relaxed font-sans">
-                    <div className="flex flex-wrap items-center gap-1.5 font-bold text-emerald-950">
-                      <span>(1 + tan θ)² + (1 - tan θ)²</span>
-                      <span>=</span>
-                      <span>1 + 2tan θ + tan² θ + 1 - 2tan θ + tan² θ</span>
-                      <span>=</span>
-                      <span>2(1 + tan² θ)</span>
-                      <span>=</span>
-                      <span>2sec² θ</span>
-                    </div>
-                    <div className="font-black text-gray-900 underline mt-3 text-[11.5px] tracking-wide font-bold">নম্বর বণ্টন:</div>
-                    <div className="text-gray-700">2sec² θ ; নির্ণয় করার জন্য ০১ নম্বর।</div>
-                    <div className="text-[11px] text-gray-800 font-medium italic pt-1 border-t border-emerald-200/50">
-                      <span className="font-bold text-red-700">[বি. দ্র.</span> শুধু উত্তর লিখলেও সম্পূর্ণ নম্বর পাবে<span className="font-bold text-red-700">]</span>
-                    </div>
-                  </div>
-                );
-              }
-
-              if (isChemistry) {
-                return (
-                  <div className="space-y-3 pr-28 text-[12px] text-gray-800 leading-relaxed font-sans">
-                    <div className="font-bold text-emerald-950">ব্রনস্টেড-লাউরি মতবাদ (প্রোটনীয় মতবাদ):</div>
-                    <p>যে সকল যৌগ বা আয়ন অন্য কোনো পদার্থকে প্রোটন (H⁺) দান করতে পারে, তাদেরকে অম্ল বা এসিড বলে। এবং যে সকল যৌগ বা আয়ন অন্য কোনো পদার্থ থেকে প্রোটন গ্রহণ করতে পারে, তাদেরকে ক্ষারক বা বেস বলে।</p>
-                    <div className="font-black text-gray-900 underline mt-3 text-[11.5px] tracking-wide font-bold">নম্বর বণ্টন:</div>
-                    <div>সঠিক সংজ্ঞা লেখার জন্য ০.৫ নম্বর। উদাহরণ ও ব্যাখ্যা লেখার জন্য ০.৫ নম্বর।</div>
-                  </div>
-                );
-              }
-
-              if (isBiology) {
-                return (
-                  <div className="space-y-3 pr-28 text-[12px] text-gray-800 leading-relaxed font-sans">
-                    <div className="font-bold text-emerald-950">পাওয়ার হাউস (Powerhouse) ব্যাখ্যা:</div>
-                    <p>মাইটোকন্ড্রিয়ার ভেতরেই শ্বসন প্রক্রিয়ার সবচেয়ে গুরুত্বপূর্ণ ধাপসমূহ (যেমন- ক্রেবস চক্র) সম্পন্ন হয়, যেখানে শক্তির সবচেয়ে বড় উৎস ATP উৎপন্ন হয়। তাই একে কোষের শক্তিঘর বা পাওয়ার হাউস বলে।</p>
-                    <div className="font-black text-gray-900 underline mt-3 text-[11.5px] tracking-wide">নম্বর বণ্টন:</div>
-                    <div>শক্তির উৎস ও ATP উল্লেখ করার জন্য ০.৫ নম্বর। ক্রেবস চক্র ও শ্বসন প্রক্রিয়ার ব্যাখ্যার জন্য ০.৫ নম্বর।</div>
-                  </div>
-                );
-              }
-
-              if (isEnglish) {
-                return (
-                  <div className="space-y-3 pr-28 text-[12px] text-gray-800 leading-relaxed font-sans">
-                    <div className="font-bold text-emerald-950">Metro Rail Paragraph Outline:</div>
-                    <p>Key points to check: introduction of Metro Rail, benefits for Dhaka traffic, modern features (electrification, smart card), and personal travel experience.</p>
-                    <div className="font-black text-gray-900 underline mt-3 text-[11.5px] tracking-wide">Marking Criteria:</div>
-                    <div>Grammar & Structure: 0.5 marks. Content relevance and flow: 0.5 marks.</div>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="space-y-3 pr-28 text-[12px] text-gray-800 leading-relaxed font-sans">
-                  <div className="flex flex-wrap items-center gap-1.5 font-bold text-[#002d5b]">
-                    <span>গড় দ্রুতি</span>
-                    <span>=</span>
-                    <span className="inline-flex flex-col items-center justify-center align-middle">
-                      <span className="border-b border-gray-800 px-1 font-mono text-[11px] leading-none pb-1">AwZuvÿ × 2 × 320</span>
-                      <span className="font-mono text-[11px] leading-none pt-1">mgq</span>
-                    </span>
-                    <span>=</span>
-                    <span className="inline-flex flex-col items-center justify-center align-middle">
-                      <span className="border-b border-gray-800 px-1 font-mono text-[11px] leading-none pb-1">640</span>
-                      <span className="font-mono text-[11px] leading-none pt-1">15 + 12</span>
-                    </span>
-                    <span>=</span>
-                    <span className="inline-flex flex-col items-center justify-center align-middle">
-                      <span className="border-b border-gray-800 px-1 font-mono text-[11px] leading-none pb-1">640</span>
-                      <span className="font-mono text-[11px] leading-none pt-1">27</span>
-                    </span>
-                    <span>=</span>
-                    <span className="font-bold font-mono">23.7ms<sup>-1</sup></span>
-                  </div>
-
-                  <div className="font-black text-gray-900 underline mt-3 text-[11.5px] tracking-wide">নম্বর বণ্টন:</div>
-
-                  <div className="flex flex-wrap items-center gap-1.5 text-gray-700">
-                    <span className="font-bold text-[#002d5b]">গড় দ্রুতি</span>
-                    <span>=</span>
-                    <span className="inline-flex flex-col items-center justify-center align-middle">
-                      <span className="border-b border-gray-800 px-1 font-mono text-[11px] leading-none pb-1">AwZuvÿ × ~</span>
-                      <span className="font-mono text-[11px] leading-none pt-1">mgq</span>
-                    </span>
-                    <span>; সূত্র লেখার জন্য ০.৫ নম্বর।</span>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-1.5 text-gray-700">
-                    <span className="font-bold text-[#002d5b]">গড় দ্রুতি</span>
-                    <span>=</span>
-                    <span className="font-bold font-mono text-[#002d5b]">23.7ms<sup>-1</sup></span>
-                    <span>; নির্ণয় করার জন্য ০.৫ নম্বর।</span>
-                  </div>
-
-                  <div className="text-[11px] text-gray-800 font-medium italic pt-1 border-t border-gray-200">
-                    <span className="font-bold text-red-700">[বি:দ্র:</span>  একক না লিখলে বা ভুল একক লিখলে ০.৫ নম্বর কর্তন করা হবে। সূত্র না লিখে সরাসরি মান বসালেও সূত্রের জন্য বরাদ্দকৃত নম্বর পাবে।<span className="font-bold text-red-700">]</span>
-                  </div>
-                </div>
-              );
-            };
-
-            return (
-              <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white rounded-lg shadow-2xl w-full max-w-4xl h-[92vh] flex flex-col overflow-hidden"
+          {/* Main Content Viewport */}
+          <main className="flex-1 flex flex-col min-w-0 bg-white overflow-hidden relative">
+            <div className="flex-1 overflow-auto bg-white flex flex-col">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${activeTab}-${activeSidebarItem}-${activeSubItem}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex-1 flex flex-col"
                 >
-                  {/* Modal Header */}
-                  <div className="bg-[#002d5b] text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0">
-                    <div>
-                      <h3 className="font-bold text-sm tracking-wide font-sans">
-                        Review Workspace: {selectedReviewRow.examSubject}
-                      </h3>
-                      <p className="text-[11px] text-blue-200 mt-0.5 font-sans">
-                        {selectedReviewRow.program} &bull; {selectedReviewRow.course} &bull; {selectedReviewRow.question}
-                      </p>
-                    </div>
-                    <button 
-                      onClick={() => setSelectedReviewRow(null)}
-                      className="text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded text-xs transition-colors font-sans font-bold"
-                    >
-                      Close Workspace
-                    </button>
-                  </div>
-
-                  {/* Scrollable Main Content */}
-                  <div className="flex-1 overflow-y-auto p-4 bg-white">
-                    <div className="max-w-4xl mx-auto space-y-3">
-                      {/* Question Header & Bengali text */}
-                      <div className="text-left font-sans">
-                        <div className="flex justify-between items-center text-[#333] mb-1.5 px-1">
-                          <div className="text-[13px]">
-                            <span className="font-bold">Question :</span> Unique Set: {selectedReviewRow.uniqueSet || '1'}, Question Serial: {selectedReviewRow.questionSerial || '3'}
-                          </div>
-                          <div className="text-[13px]">
-                            <span className="font-bold">Full Marks :</span> {selectedReviewRow.maxMarks || '1.00'}
-                          </div>
-                        </div>
-
-                        <div className="border border-gray-400 p-2 text-[13px] text-[#222] leading-relaxed font-sans bg-white">
-                          {getQuestionText(selectedReviewRow)}
-                        </div>
-                      </div>
-
-                      {/* Sample Answer & Rubric Box */}
-                      <div className="text-right">
-                         <button className="bg-[#337ab7] border border-[#2e6da4] text-white px-2 py-0.5 rounded text-[11px] font-bold font-sans shadow-xs hover:bg-[#286090]">
-                           Sample Answer
-                         </button>
-                      </div>
-                      
-                      <div className="border border-gray-400 p-3 text-left bg-white min-h-[80px]">
-                        {getSampleAnswer(selectedReviewRow)}
-                      </div>
-
-                      {/* Student's Doubt or Admin Note conditional display */}
-                      {!selectedReviewRow.suppressNotes && ((selectedReviewRow.isFromStudent !== undefined ? selectedReviewRow.isFromStudent : isStudentRequest(selectedReviewRow))) ? (
-                        <div className="border-[3px] border-red-600 p-2.5 text-left mb-2 mt-4">
-                          <div className="text-[14px] font-bold font-sans text-gray-900 mb-1.5">Student's Doubt :</div>
-                          <div className="bg-[#eeeabc] border border-gray-400 px-3 py-2.5 text-[14px] text-gray-900 font-sans font-bold leading-relaxed">
-                            {selectedReviewRow.studentDoubtText || selectedReviewRow.studentDoubt || selectedReviewRow.adminDoubt || "No doubt provided."}
-                          </div>
-                        </div>
-                      ) : !selectedReviewRow.suppressNotes ? (
-                        <div className="text-left mb-2 mt-4">
-                          <div className="text-[15px] font-sans text-gray-800 mb-1">Admin Note</div>
-                          <div className="bg-[#baba00] text-black border border-gray-400 px-3 py-2.5 text-[14px] font-sans leading-relaxed">
-                            {selectedReviewRow.adminCommentText || selectedReviewRow.adminDoubt || selectedReviewRow.studentDoubt || "No admin note provided."}
-                          </div>
-                        </div>
-                      ) : null}
-
-                      {/* Drawing Tools Toolbar */}
-                      <div className="flex items-center justify-center space-x-2 bg-[#f0eff4] border border-gray-300 py-1 px-3 max-w-max mx-auto shrink-0 mt-4 rounded shadow-sm select-none">
-                        {/* Pencil / Pen Tool */}
-                        <button 
-                          onClick={() => setActiveDrawingTool("pencil")}
-                          title="Pen Tool"
-                          className={`p-1.5 transition-colors rounded ${activeDrawingTool === "pencil" ? "bg-gray-300 shadow-inner" : "hover:bg-gray-200"}`}
-                        >
-                          <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                          </svg>
-                        </button>
-
-                        {/* Text Tool */}
-                        <button 
-                          onClick={() => setActiveDrawingTool("text")}
-                          title="Text Tool"
-                          className={`p-1.5 transition-colors rounded flex items-center justify-center min-w-[32px] min-h-[32px] ${activeDrawingTool === "text" ? "bg-gray-300 shadow-inner" : "hover:bg-gray-200"}`}
-                        >
-                          <span className="text-lg font-bold font-serif leading-none italic text-red-600">T</span>
-                        </button>
-
-                        <div className="w-[1px] h-6 bg-gray-300 mx-1" />
-
-                        {/* Undo Tool */}
-                        <button 
-                          onClick={() => {
-                            if (actionHistory.length > 0) {
-                              const lastAction = actionHistory[actionHistory.length - 1];
-                              setActionHistory(prev => prev.slice(0, -1));
-                              setRedoHistory(prev => [...prev, lastAction]);
-                              
-                              if (lastAction.type === 'path') {
-                                setAllPaths(prev => prev.filter(p => p !== lastAction.value));
-                              } else if (lastAction.type === 'comment') {
-                                setScriptComments(prev => prev.filter(c => c.text !== lastAction.value.text || c.x !== lastAction.value.x || c.y !== lastAction.value.y));
-                              }
-                            }
-                          }}
-                          disabled={actionHistory.length === 0}
-                          title="Undo"
-                          className={`p-1.5 transition-colors rounded ${actionHistory.length === 0 ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-200"}`}
-                        >
-                          <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
-                          </svg>
-                        </button>
-
-                        {/* Redo Tool */}
-                        <button 
-                          onClick={() => {
-                            if (redoHistory.length > 0) {
-                              const lastRedo = redoHistory[redoHistory.length - 1];
-                              setRedoHistory(prev => prev.slice(0, -1));
-                              setActionHistory(prev => [...prev, lastRedo]);
-                              
-                              if (lastRedo.type === 'path') {
-                                setAllPaths(prev => [...prev, lastRedo.value]);
-                              } else if (lastRedo.type === 'comment') {
-                                setScriptComments(prev => [...prev, lastRedo.value]);
-                              }
-                            }
-                          }}
-                          disabled={redoHistory.length === 0}
-                          title="Redo"
-                          className={`p-1.5 transition-colors rounded ${redoHistory.length === 0 ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-200"}`}
-                        >
-                          <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
-                          </svg>
-                        </button>
-
-                        {/* Eraser Tool */}
-                        <button 
-                          onClick={() => setActiveDrawingTool("eraser")}
-                          title="Eraser Tool"
-                          className={`p-1.5 transition-colors rounded ${activeDrawingTool === "eraser" ? "bg-gray-300 shadow-inner" : "hover:bg-gray-200"}`}
-                        >
-                          <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M16.24 3.56L21.19 8.51C21.97 9.29 21.97 10.55 21.19 11.33L14.6 17.92L11.77 15.09L18.36 8.5L13.41 3.56L16.24 3.56ZM7.76 19.04L10.59 16.21L13.42 19.04L11.77 20.69C11 21.47 9.74 21.47 8.96 20.69L7.76 19.04ZM3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25Z" />
-                          </svg>
-                        </button>
-
-                        <div className="w-[1px] h-6 bg-gray-300 mx-1" />
-
-                        {/* Rotate Tool */}
-                        <button 
-                          onClick={() => setStudentPaperRotate(prev => (prev + 90) % 360)}
-                          title="Rotate"
-                          className="p-1.5 hover:bg-gray-200 transition-colors rounded"
-                        >
-                          <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.14-.87.49-1.72 1.02-2.47zM6.09 13H4.07c.17 1.39.72 2.73 1.62 3.89l1.41-1.42c-.52-.75-.87-1.59-1.01-2.47zm3.44 5.47c-.75-.53-1.59-.88-2.47-1.02v2.02c1.39.17 2.73.72 3.89 1.62l-1.42 1.4zm6.94 0l-1.42-1.42c-.88.14-1.72.49-2.47 1.02l1.42 1.42c1.16-.9 2.5-1.45 3.89-1.62v-2.02zM13 4.07c-1.39.17-2.73.72-3.89 1.62l1.42 1.42c.75-.53 1.59-.88 2.47-1.02V4.07zM18.3 7.11l-1.41 1.42c.53.75.88 1.59 1.02 2.47h2.02c-.17-1.39-.73-2.73-1.63-3.89zM17.91 13c-.14.88-.49 1.72-1.02 2.47l1.41 1.42c.9-1.16 1.45-2.5 1.62-3.89h-2.01zM10.5 13H13v2.5l3.5-3.5L13 8.5V11h-2.5V8.5L7 12l3.5 3.5V13z" />
-                          </svg>
-                        </button>
-
-                        <div className="w-[1px] h-6 bg-gray-300 mx-1" />
-
-                        {/* Page Increments & Decrements */}
-                        {/* Add Page Button */}
-                        <button 
-                          onClick={() => {
-                            // Save current page state
-                            setPageStore(prev => ({
-                              ...prev,
-                              [currentScriptPage]: { paths: [...allPaths], comments: [...scriptComments] }
-                            }));
-                            
-                            const newTotal = totalScriptPages + 1;
-                            setTotalScriptPages(newTotal);
-                            
-                            // Initialize blank target page
-                            setAllPaths([]);
-                            setScriptComments([]);
-                            setRedoPaths([]);
-                            setActionHistory([]);
-                            setRedoHistory([]);
-                            setCurrentScriptPage(newTotal);
-                          }}
-                          title="Add Continuation Page"
-                          className="p-1 hover:bg-gray-200 transition-colors rounded flex items-center justify-center min-w-[28px] min-h-[28px]"
-                        >
-                          <span className="text-lg font-bold text-gray-800 leading-none px-1">+</span>
-                        </button>
-
-                        {/* Remove Page Button */}
-                        <button 
-                          onClick={() => {
-                            if (totalScriptPages <= 1) return;
-                            const newTotal = totalScriptPages - 1;
-                            setTotalScriptPages(newTotal);
-                            
-                            setPageStore(prev => {
-                              const copy = { ...prev };
-                              delete copy[totalScriptPages];
-                              return copy;
-                            });
-
-                            if (currentScriptPage > newTotal) {
-                              const targetData = pageStore[newTotal] || { paths: [], comments: [] };
-                              setAllPaths(targetData.paths);
-                              setScriptComments(targetData.comments);
-                              setRedoPaths([]);
-                              setActionHistory([]);
-                              setRedoHistory([]);
-                              setCurrentScriptPage(newTotal);
-                            }
-                          }}
-                          disabled={totalScriptPages <= 1}
-                          title="Remove Last Continuation Page"
-                          className={`p-1 transition-colors rounded flex items-center justify-center min-w-[28px] min-h-[28px] ${totalScriptPages <= 1 ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-200"}`}
-                        >
-                          <span className="text-xl font-bold text-gray-800 leading-none px-1">-</span>
-                        </button>
-                      </div>
-
-                      {/* Student script answer canvas inside dotted border */}
-                      <div className="border border-dotted border-gray-400 bg-white relative overflow-hidden select-none w-full min-h-[360px] flex items-center justify-center shadow-inner rounded-md">
-                        <div 
-                          className="transition-all duration-200 ease-out w-full relative"
-                          style={{ 
-                            transform: `scale(${imageScale}) rotate(${studentPaperRotate}deg)`,
-                            transformOrigin: 'center center'
-                          }}
-                        >
-                          {reviewViewMode === 'canvas' ? (
-                            <>
-                              {/* Always render the beautifully styled student notebook script */}
-                              <RenderStudentScriptPaper row={selectedReviewRow} />
-
-                              {/* Overlay transparent drawing canvas on top */}
-                              <svg 
-                                viewBox="0 0 800 360" 
-                                className="absolute inset-0 w-full h-full cursor-crosshair touch-none"
-                                onMouseDown={handleSvgMouseDown}
-                                onMouseMove={handleSvgMouseMove}
-                                onMouseUp={handleSvgMouseUp}
-                                onMouseLeave={handleSvgMouseUp}
-                                onTouchStart={handleSvgTouchStart}
-                                onTouchMove={handleSvgTouchMove}
-                                onTouchEnd={handleSvgMouseUp}
-                              >
-                                {/* Custom Overlay Drawing lines */}
-                                {allPaths.map((path, idx) => (
-                                  <g key={idx}>
-                                    {/* Thicker click targets for the eraser */}
-                                    <path 
-                                      d={path} 
-                                      fill="none" 
-                                      stroke="transparent" 
-                                      strokeWidth="24" 
-                                      strokeLinecap="round" 
-                                      strokeLinejoin="round" 
-                                      className={activeDrawingTool === 'eraser' ? 'cursor-pointer' : ''}
-                                      onMouseDown={(e) => {
-                                        if (activeDrawingTool === 'eraser') {
-                                          e.stopPropagation();
-                                          const pStr = path;
-                                          setAllPaths(prev => prev.filter(p => p !== pStr));
-                                          setActionHistory(prev => prev.filter(act => act.type !== 'path' || act.value !== pStr));
-                                        }
-                                      }}
-                                    />
-                                    <path 
-                                      d={path} 
-                                      fill="none" 
-                                      stroke="#ff3b30" 
-                                      strokeWidth="4.5" 
-                                      strokeLinecap="round" 
-                                      strokeLinejoin="round" 
-                                      className={activeDrawingTool === 'eraser' ? 'opacity-40' : ''}
-                                    />
-                                  </g>
-                                ))}
-                                {currentPath && (
-                                  <path d={currentPath} fill="none" stroke="#ff3b30" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
-                                )}
-                                {/* Custom comments from the Text Tool */}
-                                {scriptComments.map((comment, idx) => (
-                                  <g key={idx}>
-                                    <text 
-                                      x={comment.x} 
-                                      y={comment.y} 
-                                      fontFamily="'Comic Sans MS', cursive, sans-serif" 
-                                      fontSize="20" 
-                                      fontWeight="bold" 
-                                      fill="#ff3b30"
-                                      className={activeDrawingTool === 'eraser' ? 'cursor-pointer hover:fill-red-400 select-none opacity-40 line-through' : 'select-none'}
-                                      onMouseDown={(e) => {
-                                        if (activeDrawingTool === 'eraser') {
-                                          e.stopPropagation();
-                                          setScriptComments(prev => prev.filter((_, i) => i !== idx));
-                                          setActionHistory(prev => prev.filter(act => act.type !== 'comment' || act.value.x !== comment.x || act.value.y !== comment.y));
-                                        }
-                                      }}
-                                    >
-                                      {comment.text}
-                                    </text>
-                                    {activeDrawingTool === 'eraser' && (
-                                      <text 
-                                        x={comment.x} 
-                                        y={comment.y - 18} 
-                                        fill="#e53e3e" 
-                                        fontSize="10" 
-                                        fontWeight="bold" 
-                                        className="select-none fill-red-600 animate-pulse pointer-events-none"
-                                      >
-                                        [Click to erase]
-                                      </text>
-                                    )}
-                                  </g>
-                                ))}
-                              </svg>
-                            </>
-                          ) : (
-                            <div className="relative w-full max-h-[350px] overflow-hidden flex items-center justify-center bg-gray-900 rounded-lg">
-                              <img 
-                                src="/src/assets/images/scanned_exam_script_1782972819954.jpg" 
-                                alt="Scanned Exam Script" 
-                                className="w-full max-h-[350px] object-cover rounded-md"
-                                referrerPolicy="no-referrer"
-                              />
-                              <div className="absolute top-2 left-2 bg-black/70 px-2 py-1 rounded text-[10px] text-white font-bold flex items-center space-x-1 font-sans">
-                                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                                <span>ORIGINAL SCAN ARCHIVE</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Interactive Page Navigation & Indicators */}
-                      <div className="flex items-center justify-center space-x-4 mt-3 font-sans select-none">
-                        <button 
-                          disabled={currentScriptPage <= 1}
-                          onClick={() => {
-                            const prevPage = currentScriptPage - 1;
-                            setPageStore(prev => ({
-                              ...prev,
-                              [currentScriptPage]: { paths: [...allPaths], comments: [...scriptComments] }
-                            }));
-                            const targetData = pageStore[prevPage] || { paths: [], comments: [] };
-                            setAllPaths(targetData.paths);
-                            setScriptComments(targetData.comments);
-                            setRedoPaths([]);
-                            setActionHistory([]);
-                            setRedoHistory([]);
-                            setCurrentScriptPage(prevPage);
-                          }}
-                          className={`p-1 px-3.5 rounded border text-[12px] font-bold transition-colors uppercase ${
-                            currentScriptPage <= 1 
-                              ? "text-gray-300 border-gray-200 bg-gray-50 cursor-not-allowed" 
-                              : "text-[#337ab7] border-[#337ab7] bg-white hover:bg-gray-100"
-                          }`}
-                        >
-                          Previous
-                        </button>
-                        
-                        <span className="font-bold text-gray-700 text-[13px] bg-gray-100 px-3 py-1 rounded border border-gray-200 min-w-[70px] text-center">
-                          Page {currentScriptPage} / {totalScriptPages}
-                        </span>
-                        
-                        <button 
-                          disabled={currentScriptPage >= totalScriptPages}
-                          onClick={() => {
-                            const nextPage = currentScriptPage + 1;
-                            setPageStore(prev => ({
-                              ...prev,
-                              [currentScriptPage]: { paths: [...allPaths], comments: [...scriptComments] }
-                            }));
-                            const targetData = pageStore[nextPage] || { paths: [], comments: [] };
-                            setAllPaths(targetData.paths);
-                            setScriptComments(targetData.comments);
-                            setRedoPaths([]);
-                            setActionHistory([]);
-                            setRedoHistory([]);
-                            setCurrentScriptPage(nextPage);
-                          }}
-                          className={`p-1 px-3.5 rounded border text-[12px] font-bold transition-colors uppercase ${
-                            currentScriptPage >= totalScriptPages 
-                              ? "text-gray-300 border-gray-200 bg-gray-50 cursor-not-allowed" 
-                              : "text-[#337ab7] border-[#337ab7] bg-white hover:bg-gray-100"
-                          }`}
-                        >
-                          Next
-                        </button>
-                      </div>
-
-                      {/* Metadata row */}
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-gray-100 pt-3 text-left text-[12.5px] text-[#333] font-sans gap-3">
-                        <div className="space-y-0.5">
-                          <div>Roll No :{selectedReviewRow.rollNumber || '43181101234'}</div>
-                          <div>Registration No :{selectedReviewRow.registrationNo || '5232676'}</div>
-                          <div className="text-[#333]">
-                            Examiner : {selectedReviewRow.examinerName || 'Bayezid (15270) [15270]'} | EvaluationTime :{selectedReviewRow.evaluationTime || '2026-07-04 07:16 PM'}
-                          </div>
-                          {(selectedReviewRow.reviewStatus === 'Reviewed' || selectedReviewRow.reviewStatus === 'Rechecked from Admin') && (
-                            <div className="text-red-600 font-bold mt-1 text-[12px]">
-                              Reviewed By: {
-                                selectedReviewRow.adminId || (() => {
-                                  const reviewersList = [
-                                    "nazmul.2853@udvash.net",
-                                    "nazmul.7413@udvash.net",
-                                    "faisal.7402@udvash.net",
-                                    "Suja.7146@udvash.net",
-                                    "yeasin.9206@udvash.net"
-                                  ];
-                                  const keyStr = selectedReviewRow.id || selectedReviewRow.rollNumber || selectedReviewRow.question || "";
-                                  const sum = keyStr.split("").reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-                                  return reviewersList[sum % reviewersList.length];
-                                })()
-                              } (05-Jul-2026 11:30 AM)
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <button 
-                            onClick={() => setShowImageLog(true)}
-                            className="bg-[#4395d1] hover:bg-[#3484c0] text-white font-bold text-xs px-6 py-2.5 rounded transition-colors font-sans shadow-xs"
-                          >
-                            Image log
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Obtained input */}
-                      <div className="flex items-center space-x-2 pt-3">
-                        <span className="font-bold text-[#333] text-[15px]">Obtained:</span>
-                        <input 
-                          type="text" 
-                          value={reviewObtainedMarks}
-                          onChange={(e) => setReviewObtainedMarks(e.target.value)}
-                          className="w-20 bg-[#c6efce] border border-[#a2d4ab] text-[#006100] font-bold text-center px-2 py-1.5 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 text-[15px] font-sans"
-                        />
-                        <span className="font-bold text-[#333] text-[15px]">/ {selectedReviewRow.maxMarks || '1.00'}</span>
-                      </div>
-
-                      {/* Action buttons at bottom */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4">
-                        <button 
-                          onClick={() => {
-                            const isDrawingOrWriting = allPaths.length > 0 || scriptComments.length > 0;
-                            
-                            if (isDrawingOrWriting) {
-                              alert("Evaluation successfully updated! Marks and annotations have been saved.");
-                            } else {
-                              alert("Marks successfully submitted! Moving to the next student script.");
-                            }
-                            
-                            // Update record in the appropriate list
-                            const rowId = selectedReviewRow?.id;
-                            if (rowId) {
-                              if (rowId.startsWith("REV-")) {
-                                setReviewRecords(prev => prev.map(rec => {
-                                  if (rec.id === rowId) {
-                                    return {
-                                      ...rec,
-                                      obtainedMarks: reviewObtainedMarks,
-                                      reviewStatus: 'Reviewed',
-                                      allPaths: [...allPaths],
-                                      scriptComments: [...scriptComments]
-                                    };
-                                  }
-                                  return rec;
-                                }));
-                              } else if (rowId.startsWith("FWD-")) {
-                                setAdminForwardedRequests(prev => prev.map(req => {
-                                  if (req.id === rowId) {
-                                    return {
-                                      ...req,
-                                      obtainedMarks: reviewObtainedMarks,
-                                      status: 'Completed',
-                                      allPaths: [...allPaths],
-                                      scriptComments: [...scriptComments]
-                                    };
-                                  }
-                                  return req;
-                                }));
-                              } else if (rowId.startsWith("SR-")) {
-                                setStudentReviewRequests(prev => prev.map(sr => {
-                                  if (sr.id === rowId) {
-                                    return {
-                                      ...sr,
-                                      obtainedMarks: reviewObtainedMarks,
-                                      status: 'Reviewed',
-                                      allPaths: [...allPaths],
-                                      scriptComments: [...scriptComments]
-                                    };
-                                  }
-                                  return sr;
-                                }));
-                              }
-                            }
-                            
-                            // Clear workspace and reset
-                            setReviewObtainedMarks("1.00");
-                            setAllPaths([]);
-                            setScriptComments([]);
-                            setShowForwardToTeacher(false);
-                            setForwardToTeacherText("");
-                            setForwardSuccessMessage("");
-                            setSelectedReviewRow(null);
-                          }}
-                          className={`${
-                            (allPaths.length > 0 || scriptComments.length > 0)
-                              ? "bg-emerald-600 hover:bg-emerald-700"
-                              : "bg-[#337ab7] hover:bg-[#286090]"
-                          } text-white font-bold py-2.5 rounded text-center transition-colors font-sans text-[12px] md:text-[13px] shadow-sm uppercase tracking-wide`}
-                        >
-                          {(allPaths.length > 0 || scriptComments.length > 0) ? "Submit & Next" : "Skip & Next"}
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setShowForwardToTeacher(!showForwardToTeacher);
-                            setForwardSuccessMessage("");
-                          }}
-                          className={`font-bold py-2.5 rounded text-center transition-all font-sans text-[12px] md:text-[13px] shadow-sm uppercase tracking-wide border ${
-                            showForwardToTeacher 
-                              ? 'bg-purple-700 border-purple-700 text-white' 
-                              : 'bg-white border-purple-300 text-purple-700 hover:bg-[#7a43d1] hover:text-white'
-                          }`}
-                        >
-                          Forward to Teacher
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setReviewObtainedMarks("0.00");
-                            alert("Answer script marked as Blank (Obtained Marks: 0.00).");
-                            setShowForwardToTeacher(false);
-                            setForwardToTeacherText("");
-                            setForwardSuccessMessage("");
-                          }}
-                          className="bg-[#f0ad4e] hover:bg-[#ec971f] text-white font-bold py-2.5 rounded text-center transition-colors font-sans text-[12px] md:text-[13px] shadow-sm uppercase tracking-wide"
-                        >
-                          Blank
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setSelectedReviewRow(null);
-                            setShowForwardToTeacher(false);
-                            setForwardToTeacherText("");
-                            setForwardSuccessMessage("");
-                          }}
-                          className="bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold py-2.5 rounded text-center transition-colors font-sans text-[12px] md:text-[13px] shadow-sm uppercase tracking-wide"
-                        >
-                          Exit
-                        </button>
-                      </div>
-
-                      {/* Forward to Teacher Panel */}
-                      {showForwardToTeacher && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-4 border border-purple-200 bg-purple-50/40 rounded-lg p-4 text-left"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
-                            <label className="text-xs font-bold text-purple-900 uppercase tracking-wider font-sans">
-                              Admin Note to Teacher
-                            </label>
-                            <div className="flex items-center space-x-3.5 text-xs font-bold text-purple-900 bg-purple-100/60 px-3 py-1 rounded-md border border-purple-200">
-                              <label className="flex items-center space-x-1.5 cursor-pointer select-none">
-                                <input
-                                  type="checkbox"
-                                  checked={forwardSingleChecked}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setForwardSingleChecked(true);
-                                      setForwardMultipleChecked(false);
-                                    } else {
-                                      setForwardSingleChecked(false);
-                                      setForwardMultipleChecked(true);
-                                    }
-                                  }}
-                                  className="rounded border-purple-300 text-purple-600 focus:ring-purple-500 h-3.5 w-3.5 cursor-pointer"
-                                />
-                                <span className="font-sans">Single</span>
-                              </label>
-                              <label className="flex items-center space-x-1.5 cursor-pointer select-none">
-                                <input
-                                  type="checkbox"
-                                  checked={forwardMultipleChecked}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setForwardMultipleChecked(true);
-                                      setForwardSingleChecked(false);
-                                    } else {
-                                      setForwardMultipleChecked(false);
-                                      setForwardSingleChecked(true);
-                                    }
-                                  }}
-                                  className="rounded border-purple-300 text-purple-600 focus:ring-purple-500 h-3.5 w-3.5 cursor-pointer"
-                                />
-                                <span className="font-sans">Multiple</span>
-                              </label>
-                            </div>
-                          </div>
-                          
-                          {forwardMultipleChecked && (
-                            <div className="mb-3 bg-purple-100/90 border border-purple-200 text-purple-900 rounded-md px-3 py-2 text-xs font-extrabold font-sans flex items-center justify-between shadow-3xs">
-                              <span className="flex items-center space-x-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-ping shrink-0"></span>
-                                <span>Group Selected:</span>
-                              </span>
-                              <span className="bg-white px-2 py-0.5 rounded border border-purple-300 font-mono text-purple-800">
-                                Unique Set: {uSet}, Question Serial: {qSerial}
-                              </span>
-                            </div>
-                          )}
-
-                          <textarea
-                             value={forwardToTeacherText}
-                             onChange={(e) => setForwardToTeacherText(e.target.value)}
-                             placeholder="Enter your note for the teacher here... e.g. 'Please review the answer for question 3 again.'"
-                             className="w-full min-h-[90px] border border-purple-200 rounded-md p-3 text-[13px] font-sans text-gray-800 bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y"
-                          />
-                          <div className="flex justify-end space-x-2 mt-3">
-                            <button
-                              onClick={() => {
-                                setShowForwardToTeacher(false);
-                                setForwardToTeacherText("");
-                              }}
-                              className="px-3.5 py-1.5 border border-gray-300 rounded text-gray-700 text-xs font-bold font-sans hover:bg-gray-100 transition-all"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (!forwardToTeacherText.trim()) {
-                                  alert("Please write a note before forwarding.");
-                                  return;
-                                }
-                                const selectedOpts = [];
-                                if (forwardSingleChecked) selectedOpts.push("Single");
-                                if (forwardMultipleChecked) selectedOpts.push("Multiple");
-                                const optsStr = selectedOpts.length > 0 ? ` [Options Selected: ${selectedOpts.join(", ")}]` : " [No Options Selected]";
-
-                                // Get examiner info
-                                const examinerNameRaw = selectedReviewRow ? (selectedReviewRow.examinerName || selectedReviewRow.examiner || "Unknown Examiner") : "Unknown Examiner";
-                                const examDet = getExaminerDetails(typeof examinerNameRaw === 'object' ? examinerNameRaw.name : examinerNameRaw);
-
-                                // If Multiple is selected, the review count will be the total number of scripts evaluated in the set, otherwise just 1 script.
-                                const finalReviewCount = forwardMultipleChecked
-                                  ? parseInt(selectedReviewRow?.totalScript || "124", 10)
-                                  : 1;
-
-                                // Extract question serial and unique set from selectedReviewRow
-                                let qSerial = "1";
-                                let uSet = "1";
-                                if (selectedReviewRow?.question) {
-                                  const matchQ = selectedReviewRow.question.match(/Question Serial:\s*(\d+)/i);
-                                  if (matchQ) qSerial = matchQ[1];
-                                  const matchS = selectedReviewRow.question.match(/Unique Set:\s*(\d+)/i);
-                                  if (matchS) uSet = matchS[1];
-                                } else if (selectedReviewRow?.questionSerial) {
-                                  qSerial = selectedReviewRow.questionSerial;
-                                  uSet = selectedReviewRow.uniqueSet || "1";
-                                }
-
-                                // Create a new forwarded request item
-                                const newForwardedRequest = {
-                                  id: `FWD-${Math.floor(100 + Math.random() * 900)}`,
-                                  examiner: {
-                                    id: examDet.id,
-                                    name: examDet.name,
-                                    phone: "8801" + Math.floor(1300000000 + Math.random() * 600000000)
-                                  },
-                                  course: (selectedReviewRow && (selectedReviewRow.courseName || selectedReviewRow.course)) || "NDC & SJC All Service [CAP - 2026]",
-                                  subject: (selectedReviewRow && selectedReviewRow.subject) || "Physics [OW]",
-                                  exam: (selectedReviewRow && (selectedReviewRow.examName || selectedReviewRow.exam)) || "Weekly Written Test-02",
-                                  adminId: "nazmul.2853@udvash.net",
-                                  note: forwardToTeacherText,
-                                  date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-                                  status: "Pending Teacher Response",
-                                  reviewCount: finalReviewCount,
-                                  
-                                  // Added fields to support filters in Admin Review Request
-                                  organization: selectedReviewRow?.organization || "UDVASH",
-                                  program: selectedReviewRow?.program || "College Admission Program",
-                                  session: selectedReviewRow?.session || "2026",
-                                  examType: selectedReviewRow?.examType || "Online Written",
-                                  version: selectedReviewRow?.version || "Bangla",
-                                  questionSerial: qSerial,
-                                  uniqueSet: uSet,
-                                  evaluationType: selectedReviewRow?.evaluationType || "Regular",
-                                  reviewRequest: "Rechecked from Admin",
-                                  rollNumber: selectedReviewRow?.rollNumber || "37180701100",
-                                  minMarks: selectedReviewRow?.minMarks || "0.00",
-                                  maxMarks: selectedReviewRow?.maxMarks || "1.00",
-                                  obtainedMarks: selectedReviewRow?.obtainedMarks || "0.00",
-                                  
-                                  // Multiple support
-                                  isMultiple: forwardMultipleChecked,
-                                  totalScriptsCount: forwardMultipleChecked ? 10 : 1,
-                                  checkedScriptsCount: forwardMultipleChecked ? 5 : 0
-                                };
-
-                                setAdminForwardedRequests(prev => [newForwardedRequest, ...prev]);
-
-                                setForwardSuccessMessage(`আপনার মন্তব্য সহ স্ক্রিপ্টটি সফলভাবে প্রধান শিক্ষকের নিকট পাঠানো হয়েছে!${optsStr} মন্তব্য: "${forwardToTeacherText}"`);
-                                setForwardToTeacherText("");
-                                setTimeout(() => {
-                                  setShowForwardToTeacher(false);
-                                }, 4000);
-                              }}
-                              className="px-4 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded text-xs font-bold font-sans transition-all flex items-center space-x-1"
-                            >
-                              <span>Submit</span>
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-
-                      {/* Forward Success Message */}
-                      {forwardSuccessMessage && (
-                        <motion.div 
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="mt-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg p-3 text-xs font-semibold font-sans text-left flex items-start space-x-2 shadow-xs"
-                        >
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mt-1 shrink-0"></span>
-                          <span>{forwardSuccessMessage}</span>
-                        </motion.div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Image Log Modal */}
-                  {showImageLog && (
-                    <div className="fixed inset-0 bg-black/75 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white rounded-lg shadow-2xl w-full max-w-5xl h-[88vh] flex flex-col overflow-hidden border border-gray-300"
-                      >
-                        {/* Header */}
-                        <div className="bg-[#002d5b] text-white px-6 py-3 flex items-center justify-between shrink-0">
-                          <h3 className="font-bold text-lg font-sans tracking-tight">Saq Image Log</h3>
-                          <button 
-                            onClick={() => setShowImageLog(false)}
-                            className="text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition-colors font-bold text-xl"
-                          >
-                            ×
-                          </button>
-                        </div>
-                        
-                        {/* Content Area */}
-                        <div className="flex-1 overflow-auto p-4 bg-[#f0f2f5]">
-                          <div className="bg-white rounded border border-gray-300 overflow-hidden shadow-sm">
-                            <table className="w-full border-collapse">
-                              <thead>
-                                <tr className="bg-[#f8f9fa] border-b border-gray-300 text-[13px] font-bold text-gray-700">
-                                  <th className="px-4 py-3 border-r border-gray-200 text-center w-[32%]">Image</th>
-                                  <th className="px-4 py-3 border-r border-gray-200 text-left w-[34%]">Details</th>
-                                  <th className="px-4 py-3 text-left w-[34%]">User</th>
-                                </tr>
-                              </thead>
-                              <tbody className="text-[12px] text-[#333] divide-y divide-gray-200">
-                                {/* Review Version (Top) */}
-                                <tr className="bg-purple-50/10 hover:bg-purple-50/25 transition-colors">
-                                  <td className="p-4 border-r border-gray-200">
-                                    <div className="text-blue-600 font-mono text-[10px] mb-2 font-bold truncate">review_annotated_{selectedReviewRow.id || 'rev01'}.png</div>
-                                    <div className="border border-purple-200 p-1.5 bg-white shadow-xs rounded-sm inline-block w-full">
-                                      <div className="relative w-full h-[140px] overflow-hidden rounded-xs border border-purple-100 flex items-center justify-center bg-purple-50/30 scale-[0.9]">
-                                        <RenderStudentScriptPaper row={{ ...selectedReviewRow }} mode="review" />
-                                        <div className="absolute inset-0 bg-transparent" />
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="p-4 border-r border-gray-200 align-top space-y-1.5 font-sans">
-                                    <div className="flex items-center space-x-2">
-                                      <span className="font-extrabold text-[11px] uppercase px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200">
-                                        {selectedReviewRow.isFromStudent ? "Student Review Request" : "Admin Note"}
-                                      </span>
-                                    </div>
-                                    <div className="text-gray-700 text-[12px] leading-relaxed pt-1.5">
-                                      <strong>Doubt / Note:</strong> <span className="italic text-purple-900 bg-purple-50/80 px-1 py-0.5 rounded font-medium">
-                                        "{selectedReviewRow.isFromStudent 
-                                          ? (selectedReviewRow.studentDoubtText || selectedReviewRow.studentDoubt || "Anode manei toh rinattok pranto") 
-                                          : (selectedReviewRow.adminCommentText || selectedReviewRow.adminDoubt || "খাতাটি পুনঃ মূল্যায়ন করো।")}"
-                                      </span>
-                                    </div>
-                                    <div className="pt-1.5 grid grid-cols-2 gap-y-1 text-[11px] text-gray-500">
-                                      <div><strong>UniqueSet:</strong> {selectedReviewRow.uniqueSet || '2'}</div>
-                                      <div><strong>Question Serial:</strong> {selectedReviewRow.questionSerial || '12'}</div>
-                                      <div><strong>Obtained Marks:</strong> <span className="text-purple-700 font-bold">{reviewObtainedMarks || selectedReviewRow.obtainedMarks || '0.00'}</span></div>
-                                    </div>
-                                  </td>
-                                  <td className="p-4 align-top space-y-1.5 font-sans text-[11px] text-gray-600">
-                                    <div><span className="font-bold">Time:</span> {selectedReviewRow.date || new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' 11:30 AM'}</div>
-                                    <div><span className="font-bold">Status:</span> {selectedReviewRow.status || 'Pending Resolution'}</div>
-                                    <div><span className="font-bold text-gray-400 italic">ID: {selectedReviewRow.id || 'FWD-001'}</span></div>
-                                    <div className="pt-1.5">
-                                      <div className="font-bold text-gray-900">Last Operation:</div>
-                                      <div className="text-purple-800 font-bold underline">ReviewRequestLogged</div>
-                                    </div>
-                                  </td>
-                                </tr>
-
-                                {/* Evaluated Version (Middle) */}
-                                <tr className="hover:bg-blue-50/20 transition-colors">
-                                  <td className="p-4 border-r border-gray-200">
-                                    <div className="text-blue-600 font-mono text-[10px] mb-2 font-bold truncate">anno_2_f46d82d6-b3a5-48db-8ef1-c92e29526190.jpg</div>
-                                    <div className="border border-gray-300 p-1.5 bg-white shadow-xs rounded-sm inline-block w-full">
-                                      <div className="relative w-full h-[140px] overflow-hidden rounded-xs border border-gray-100 flex items-center justify-center bg-gray-50 scale-[0.9]">
-                                        <RenderStudentScriptPaper row={{ ...selectedReviewRow }} mode="evaluated" />
-                                        <div className="absolute inset-0 bg-transparent" />
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="p-4 border-r border-gray-200 align-top space-y-1.5 font-sans">
-                                    <div className="flex items-center space-x-2">
-                                      <span className="font-extrabold text-[11px] uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                        Evaluated Script
-                                      </span>
-                                    </div>
-                                    <div className="text-gray-600 text-[11px] leading-relaxed pt-1">
-                                      Graded with red ticks, corrections, annotations and examiner signature.
-                                    </div>
-                                    <div className="pt-1 grid grid-cols-2 gap-y-1 text-[11px] text-gray-500">
-                                      <div><strong>UniqueSet:</strong> {selectedReviewRow.uniqueSet || '2'}</div>
-                                      <div><strong>Question Serial:</strong> {selectedReviewRow.questionSerial || '12'}</div>
-                                      <div><strong>Original Marks:</strong> <span className="text-emerald-700 font-bold">{selectedReviewRow.obtainedMarks || '1.00'}</span></div>
-                                    </div>
-                                  </td>
-                                  <td className="p-4 align-top space-y-1.5 font-sans text-gray-700 text-[11px]">
-                                    <div><span className="font-bold">Time:</span> 05 Jul, 2026 07:31 PM</div>
-                                    <div><span className="font-bold">Examiner:</span> {selectedReviewRow.examinerName || 'Junayad [17576]'}</div>
-                                    <div><span className="font-bold">Is Marked:</span> Yes</div>
-                                    <div className="pt-1.5">
-                                      <div className="font-bold text-gray-900">Last Operation:</div>
-                                      <div className="text-emerald-800 font-bold">MarksEntryByTeacher</div>
-                                    </div>
-                                  </td>
-                                </tr>
-
-                                {/* Raw Version (Bottom) */}
-                                <tr className="bg-gray-100/50 hover:bg-gray-100/70 transition-colors">
-                                  <td className="p-4 border-r border-gray-200">
-                                    <div className="text-blue-600 font-mono text-[10px] mb-2 font-bold truncate">3_62d5c931-19fa-44c9-a324-85fd1408fd1a.jpg</div>
-                                    <div className="border border-gray-300 p-1.5 bg-white shadow-xs rounded-sm inline-block w-full">
-                                      <div className="relative w-full h-[140px] overflow-hidden rounded-xs border border-gray-100 flex items-center justify-center grayscale opacity-70 bg-gray-100 scale-[0.9]">
-                                        <RenderStudentScriptPaper row={{ ...selectedReviewRow }} mode="raw" />
-                                        <div className="absolute inset-0 bg-black/5" />
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="p-4 border-r border-gray-200 align-top space-y-1.5 font-sans">
-                                    <div className="flex items-center space-x-2">
-                                      <span className="font-extrabold text-[11px] uppercase px-2 py-0.5 rounded bg-gray-200 text-gray-700 border border-gray-300">
-                                        Raw Script
-                                      </span>
-                                    </div>
-                                    <div className="text-gray-500 text-[11px] leading-relaxed pt-1">
-                                      The original answer script uploaded directly from candidate scanning device. No examiner markings exist on this image.
-                                    </div>
-                                    <div className="pt-1 grid grid-cols-2 gap-y-1 text-[11px] text-gray-500">
-                                      <div><strong>UniqueSet:</strong> {selectedReviewRow.uniqueSet || '2'}</div>
-                                      <div><strong>Question Serial:</strong> {selectedReviewRow.questionSerial || '12'}</div>
-                                      <div><strong>Marks:</strong> 0.00</div>
-                                    </div>
-                                  </td>
-                                  <td className="p-4 align-top space-y-1.5 font-sans text-gray-600 text-[11px]">
-                                    <div><span className="font-bold">Uploaded Time:</span> 05 Jul, 2026 07:21 PM</div>
-                                    <div><span className="font-bold">System Status:</span> Raw Scanned</div>
-                                    <div><span className="font-bold">Source:</span> scanned_qmaster_app</div>
-                                    <div className="pt-1.5">
-                                      <div className="font-bold text-gray-900">Last Operation:</div>
-                                      <div className="text-gray-800 font-bold">NewUploaded</div>
-                                    </div>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                        
-                        {/* Footer */}
-                        <div className="bg-gray-50 border-t border-gray-300 px-6 py-3 flex justify-end shrink-0">
-                          <button 
-                            onClick={() => setShowImageLog(false)}
-                            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-6 py-1.5 rounded transition-colors text-sm font-sans shadow-xs"
-                          >
-                            Close
-                          </button>
-                        </div>
-                      </motion.div>
-                    </div>
-                  )}
+                  {renderContent()}
                 </motion.div>
-              </div>
-            );
-          })()}
-    </div>
-  );
+              </AnimatePresence>
+            </div>
+
+            {/* Main Content Footer */}
+            <footer className="h-16 bg-white flex items-center justify-center border-t border-gray-100 flex-shrink-0">
+              <p className="text-xs text-gray-500">© 2026 - ORG (Nazmul Alam-2853)</p>
+            </footer>
+          </main>
+
+        </div>
+      </div>
+    );
+  };
+
+  // Render app layout directly (fully responsive layout is automatically handled)
+  return renderAppLayout();
 }
