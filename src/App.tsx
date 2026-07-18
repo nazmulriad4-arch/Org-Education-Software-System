@@ -1671,6 +1671,8 @@ export default function App() {
       setCurrentUser(null);
       localStorage.removeItem('currentUser');
       setIsProfileOpen(false);
+      setLoginEmail('');
+      setLoginPassword('');
       alert("আপনার অ্যাকাউন্টটি স্থায়ীভাবে ডিলিট করা হয়েছে। অনুগ্রহ করে আবার লগ ইন করুন বা সিস্টেম ওনারের সাথে যোগাযোগ করুন।\n\n(Your account has been permanently deleted. Logging out of session.)");
     } else {
       // Check if details have changed
@@ -7431,6 +7433,8 @@ export default function App() {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
     setIsProfileOpen(false);
+    setLoginEmail('');
+    setLoginPassword('');
   };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
