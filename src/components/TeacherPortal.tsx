@@ -15,6 +15,7 @@ import {
   Search, 
   Filter, 
   Plus, 
+  Minus,
   Send, 
   Edit3, 
   ThumbsUp, 
@@ -96,6 +97,19 @@ export default function TeacherPortal({
   const [pendingQuestions, setPendingQuestions] = useState<any[]>([]);
   const [communityPosts, setCommunityPosts] = useState<any[]>([]);
   const [isDbLoaded, setIsDbLoaded] = useState(false);
+
+  // Evaluation Payment Filter States
+  const [evalPaymentProgram, setEvalPaymentProgram] = useState('All Program');
+  const [evalPaymentSession, setEvalPaymentSession] = useState('All Session');
+  const [evalPaymentCourse, setEvalPaymentCourse] = useState('All Course');
+  const [evalPaymentExam, setEvalPaymentExam] = useState('');
+  const [evalPaymentExamType, setEvalPaymentExamType] = useState('All Exam Type');
+  const [evalPaymentStatus, setEvalPaymentStatus] = useState('All Status');
+  const [evalPaymentStartDate, setEvalPaymentStartDate] = useState('2026-07-12');
+  const [evalPaymentEndDate, setEvalPaymentEndDate] = useState('2026-07-19');
+  const [isEvalFilterExpanded, setIsEvalFilterExpanded] = useState(true);
+  const [isEvalSearching, setIsEvalSearching] = useState(false);
+  const [evalSearchResults, setEvalSearchResults] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -1140,7 +1154,7 @@ export default function TeacherPortal({
                         <td className="px-4 py-3.5 text-gray-700 font-bold">NDC & SJC All Service</td>
                         <td className="px-4 py-3.5 text-gray-600">C-01 Chemistry Intro Lab</td>
                         <td className="px-4 py-3.5 text-center text-gray-500 font-mono">1.5 Hours</td>
-                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ১,২০০</td>
+                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ১,২০১</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1158,40 +1172,278 @@ export default function TeacherPortal({
               exit={{ opacity: 0, y: -15 }}
               className="space-y-6 text-left"
             >
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h2 className="text-base font-extrabold text-[#002d5b] border-b border-gray-100 pb-3 mb-4 font-sans">Evaluation Payment History</h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs font-sans">
-                    <thead>
-                      <tr className="bg-gray-50 text-gray-500 font-bold border-b border-gray-200">
-                        <th className="px-4 py-3 text-left">Invoice No</th>
-                        <th className="px-4 py-3 text-left">Exam Details</th>
-                        <th className="px-4 py-3 text-center">Scripts Graded</th>
-                        <th className="px-4 py-3 text-center">Rate</th>
-                        <th className="px-4 py-3 text-right">Total Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      <tr>
-                        <td className="px-4 py-3.5 font-mono text-purple-900">INV-E9812</td>
-                        <td className="px-4 py-3.5 text-gray-700 font-semibold">Weekly Written Exam-02 Physics</td>
-                        <td className="px-4 py-3.5 text-center font-mono">45 papers</td>
-                        <td className="px-4 py-3.5 text-center font-mono">৳ 90.00</td>
-                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ৪,০৫০</td>
-                      </tr>
-                      <tr>
-                        <td className="px-4 py-3.5 font-mono text-purple-900">INV-E9704</td>
-                        <td className="px-4 py-3.5 text-gray-700 font-semibold">Daily Written Exam-01 Chemistry</td>
-                        <td className="px-4 py-3.5 text-center font-mono">30 papers</td>
-                        <td className="px-4 py-3.5 text-center font-mono">৳ 90.00</td>
-                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ২,৭০০</td>
-                      </tr>
-                    </tbody>
-                  </table>
+              {/* Filter Section (Matches Screenshot 3) */}
+              <div className="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
+                <div 
+                  className="bg-gray-50/50 px-5 py-3 border-b border-gray-200 flex items-center justify-between cursor-pointer"
+                  onClick={() => setIsEvalFilterExpanded(!isEvalFilterExpanded)}
+                >
+                  <h2 className="text-sm font-extrabold text-gray-700 font-sans">Evaluation Payment</h2>
+                  <button className="text-gray-500">
+                    <Minus className={`w-4 h-4 transition-transform ${isEvalFilterExpanded ? '' : 'rotate-180'}`} />
+                  </button>
                 </div>
+                
+                {isEvalFilterExpanded && (
+                  <div className="p-8 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 max-w-5xl mx-auto">
+                      {/* Left Column */}
+                      <div className="space-y-5">
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700 text-right">Program</label>
+                          <select 
+                            value={evalPaymentProgram}
+                            onChange={(e) => setEvalPaymentProgram(e.target.value)}
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Program</option>
+                            <option>CAP 2026</option>
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700 text-right">Course</label>
+                          <select 
+                            value={evalPaymentCourse}
+                            onChange={(e) => setEvalPaymentCourse(e.target.value)}
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Course</option>
+                            <option>NDC & SJC All Service</option>
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700 text-right">Exam Type</label>
+                          <select 
+                            value={evalPaymentExamType}
+                            onChange={(e) => setEvalPaymentExamType(e.target.value)}
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Exam Type</option>
+                            <option>SAQ</option>
+                            <option>MCQ</option>
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700 text-right">Start Date</label>
+                          <input 
+                            type="date"
+                            value={evalPaymentStartDate}
+                            onChange={(e) => setEvalPaymentStartDate(e.target.value)}
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50/50"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Right Column */}
+                      <div className="space-y-5">
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700 text-right">Session</label>
+                          <select 
+                            value={evalPaymentSession}
+                            onChange={(e) => setEvalPaymentSession(e.target.value)}
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Session</option>
+                            <option>Morning</option>
+                            <option>Evening</option>
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700 text-right">Exam</label>
+                          <input 
+                            type="text"
+                            value={evalPaymentExam}
+                            onChange={(e) => setEvalPaymentExam(e.target.value)}
+                            placeholder="[Code] Exam Name"
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700 text-right">Payment</label>
+                          <select 
+                            value={evalPaymentStatus}
+                            onChange={(e) => setEvalPaymentStatus(e.target.value)}
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Status</option>
+                            <option>Paid</option>
+                            <option>Due</option>
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-gray-700 text-right">End Date</label>
+                          <input 
+                            type="date"
+                            value={evalPaymentEndDate}
+                            onChange={(e) => setEvalPaymentEndDate(e.target.value)}
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50/50"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center pt-2">
+                      <button 
+                        onClick={() => {
+                          setIsEvalSearching(true);
+                          // Mock search delay and results
+                          setTimeout(() => {
+                            setEvalSearchResults([
+                              {
+                                date: '18 Jul, 2026',
+                                session: 'CAP 2026',
+                                course: 'NDC & SJC All Service',
+                                branch: 'Khilgaon Udvash',
+                                exam: '[121] Daily Exam For NDC English-03-04',
+                                qType: 'Normal',
+                                evalType: 'Regular',
+                                version: 'English',
+                                examType: 'SAQ',
+                                subject: 'English',
+                                quantity: 7,
+                                amount: 2.80,
+                                base: 0.00,
+                                extra: 0.00,
+                                total: 3.00,
+                                approvalStatus: 'Pending',
+                                status: 'Due',
+                                payDate: '-'
+                              },
+                              {
+                                date: '18 Jul, 2026',
+                                session: 'CAP 2026',
+                                course: 'NDC & SJC All Service',
+                                branch: 'Malibagh Udvash',
+                                exam: '[121] Daily Exam For NDC English-03-04',
+                                qType: 'Normal',
+                                evalType: 'Regular',
+                                version: 'English',
+                                examType: 'SAQ',
+                                subject: 'English',
+                                quantity: 16,
+                                amount: 6.40,
+                                base: 0.00,
+                                extra: 0.00,
+                                total: 7.00,
+                                approvalStatus: 'Pending',
+                                status: 'Due',
+                                payDate: '-'
+                              },
+                              {
+                                date: '18 Jul, 2026',
+                                session: 'CAP 2026',
+                                course: 'NDC & SJC All Service',
+                                branch: 'Savar Udvash',
+                                exam: '[121] Daily Exam For NDC English-03-04',
+                                qType: 'Normal',
+                                evalType: 'Regular',
+                                version: 'English',
+                                examType: 'SAQ',
+                                subject: 'English',
+                                quantity: 11,
+                                amount: 4.40,
+                                base: 0.00,
+                                extra: 0.00,
+                                total: 5.00,
+                                approvalStatus: 'Approved',
+                                status: 'Due',
+                                payDate: '-'
+                              },
+                              {
+                                date: '18 Jul, 2026',
+                                session: 'CAP 2026',
+                                course: 'NDC & SJC All Service',
+                                branch: 'Cumilla Udvash',
+                                exam: '[121] Daily Exam For NDC English-03-04',
+                                qType: 'Normal',
+                                evalType: 'Regular',
+                                version: 'English',
+                                examType: 'SAQ',
+                                subject: 'English',
+                                quantity: 12,
+                                amount: 4.80,
+                                base: 0.00,
+                                extra: 0.00,
+                                total: 5.00,
+                                approvalStatus: 'Pending',
+                                status: 'Due',
+                                payDate: '-'
+                              }
+                            ]);
+                            setIsEvalSearching(false);
+                          }, 600);
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-2 rounded text-xs transition-colors shadow-sm"
+                      >
+                        {isEvalSearching ? 'Searching...' : 'Search'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* Results Table Section (Matches Screenshot 1 & 2) */}
+              {evalSearchResults.length > 0 && (
+                <div className="bg-white rounded border border-gray-200 overflow-hidden shadow-xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[11px] font-sans border-collapse">
+                      <thead>
+                        <tr className="bg-white text-gray-700 border-b border-gray-200">
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Date</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Program Session</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Course</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Branch</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">[Code] Exam</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Script Question Type</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Type</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Script Version</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Exam Type</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Subject</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Total Quantity</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Amount</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Base Amount</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Extra Amount</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Total Amount</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Approval Status</th>
+                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Payment Status</th>
+                          <th className="px-3 py-4 font-bold text-center">Payment Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {evalSearchResults.map((row, idx) => (
+                          <tr key={idx} className="hover:bg-gray-50/50">
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.date}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.session}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.course}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.branch}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.exam}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.qType}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.evalType}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.version}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.examType}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.subject}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.quantity}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.amount.toFixed(2)}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.base.toFixed(2)}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.extra.toFixed(2)}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-bold">{row.total.toFixed(2)}</td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100">
+                              <span className={`font-bold ${row.approvalStatus === 'Approved' ? 'text-green-600' : 'text-orange-500'}`}>{row.approvalStatus}</span>
+                            </td>
+                            <td className="px-3 py-4 text-center border-r border-gray-100">
+                              <span className={`font-bold ${row.status === 'Paid' ? 'text-green-600' : 'text-gray-600'}`}>{row.status}</span>
+                            </td>
+                            <td className="px-3 py-4 text-center text-gray-600">{row.payDate}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
+
 
           {/* 8. MY PAYMENT - MATERIALS PAYMENT REPORT */}
           {activeTab === 'materials-payment' && (
@@ -1877,84 +2129,85 @@ export default function TeacherPortal({
                 </button>
               </div>
 
-              <form onSubmit={handleReviewModalSubmit} className="p-6 space-y-4">
-                <div className="p-3.5 bg-gray-50 rounded border border-gray-200 text-xs text-gray-700 leading-relaxed font-sans">
-                  {reviewModalType === 'student' ? (
-                    <>
-                      <strong className="text-blue-900 block mb-1">Student Doubt (শিক্ষার্থীর প্রশ্ন/অভিযোগ):</strong>
-                      <p className="italic bg-white p-2.5 rounded border border-gray-100 text-gray-800">
-                        " {selectedReviewModal.doubtText} "
-                      </p>
-                      <div className="mt-2 text-[11px] text-gray-500">
-                        Student Name: <strong>{selectedReviewModal.studentName}</strong> (Roll: {selectedReviewModal.roll})
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <strong className="text-purple-950 block mb-1">Admin Note (অ্যাডমিনের নির্দেশনা):</strong>
-                      <p className="italic bg-white p-2.5 rounded border border-[#f0e6ff] text-purple-950 bg-purple-50/20">
-                        " {selectedReviewModal.note} "
-                      </p>
-                      <div className="mt-2 text-[11px] text-gray-500">
-                        Forwarded by: <strong>{selectedReviewModal.adminId || "Admin-102"}</strong> &bull; Examiner Code: {selectedReviewModal.examiner?.id || "N/A"}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 block font-sans">Original Grade</label>
-                    <div className="w-full bg-gray-100 border border-gray-200 text-gray-500 rounded px-3 py-2 text-xs font-mono font-bold">
-                      {reviewModalType === 'student' 
-                        ? `${selectedReviewModal.originalMarks} / 10` 
-                        : `${selectedReviewModal.originalMarks || selectedReviewModal.minMarks || '5'} / ${selectedReviewModal.maxMarks || '10'}`
-                      }
+              <div className="p-6 overflow-y-auto max-h-[70vh]">
+                <form onSubmit={handleReviewModalSubmit} className="space-y-4">
+                  {/* Question Info Section */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-gray-500">Unique Set</label>
+                      <p className="text-xs font-bold text-gray-800">{selectedReviewModal.uniqueSet || '1'}</p>
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-gray-500">Question Serial</label>
+                      <p className="text-xs font-bold text-gray-800">{selectedReviewModal.questionSerial || '1'}</p>
+                    </div>
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-gray-500">Full Marks</label>
+                      <p className="text-xs font-bold text-gray-800">{selectedReviewModal.maxMarks || '1.00'}</p>
+                    </div>
+                    <div className="col-span-3">
+                      <label className="text-[10px] uppercase font-bold text-gray-500">Question Text</label>
+                      <p className="text-xs font-medium text-gray-700 italic">"{selectedReviewModal.question || 'প্রশ্নটি লোড হচ্ছে...'}"</p>
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 block font-sans">Updated Marks (সংশোধিত নম্বর)</label>
-                    <input 
-                      type="text" 
-                      required
-                      value={revisedMarks}
-                      onChange={(e) => setRevisedMarks(e.target.value)}
-                      placeholder="e.g. 7.5"
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#007bff]"
-                    />
+
+                  {/* Student Doubt / Admin Note */}
+                  <div className={`p-4 rounded-lg border ${reviewModalType === 'student' ? 'bg-blue-50 border-blue-100' : 'bg-purple-50 border-purple-100'}`}>
+                    <strong className={`block mb-1 text-xs ${reviewModalType === 'student' ? 'text-blue-900' : 'text-purple-900'}`}>
+                      {reviewModalType === 'student' ? "Student's Doubt (শিক্ষার্থীর প্রশ্ন):" : "Admin Note (অ্যাডমিনের নির্দেশনা):"}
+                    </strong>
+                    <p className={`text-xs p-2.5 rounded bg-white ${reviewModalType === 'student' ? 'text-blue-800' : 'text-purple-800'}`}>
+                      "{reviewModalType === 'student' ? selectedReviewModal.doubtText : selectedReviewModal.note}"
+                    </p>
                   </div>
-                </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-gray-700 block font-sans">Re-evaluation Remarks / Response Comment (মন্তব্য)</label>
-                  <textarea 
-                    value={revisedRemarks}
-                    onChange={(e) => setRevisedRemarks(e.target.value)}
-                    required
-                    placeholder={reviewModalType === 'student' 
-                      ? "শিক্ষার্থীর জন্য রি-চেক মন্তব্য লিখুন... যেমন: 'উত্তরের ৩ নং প্রশ্ন পুনরায় চেক করে ২ নম্বর যোগ করা হল।'"
-                      : "অ্যাডমিন ও শিক্ষার্থীর জন্য মন্তব্য লিখুন... যেমন: 'প্রধান শিক্ষক দ্বারা রি-ভ্যালু করা হয়েছে। নম্বর সংশোধন করা হলো।'"
-                    }
-                    className="w-full min-h-[70px] border border-gray-300 rounded p-3 text-xs font-sans focus:outline-none focus:ring-2 focus:ring-[#007bff] resize-y"
-                  />
-                </div>
+                  {/* Script Annotation Area */}
+                  <div className="border border-gray-200 rounded-lg p-2 bg-gray-100 min-h-[200px] flex items-center justify-center">
+                    <span className="text-xs text-gray-400 font-medium">Script Image Area (Annotation enabled)</span>
+                  </div>
 
-                <div className="flex justify-end space-x-2 pt-2">
-                  <button 
-                    type="button"
-                    onClick={() => setSelectedReviewModal(null)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded text-xs transition-colors cursor-pointer font-sans"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="bg-[#007bff] hover:bg-[#0069d9] text-white font-bold px-6 py-2 rounded text-xs transition-colors shadow-xs cursor-pointer font-sans"
-                  >
-                    Submit Re-evaluation
-                  </button>
-                </div>
-              </form>
+                  {/* Grading */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-gray-700 block font-sans">Original Grade</label>
+                      <div className="w-full bg-gray-100 border border-gray-200 text-gray-500 rounded px-3 py-2 text-xs font-mono font-bold">
+                        {reviewModalType === 'student' 
+                          ? `${selectedReviewModal.originalMarks} / 10` 
+                          : `${selectedReviewModal.originalMarks || selectedReviewModal.minMarks || '5'} / ${selectedReviewModal.maxMarks || '10'}`
+                        }
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-gray-700 block font-sans">Updated Marks (সংশোধিত নম্বর)</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={revisedMarks}
+                        onChange={(e) => setRevisedMarks(e.target.value)}
+                        placeholder="e.g. 7.5"
+                        className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#007bff]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex justify-between pt-4 border-t border-gray-100">
+                    <button 
+                      type="button"
+                      onClick={() => setSelectedReviewModal(null)}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded text-xs transition-colors cursor-pointer font-sans"
+                    >
+                      Exit
+                    </button>
+                    <button 
+                      type="submit"
+                      className="bg-[#007bff] hover:bg-[#0069d9] text-white font-bold px-6 py-2 rounded text-xs transition-colors shadow-xs cursor-pointer font-sans"
+                    >
+                      Update & Next
+                    </button>
+                  </div>
+                </form>
+              </div>
             </motion.div>
           </div>
         )}

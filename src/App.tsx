@@ -54,6 +54,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { evaluateScript, type Annotation, type EvaluationResult as AIEvaluationResult } from './services/geminiService';
 import TeacherPortal from './components/TeacherPortal';
 import UserManagementPanel from './components/UserManagement';
+import PasswordChange from './components/PasswordChange';
 import { dbGetItems, dbSaveItem, dbDeleteItem } from './services/firebase';
 
 // --- Types ---
@@ -474,6 +475,7 @@ export default function App() {
   // File Preview & Rotation States
   const [rotations, setRotations] = useState<Record<string, number>>({});
   const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
   
   // State for file uploads
   const [solutionFiles, setSolutionFiles] = useState<File[]>([]);
@@ -8909,37 +8911,17 @@ export default function App() {
                         </p>
                       </div>
                     </div>
-                    {/* Mobile tabs menu inside dropdown */}
-                    <div className="block md:hidden border-b border-gray-100 p-1.5 space-y-1 bg-gray-50">
-                      <p className="text-[9.5px] text-gray-400 font-bold px-2 py-0.5 uppercase">Modules</p>
-                      {permittedTabs.map((tab) => (
-                        <button
-                          key={tab}
-                          onClick={() => {
-                            setActiveTab(tab);
-                            setShowReviewWorkspace(false);
-                            setSelectedReviewRow(null);
-                            setShowForwardToTeacher(false);
-                            setShowImageLog(false);
-                            setIsProfileOpen(false);
-                            const items = sidebarItemsMap[tab] || [];
-                            if (items.length > 0) {
-                              setActiveSidebarItem(items[0].id);
-                              if (items[0].subItems && items[0].subItems.length > 0) {
-                                setActiveSubItem(items[0].subItems[0].id);
-                              } else {
-                                setActiveSubItem(null);
-                              }
-                            }
-                          }}
-                          className={`w-full text-left px-2 py-1.5 text-xs rounded transition-colors ${
-                            activeTab === tab ? 'bg-blue-600 text-white font-semibold' : 'text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          {tab}
-                        </button>
-                      ))}
-                    </div>
+                    {/* Change Password Option */}
+                    <button 
+                      onClick={() => {
+                        setShowPasswordChangeModal(true);
+                        setIsProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 flex items-center font-medium border-t border-gray-50"
+                    >
+                      <Lock className="w-3.5 h-3.5 mr-2" /> Change Password
+                    </button>
+
                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center font-semibold border-t border-gray-50">
                       <Power className="w-3.5 h-3.5 mr-2" /> Logout
                     </button>
@@ -9181,6 +9163,23 @@ export default function App() {
 
         {/* Global Confirmation Modals */}
         <AnimatePresence>
+          {showPasswordChangeModal && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+              >
+                <PasswordChange 
+                  currentUser={currentUser}
+                  usersList={usersList}
+                  setUsersList={setUsersList}
+                  onLogout={handleLogout}
+                  onClose={() => setShowPasswordChangeModal(false)}
+                />
+              </motion.div>
+            </div>
+          )}
           {cancelConfirmId && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
               <motion.div 

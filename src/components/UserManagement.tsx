@@ -16,7 +16,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 
-interface UserItem {
+export interface UserItem {
   id: string; // Used as the identifier / User Email / Username
   name: string;
   email: string;
