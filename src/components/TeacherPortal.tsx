@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { dbGetItems, dbSaveItem, dbDeleteItem } from '../services/firebase';
+import HandwrittenPaper from '../assets/images/bengali_handwritten_exam_paper_1784459875251.jpg';
 import { 
   Calendar, 
   FileText, 
@@ -31,6 +32,12 @@ import {
   CreditCard,
   FileCheck,
   MessageCircle,
+  Pencil,
+  Type,
+  Undo2,
+  Redo2,
+  Eraser,
+  RotateCcw,
   X
 } from 'lucide-react';
 
@@ -111,13 +118,110 @@ export default function TeacherPortal({
   const [isEvalSearching, setIsEvalSearching] = useState(false);
   const [evalSearchResults, setEvalSearchResults] = useState<any[]>([]);
 
+  // Canvas Drawing State for Script Review
+  const [activeDrawingTool, setActiveDrawingTool] = useState("pencil");
+  const [imageScale, setImageScale] = useState(1);
+  const [studentPaperRotate, setStudentPaperRotate] = useState(0);
+  const [extraBottomSpace, setExtraBottomSpace] = useState(0);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [activeTextInput, setActiveTextInput] = useState<{x: number, y: number} | null>(null);
+  const [currentPath, setCurrentPath] = useState("");
+  const [allPaths, setAllPaths] = useState<string[]>([]);
+  const [scriptComments, setScriptComments] = useState<{x: number, y: number, text: string}[]>([]);
+  const [actionHistory, setActionHistory] = useState<{type: 'path'|'comment', value: string | any}[]>([]);
+  const [redoHistory, setRedoHistory] = useState<{type: 'path'|'comment', value: string | any}[]>([]);
+
+  // Mouse handlers for drawing
+  const handleCanvasMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (activeDrawingTool !== 'pencil' && activeDrawingTool !== 'eraser') return;
+    setIsDrawing(true);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setCurrentPath(`M ${x.toFixed(2)} ${y.toFixed(2)}`);
+  };
+
+  const handleCanvasMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!isDrawing) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    if (activeDrawingTool === 'pencil') {
+      setCurrentPath(prev => `${prev} L ${x.toFixed(2)} ${y.toFixed(2)}`);
+    } else if (activeDrawingTool === 'eraser') {
+      // Very basic eraser logic: clear paths that are close (simplified by just clearing the last path for this demo)
+    }
+  };
+
+  const handleCanvasMouseUp = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    if (activeDrawingTool === 'pencil' && currentPath) {
+      setAllPaths(prev => [...prev, currentPath]);
+      setActionHistory(prev => [...prev, { type: 'path', value: currentPath }]);
+      setRedoHistory([]);
+      setCurrentPath("");
+    }
+  };
+
+  const handleCanvasMouseLeave = () => {
+    if (isDrawing) {
+      handleCanvasMouseUp();
+    }
+  };
+
+  const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+    if (activeDrawingTool !== 'text') return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setActiveTextInput({ x, y });
+  };
+
+  const handleTextInputSubmit = (text: string, x: number, y: number) => {
+    if (text.trim()) {
+      const newComment = { x, y, text: text.trim() };
+      const updatedComments = [...scriptComments, newComment];
+      setScriptComments(updatedComments);
+      setActionHistory(prev => [...prev, { type: 'comment', value: newComment }]);
+      setRedoHistory([]);
+    }
+    setActiveTextInput(null);
+  };
+
+  const handleUndo = () => {
+    if (actionHistory.length === 0) return;
+    const lastAction = actionHistory[actionHistory.length - 1];
+    if (lastAction.type === 'path') {
+      setAllPaths(prev => prev.slice(0, -1));
+    } else if (lastAction.type === 'comment') {
+      setScriptComments(prev => prev.slice(0, -1));
+    }
+    setRedoHistory(prev => [...prev, lastAction]);
+    setActionHistory(prev => prev.slice(0, -1));
+  };
+
+  const handleRedo = () => {
+    if (redoHistory.length === 0) return;
+    const nextAction = redoHistory[redoHistory.length - 1];
+    if (nextAction.type === 'path') {
+      setAllPaths(prev => [...prev, nextAction.value]);
+    } else if (nextAction.type === 'comment') {
+      setScriptComments(prev => [...prev, nextAction.value]);
+    }
+    setActionHistory(prev => [...prev, nextAction]);
+    setRedoHistory(prev => prev.slice(0, -1));
+  };
+
   useEffect(() => {
     async function loadData() {
       try {
         const defaultScripts = [
-          { id: 'SCR-101', studentName: 'Imtiaz Ahmed', roll: '37180701', subject: 'Chemistry [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 18:24', maxMarks: 10, image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=400' },
-          { id: 'SCR-102', studentName: 'Fahima Tabassum', roll: '37180702', subject: 'Physics [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 19:10', maxMarks: 10, image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400' },
-          { id: 'SCR-103', studentName: 'Rafid Al-Hasan', roll: '37180703', subject: 'Higher Mathematics [TW]', examName: 'Daily Exam Chemistry-04', status: 'Pending', submittedDate: '2026-07-03 21:05', maxMarks: 10, image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400' },
+          { id: 'SCR-101', studentName: 'Imtiaz Ahmed', roll: '37180701', subject: 'Chemistry [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 18:24', maxMarks: 10, image: HandwrittenPaper },
+          { id: 'SCR-102', studentName: 'Fahima Tabassum', roll: '37180702', subject: 'Physics [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 19:10', maxMarks: 10, image: HandwrittenPaper },
+          { id: 'SCR-103', studentName: 'Rafid Al-Hasan', roll: '37180703', subject: 'Higher Mathematics [TW]', examName: 'Daily Exam Chemistry-04', status: 'Pending', submittedDate: '2026-07-03 21:05', maxMarks: 10, image: HandwrittenPaper },
           { id: 'SCR-104', studentName: 'Sadia Rahman', roll: '37180704', subject: 'Biology [OW]', examName: 'Weekly Exam-03', status: 'Evaluated', marks: 8.5, maxMarks: 10, feedback: 'Excellent structural diagram drawing.', submittedDate: '2026-07-02 14:15' }
         ];
 
@@ -2110,7 +2214,7 @@ export default function TeacherPortal({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-lg shadow-2xl max-w-lg w-full border border-gray-100 overflow-hidden flex flex-col"
+              className="bg-white rounded-lg shadow-2xl max-w-4xl w-full border border-gray-100 overflow-hidden flex flex-col"
             >
               <div className="bg-[#007bff] text-white p-4 flex items-center justify-between">
                 <div>
@@ -2129,26 +2233,29 @@ export default function TeacherPortal({
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto max-h-[70vh]">
-                <form onSubmit={handleReviewModalSubmit} className="space-y-4">
-                  {/* Question Info Section */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-gray-500">Unique Set</label>
-                      <p className="text-xs font-bold text-gray-800">{selectedReviewModal.uniqueSet || '1'}</p>
+              <div className="p-6 overflow-y-auto max-h-[85vh]">
+                <form onSubmit={handleReviewModalSubmit} className="space-y-5">
+                  {/* Question Info Section (Matches Screenshots exactly) */}
+                  <div className="bg-white border-b-2 border-gray-100 pb-4 flex justify-between items-center text-sm font-bold text-gray-800">
+                    <span className="font-sans">Question : Unique Set: {selectedReviewModal.uniqueSet || '1'}, Question Serial: {selectedReviewModal.questionSerial || '4'}</span>
+                    <span className="font-sans">Full Marks : {Number(selectedReviewModal.maxMarks || 1).toFixed(2)}</span>
+                  </div>
+                  
+                  {/* Question Text */}
+                  <div className="text-[15px] font-bold text-gray-900 font-sans leading-relaxed px-2">
+                    {selectedReviewModal.question || 'স্থির বিদ্যুতের পরীক্ষাগুলো কোন ঋতুতে সবচেয়ে ভালো কাজ করে?'}
+                  </div>
+
+                  {/* Sample Answer Box */}
+                  <div className="bg-[#dcedc8] p-4 relative text-sm text-gray-900 font-medium">
+                    <div className="absolute top-2 right-2">
+                      <button type="button" className="bg-[#1976d2] text-white px-3 py-1 rounded text-xs font-bold shadow-md hover:bg-[#1565c0]">
+                        Sample Answer
+                      </button>
                     </div>
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-gray-500">Question Serial</label>
-                      <p className="text-xs font-bold text-gray-800">{selectedReviewModal.questionSerial || '1'}</p>
-                    </div>
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-gray-500">Full Marks</label>
-                      <p className="text-xs font-bold text-gray-800">{selectedReviewModal.maxMarks || '1.00'}</p>
-                    </div>
-                    <div className="col-span-3">
-                      <label className="text-[10px] uppercase font-bold text-gray-500">Question Text</label>
-                      <p className="text-xs font-medium text-gray-700 italic">"{selectedReviewModal.question || 'প্রশ্নটি লোড হচ্ছে...'}"</p>
-                    </div>
+                    <p className="mb-1">শীতকালে।</p>
+                    <p className="font-bold">নম্বর বণ্টন:</p>
+                    <p>শীতকালে; লেখার জন্য ০১ নম্বর।</p>
                   </div>
 
                   {/* Student Doubt / Admin Note */}
@@ -2162,8 +2269,150 @@ export default function TeacherPortal({
                   </div>
 
                   {/* Script Annotation Area */}
-                  <div className="border border-gray-200 rounded-lg p-2 bg-gray-100 min-h-[200px] flex items-center justify-center">
-                    <span className="text-xs text-gray-400 font-medium">Script Image Area (Annotation enabled)</span>
+                  <div className="border border-gray-200 rounded-sm bg-gray-50 flex flex-col items-center justify-center mt-6">
+                    {/* Toolbar */}
+                    <div className="w-full flex justify-center items-center gap-4 py-2 border-b border-gray-200 bg-[#f5f5f5]">
+                      <button type="button" onClick={() => setActiveDrawingTool('pencil')} className={`p-2 rounded ${activeDrawingTool === 'pencil' ? 'bg-gray-300' : 'hover:bg-gray-200'} transition-all`} title="Pencil">
+                        <Pencil className="w-6 h-6 text-red-600 fill-red-600" />
+                      </button>
+                      <button type="button" onClick={() => setActiveDrawingTool('text')} className={`p-2 rounded ${activeDrawingTool === 'text' ? 'bg-gray-300' : 'hover:bg-gray-200'} transition-all text-red-600 font-serif font-bold text-xl leading-none`} title="Text">
+                        T
+                      </button>
+                      <button type="button" onClick={handleUndo} disabled={actionHistory.length === 0} className="p-2 rounded hover:bg-gray-200 transition-all text-gray-500 disabled:opacity-40" title="Undo">
+                        <Undo2 className="w-6 h-6" />
+                      </button>
+                      <button type="button" onClick={handleRedo} disabled={redoHistory.length === 0} className="p-2 rounded hover:bg-gray-200 transition-all text-gray-500 disabled:opacity-40" title="Redo">
+                        <Redo2 className="w-6 h-6" />
+                      </button>
+                      <button type="button" onClick={() => setActiveDrawingTool('eraser')} className={`p-2 rounded ${activeDrawingTool === 'eraser' ? 'bg-gray-300' : 'hover:bg-gray-200'} transition-all text-gray-700`} title="Eraser">
+                        <Eraser className="w-6 h-6" />
+                      </button>
+                      <button type="button" onClick={() => setStudentPaperRotate(prev => (prev + 90) % 360)} className="p-2 rounded hover:bg-gray-200 transition-all text-gray-700" title="Rotate">
+                        <RotateCcw className="w-6 h-6" />
+                      </button>
+                      <button type="button" onClick={() => setExtraBottomSpace(prev => prev + 48)} className="p-2 rounded hover:bg-gray-200 transition-all text-gray-700" title="Add Page Space">
+                        <Plus className="w-7 h-7 stroke-[3]" />
+                      </button>
+                      <button type="button" onClick={() => setExtraBottomSpace(prev => Math.max(0, prev - 48))} className="p-2 rounded hover:bg-gray-200 transition-all text-gray-700" title="Remove Page Space">
+                        <Minus className="w-8 h-8 stroke-[4]" />
+                      </button>
+                    </div>
+
+                    {/* Canvas Area */}
+                    <div className="p-4 w-full flex justify-center bg-gray-50 overflow-hidden">
+                      <div 
+                        onClick={handleImageClick}
+                        className="relative border-2 border-dashed border-gray-400 bg-white"
+                        style={{
+                          transform: `rotate(${studentPaperRotate}deg) scale(${imageScale})`,
+                          transformOrigin: 'center center',
+                          width: '100%',
+                          maxWidth: '700px'
+                        }}
+                      >
+                        <div className="w-full flex flex-col pointer-events-none select-none">
+                          <img 
+                            src={HandwrittenPaper} 
+                            alt="Student Answer" 
+                            className="w-full h-auto object-contain block opacity-85"
+                          />
+                          {/* Extra white page space at the bottom */}
+                          <div style={{ height: `${extraBottomSpace}px` }} className="w-full bg-white transition-all"></div>
+                        </div>
+
+                        {/* Drawing Canvas Overlay */}
+                        <svg
+                          className="absolute inset-0 w-full h-full pointer-events-auto"
+                          onMouseDown={handleCanvasMouseDown}
+                          onMouseMove={handleCanvasMouseMove}
+                          onMouseUp={handleCanvasMouseUp}
+                          onMouseLeave={handleCanvasMouseLeave}
+                          style={{
+                            cursor: activeDrawingTool === 'pencil' ? 'crosshair' : activeDrawingTool === 'text' ? 'text' : activeDrawingTool === 'eraser' ? 'cell' : 'default',
+                            zIndex: 10
+                          }}
+                        >
+                          {allPaths.map((pathStr, index) => (
+                            <path
+                              key={index}
+                              d={pathStr}
+                              stroke="red"
+                              strokeWidth="3"
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          ))}
+                          {isDrawing && currentPath && (
+                            <path
+                              d={currentPath}
+                              stroke="red"
+                              strokeWidth="3"
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          )}
+                        </svg>
+
+                        {/* Text Comments Overlay */}
+                        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 15 }}>
+                          {scriptComments.map((comment, index) => (
+                            <div
+                              key={index}
+                              className="absolute bg-white px-2 py-1 rounded shadow-md text-red-600 font-bold text-sm"
+                              style={{
+                                left: `${comment.x}%`,
+                                top: `${comment.y}%`,
+                                transform: 'translate(-50%, -50%)',
+                                pointerEvents: 'auto'
+                              }}
+                            >
+                              {comment.text}
+                            </div>
+                          ))}
+
+                          {/* Active Text Input */}
+                          {activeTextInput && (
+                            <div
+                              className="absolute pointer-events-auto"
+                              style={{
+                                left: `${activeTextInput.x}%`,
+                                top: `${activeTextInput.y}%`,
+                                transform: 'translate(-50%, -50%)'
+                              }}
+                            >
+                              <input
+                                type="text"
+                                autoFocus
+                                placeholder="Type..."
+                                className="px-2 py-1 bg-white border border-red-500 rounded shadow-md text-sm text-red-600 font-bold outline-none ring-2 ring-red-500/30"
+                                onBlur={(e) => handleTextInputSubmit(e.target.value, activeTextInput.x, activeTextInput.y)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleTextInputSubmit(e.currentTarget.value, activeTextInput.x, activeTextInput.y);
+                                  if (e.key === 'Escape') setActiveTextInput(null);
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-full text-center py-2 text-gray-500 text-sm font-medium border-t border-gray-200">
+                      1/1
+                    </div>
+                  </div>
+
+                  {/* Student Details Footer (Matches Screenshots exactly) */}
+                  <div className="flex justify-between items-end border-t border-gray-200 pt-4 mt-2">
+                    <div className="text-[13px] text-gray-700 space-y-1 font-sans">
+                      <p>Roll No : {selectedReviewModal.roll || '20218901050'}</p>
+                      <p>Registration No : {selectedReviewModal.regNo || '4869621'}</p>
+                      <p>Examiner : [21192] Fahim (2023) | EvaluationTime : 2026-07-18 07:56 PM</p>
+                    </div>
+                    <button type="button" className="bg-[#4285f4] hover:bg-[#3367d6] text-white px-6 py-2 rounded shadow-sm text-sm font-medium transition-colors">
+                      Image log
+                    </button>
                   </div>
 
                   {/* Grading */}

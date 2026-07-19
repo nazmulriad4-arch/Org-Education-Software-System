@@ -652,7 +652,9 @@ export default function App() {
   const [activeDrawingTool, setActiveDrawingTool] = useState("pencil");
   const [imageScale, setImageScale] = useState(1);
   const [studentPaperRotate, setStudentPaperRotate] = useState(0);
+  const [extraBottomSpace, setExtraBottomSpace] = useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [activeTextInput, setActiveTextInput] = useState<{x: number, y: number} | null>(null);
   const [currentPath, setCurrentPath] = useState("");
   const [allPaths, setAllPaths] = useState<string[]>([]);
   const [initialPathCount, setInitialPathCount] = useState(0);
@@ -2536,14 +2538,18 @@ export default function App() {
     };
 
     const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      if ((e.target as HTMLElement).tagName === 'INPUT') return;
       if (activeDrawingTool !== 'comment') return;
       const rect = e.currentTarget.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
       
-      const commentText = prompt("Enter comment text / মন্তব্য লিখুন:");
-      if (commentText && commentText.trim()) {
-        const newComment = { x, y, text: commentText.trim() };
+      setActiveTextInput({ x, y });
+    };
+
+    const handleTextInputSubmit = (text: string, x: number, y: number) => {
+      if (text.trim()) {
+        const newComment = { x, y, text: text.trim() };
         const updatedComments = [...scriptComments, newComment];
         setScriptComments(updatedComments);
         setPageStore(prev => ({
@@ -2556,6 +2562,7 @@ export default function App() {
         setActionHistory(prev => [...prev, { type: 'comment', value: newComment }]);
         setRedoHistory([]);
       }
+      setActiveTextInput(null);
     };
 
     const handleUndo = () => {
@@ -2966,32 +2973,32 @@ export default function App() {
                   <Eraser className="w-7 h-7" />
                 </button>
 
-                {/* Reset / Rotate Icon */}
+                {/* Rotate Icon */}
                 <button
                   type="button"
-                  onClick={handleResetAll}
+                  onClick={() => setStudentPaperRotate(prev => (prev + 90) % 360)}
                   className="px-5 py-2.5 text-[#544f63] hover:bg-gray-200 transition-all border-r border-gray-300"
-                  title="Reset All"
+                  title="Rotate Image"
                 >
                   <RotateCcw className="w-6 h-6" />
                 </button>
 
-                {/* Zoom In / Plus */}
+                {/* Add Extra Page Space / Plus */}
                 <button
                   type="button"
-                  onClick={() => setImageScale(prev => Math.min(3, prev + 0.2))}
+                  onClick={() => setExtraBottomSpace(prev => prev + 48)}
                   className="px-5 py-2.5 text-[#544f63] hover:bg-gray-200 transition-all border-r border-gray-300"
-                  title="Zoom In"
+                  title="Add Extra Page Space"
                 >
                   <Plus className="w-7 h-7 stroke-[3]" />
                 </button>
 
-                {/* Zoom Out / Minus */}
+                {/* Remove Extra Page Space / Minus */}
                 <button
                   type="button"
-                  onClick={() => setImageScale(prev => Math.max(0.5, prev - 0.2))}
+                  onClick={() => setExtraBottomSpace(prev => Math.max(0, prev - 48))}
                   className="px-4 py-2.5 text-[#544f63] hover:bg-gray-200 transition-all"
-                  title="Zoom Out"
+                  title="Remove Extra Page Space"
                 >
                   <Minus className="w-8 h-8 stroke-[4]" />
                 </button>
@@ -3007,16 +3014,21 @@ export default function App() {
                   transform: `rotate(${studentPaperRotate}deg) scale(${imageScale})`,
                   transformOrigin: 'center center',
                   width: '100%',
-                  maxWidth: '520px',
-                  aspectRatio: '16/4.5'
+                  maxWidth: '520px'
                 }}
               >
-                <img
-                  src={scriptImage}
-                  alt="Student Answer sheet"
-                  className="w-full h-full object-cover select-none pointer-events-none"
-                  referrerPolicy="no-referrer"
-                />
+                <div className="w-full flex flex-col pointer-events-none select-none">
+                  <div style={{ aspectRatio: '16/4.5', width: '100%' }} className="relative">
+                    <img
+                      src={scriptImage}
+                      alt="Student Answer sheet"
+                      className="w-full h-full object-cover block"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  {/* Extra white page space at the bottom */}
+                  <div style={{ height: `${extraBottomSpace}px` }} className="w-full bg-white transition-all"></div>
+                </div>
 
                 {/* Submitted Successfully Overlay */}
                 {selectedReviewRow?.isSubmitted && (
@@ -3179,6 +3191,34 @@ export default function App() {
                       </div>
                     </div>
                   ))}
+
+                  {/* Active Text Input */}
+                  {activeTextInput && (
+                    <div
+                      className="absolute pointer-events-auto"
+                      style={{
+                        left: `${activeTextInput.x}%`,
+                        top: `${activeTextInput.y}%`,
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: 100
+                      }}
+                    >
+                      <input
+                        type="text"
+                        autoFocus
+                        placeholder="Type text..."
+                        className="px-2 py-1 bg-white border border-red-500 rounded shadow-lg text-sm text-red-600 font-bold outline-none ring-2 ring-red-500/30 min-w-[150px]"
+                        onBlur={(e) => handleTextInputSubmit(e.target.value, activeTextInput.x, activeTextInput.y)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleTextInputSubmit(e.currentTarget.value, activeTextInput.x, activeTextInput.y);
+                          } else if (e.key === 'Escape') {
+                            setActiveTextInput(null);
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
