@@ -3498,6 +3498,7 @@ export default function App() {
                   </div>
                 </div>
 
+                {forwardMultipleChecked && (                  <div className="text-xs font-bold text-[#7030a0] mb-3">                    Group Selected: Question : Unique Set: {uniqueSet}, Question Serial: {questionSerial}                  </div>                )}
                 <div className="space-y-3">
                   <textarea
                     value={forwardToTeacherText}
@@ -8684,6 +8685,7 @@ export default function App() {
             setAdminForwardedRequests={setAdminForwardedRequests}
             studentReviewRequests={studentReviewRequests}
             setStudentReviewRequests={setStudentReviewRequests}
+            currentUser={currentUser}
           />
         </div>
       );

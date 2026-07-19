@@ -47,6 +47,7 @@ interface TeacherPortalProps {
   setAdminForwardedRequests?: React.Dispatch<React.SetStateAction<any[]>>;
   studentReviewRequests?: any[];
   setStudentReviewRequests?: React.Dispatch<React.SetStateAction<any[]>>;
+  currentUser?: any;
 }
 
 export default function TeacherPortal({ 
@@ -54,7 +55,8 @@ export default function TeacherPortal({
   adminForwardedRequests = [],
   setAdminForwardedRequests,
   studentReviewRequests: propStudentReviewRequests,
-  setStudentReviewRequests: propSetStudentReviewRequests
+  setStudentReviewRequests: propSetStudentReviewRequests,
+  currentUser
 }: TeacherPortalProps) {
   // Navigation & Page State
   const [activeTab, setActiveTab] = useState<'routine' | 'evaluation' | 'review' | 'due-amount' | 'summary-report' | 'class-payment' | 'evaluation-payment' | 'materials-payment' | 'qa-payment' | 'class-performance' | 'pending-question' | 'edit-answer' | 'community'>('routine');
@@ -758,7 +760,7 @@ export default function TeacherPortal({
             <User className="w-5 h-5" />
           </div>
           <div className="text-right hidden sm:block">
-            <p className="text-[12px] font-extrabold text-gray-800 leading-none">A. H. M. Shakil</p>
+            <p className="text-[12px] font-extrabold text-gray-800 leading-none">{currentUser?.name || currentUser?.id?.split('@')[0] || 'Teacher'}</p>
             <span className="text-[10px] text-gray-500 font-medium">Core Instructor</span>
           </div>
         </div>
@@ -2408,7 +2410,7 @@ export default function TeacherPortal({
                     <div className="text-[13px] text-gray-700 space-y-1 font-sans">
                       <p>Roll No : {selectedReviewModal.roll || '20218901050'}</p>
                       <p>Registration No : {selectedReviewModal.regNo || '4869621'}</p>
-                      <p>Examiner : [21192] Fahim (2023) | EvaluationTime : 2026-07-18 07:56 PM</p>
+                      <p>Examiner : [21192] {currentUser?.name || currentUser?.id?.split('@')[0] || 'Teacher'} | EvaluationTime : 2026-07-18 07:56 PM</p>
                     </div>
                     <button type="button" className="bg-[#4285f4] hover:bg-[#3367d6] text-white px-6 py-2 rounded shadow-sm text-sm font-medium transition-colors">
                       Image log
