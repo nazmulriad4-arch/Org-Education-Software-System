@@ -996,62 +996,67 @@ export default function TeacherPortal({
               exit={{ opacity: 0, y: -15 }}
               className="space-y-6 text-left"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-br from-purple-700 to-indigo-800 text-white p-6 rounded-lg shadow-md border border-purple-600">
-                  <span className="text-[11px] font-bold text-purple-200 font-sans uppercase tracking-wider block mb-1">Total Due Amount</span>
-                  <div className="text-3xl font-extrabold font-mono flex items-baseline">
-                    ৳ ১৫,৭৫০
-                    <span className="text-xs font-semibold ml-2 font-sans text-purple-200">BDT</span>
-                  </div>
-                  <div className="h-0.5 bg-white/20 my-4 rounded-full"></div>
-                  <p className="text-xs text-purple-100 font-sans">This contains payment for 43 evaluated papers and 6 live lectures.</p>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-xs flex flex-col justify-between">
-                  <div>
-                    <span className="text-[11px] font-extrabold text-gray-400 font-sans uppercase tracking-wider block mb-1">Last Cash Out Request</span>
-                    <div className="text-xl font-extrabold font-mono text-gray-800">৳ ১২,২০০</div>
-                    <span className="text-[10.5px] text-emerald-600 font-sans font-bold mt-1 inline-block bg-emerald-50 px-2 py-0.5 rounded">Paid on 2026-06-25</span>
-                  </div>
-                  <div className="border-t border-gray-100 pt-3 mt-4 flex items-center justify-between text-[11.5px] font-sans">
-                    <span className="text-gray-500">Method:</span>
-                    <strong className="text-gray-700 font-mono">bKash Personal</strong>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-xs flex flex-col justify-between">
-                  <div>
-                    <span className="text-[11px] font-extrabold text-gray-400 font-sans uppercase tracking-wider block mb-1">Automatic Billing System</span>
-                    <p className="text-xs text-gray-500 font-sans leading-relaxed">উদ্ভাস-উন্মেষ এর নতুন নিয়ম অনুযায়ী প্রতি মাসের ১ এবং ১৫ তারিখে স্বয়ংক্রিয়ভাবে পেমেন্ট প্রসেস করা হবে।</p>
-                  </div>
-                  <button 
-                    onClick={() => showToast('Withdraw request submitted to admin for fast-track processing.')}
-                    className="w-full bg-[#5cb85c] hover:bg-[#449d44] text-white font-bold text-xs py-2.5 rounded transition-all shadow-xs cursor-pointer uppercase tracking-wide text-center"
-                  >
-                    Request Fast-Track Payout
-                  </button>
-                </div>
-              </div>
-
-              {/* Breakdown detail */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-sm font-bold text-[#002d5b] border-b border-gray-100 pb-3 mb-4 font-sans">Active Earnings Breakdown (চলতি সপ্তাহের বিবরণী)</h3>
-                <div className="space-y-3.5">
-                  <div className="flex items-center justify-between text-xs font-sans p-3 bg-gray-50 rounded border border-gray-100">
-                    <div>
-                      <strong className="text-gray-800 block">Online Script Evaluation Earnings</strong>
-                      <span className="text-gray-500 font-mono">75 papers x ৳ 90.00 rate</span>
-                    </div>
-                    <strong className="text-gray-900 font-mono">৳ ৬,৭৫০</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-xs font-sans p-3 bg-gray-50 rounded border border-gray-100">
-                    <div>
-                      <strong className="text-gray-800 block">Class Lecture Remuneration</strong>
-                      <span className="text-gray-500 font-mono">6 lectures conducted x ৳ 1,500 rate</span>
-                    </div>
-                    <strong className="text-gray-900 font-mono">৳ ৯,০০০</strong>
-                  </div>
-                </div>
+              {/* Payment Summary Table (Matches Screenshot) */}
+              <div className="bg-white rounded border border-gray-300 shadow-sm overflow-hidden">
+                <table className="w-full border-collapse text-[13px] font-sans">
+                  <thead>
+                    <tr className="bg-gray-50 text-gray-700">
+                      <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Payment Type</th>
+                      <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Approved Amount</th>
+                      <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Pending Amount</th>
+                      <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Total Due</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-600">
+                    <tr className="bg-white">
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-medium bg-gray-50/30">Class Payment</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                    </tr>
+                    <tr className="bg-white">
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-medium bg-gray-50/30">Incentive Payment</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                    </tr>
+                    <tr className="bg-white">
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-medium bg-gray-50/30">Seniorship Payment</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                    </tr>
+                    <tr className="bg-white">
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-medium bg-gray-50/30">Evaluation Payment</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-bold text-gray-800">85</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-bold text-gray-800">70</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-bold text-gray-800">155</td>
+                    </tr>
+                    <tr className="bg-white">
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-medium bg-gray-50/30">Materials Payment</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-bold text-gray-800">100</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-bold text-gray-800">100</td>
+                    </tr>
+                    <tr className="bg-white">
+                      <td className="border border-gray-200 px-4 py-3.5 text-center font-medium bg-gray-50/30">Q&A Payment</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                      <td className="border border-gray-200 px-4 py-3.5 text-center">-</td>
+                    </tr>
+                    <tr className="bg-gray-100 font-extrabold text-gray-900">
+                      <td className="border border-gray-200 px-4 py-3 text-center">Total</td>
+                      <td className="border border-gray-200 px-4 py-3 text-center">85</td>
+                      <td className="border border-gray-200 px-4 py-3 text-center">170</td>
+                      <td className="border border-gray-200 px-4 py-3 text-center">255</td>
+                    </tr>
+                    <tr className="bg-white font-extrabold text-gray-900">
+                      <td className="border border-gray-200 px-4 py-3 text-center">Payable Amount</td>
+                      <td className="border border-gray-200 px-4 py-3 text-center">85</td>
+                      <td colSpan={2} className="border border-gray-200 px-4 py-3 bg-gray-50/20"></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </motion.div>
           )}

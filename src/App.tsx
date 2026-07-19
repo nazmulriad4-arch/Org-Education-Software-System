@@ -46,7 +46,9 @@ import {
   FileQuestion,
   ChevronLeft,
   ChevronRight,
-  Menu
+  Menu,
+  AlertTriangle,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { evaluateScript, type Annotation, type EvaluationResult as AIEvaluationResult } from './services/geminiService';
@@ -1243,6 +1245,78 @@ export default function App() {
 
   const [adminForwardedRequests, setAdminForwardedRequests] = useState([
     {
+      id: "FWD-STU-001",
+      examiner: { id: "7380", name: "Nafisa", phone: "" },
+      course: "NDC & SJC All Service [CAP - 2026]",
+      subject: "Islam [TW]",
+      exam: "Daily Exam For NDC Islam-03-04",
+      adminId: "Suja.7146@udvash.net",
+      note: "Boi dekhen, bissobasi hobe",
+      date: "2026-07-18 06:18 PM",
+      status: "Pending Teacher Response",
+      organization: "UDVASH",
+      program: "College Admission Program",
+      session: "2026",
+      examType: "Daily Exam",
+      version: "Bangla",
+      questionSerial: "3",
+      uniqueSet: "1",
+      evaluationType: "Regular",
+      reviewRequest: "Rechecked from Student",
+      rollNumber: "24171101007",
+      minMarks: "0",
+      maxMarks: "1",
+      reviewCount: 1
+    },
+    {
+      id: "FWD-STU-002",
+      examiner: { id: "30645", name: "Labonnya", phone: "" },
+      course: "HSC Bangla-English Full Course [Online]",
+      subject: "Bangla [TW]",
+      exam: "Daily Live Written Exam Bangla-01",
+      adminId: "nazmul.2853@udvash.net",
+      note: "Kebol bohubrihi lekhle Hoy na?",
+      date: "2026-07-18 06:55 PM",
+      status: "Pending Teacher Response",
+      organization: "UDVASH",
+      program: "HSC BE O-2027",
+      session: "2027",
+      examType: "Daily Exam",
+      version: "Bangla",
+      questionSerial: "1",
+      uniqueSet: "2",
+      evaluationType: "Regular",
+      reviewRequest: "Rechecked from Student",
+      rollNumber: "14216600394",
+      minMarks: "0",
+      maxMarks: "1",
+      reviewCount: 1
+    },
+    {
+      id: "FWD-STU-003",
+      examiner: { id: "29974", name: "Reyad", phone: "" },
+      course: "NDC & SJC All Service [CAP - 2026]",
+      subject: "Physics [TW]",
+      exam: "Daily Live Exam For NDC Physics-03-04",
+      adminId: "faisal.7402@udvash.net",
+      note: "সেটিই তো লিখছি",
+      date: "2026-07-18 06:13 PM",
+      status: "Pending Teacher Response",
+      organization: "UDVASH",
+      program: "College Admission Program",
+      session: "2026",
+      examType: "Daily Exam",
+      version: "Bangla",
+      questionSerial: "5",
+      uniqueSet: "1",
+      evaluationType: "Regular",
+      reviewRequest: "Rechecked from Student",
+      rollNumber: "10130400401",
+      minMarks: "0",
+      maxMarks: "1",
+      reviewCount: 1
+    },
+    {
       id: "FWD-005",
       examiner: { id: "10321", name: "M. Nazmul Alam", phone: "8801701234567" },
       course: "HSC Bangla-English Full Course [Online]",
@@ -1682,6 +1756,12 @@ export default function App() {
   const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
   const [adminDashExamType, setAdminDashExamType] = useState('All Exam Type');
   const [adminDashTime, setAdminDashTime] = useState('Last 30 Minute');
+
+  const handleCancelRequest = (id: string) => {
+    setAdminForwardedRequests(prev => prev.filter(req => req.id !== id));
+    setCancelConfirmId(null);
+    alert("Review request has been cancelled successfully. (রিভিউ রিকোয়েস্টটি সফলভাবে বাতিল করা হয়েছে।)");
+  };
 
   const getExaminerDetails = (fullName: string) => {
     const match = fullName.match(/(.*?)\s*\((\d+)\)/);
@@ -2601,9 +2681,14 @@ export default function App() {
         return req;
       }));
 
-      alert("Review Evaluation Submitted Successfully! (রি-চেক ও মূল্যায়ন সফলভাবে সম্পন্ন হয়েছে)");
-      setShowReviewWorkspace(false);
-      setSelectedReviewRow(null);
+      // Update current row to show success message
+      setSelectedReviewRow(prev => prev ? { ...prev, isSubmitted: true } : null);
+
+      // Auto exit after a delay to show the message
+      setTimeout(() => {
+        setShowReviewWorkspace(false);
+        setSelectedReviewRow(null);
+      }, 3000);
     };
 
     const handleSkipAndNext = () => {
@@ -2699,12 +2784,17 @@ export default function App() {
 
       setAdminForwardedRequests(prev => [newForwardRequest, ...prev]);
 
-      alert(`Submitted Forward to Teacher Request! (${forwardMultipleChecked ? "Multiple scripts" : "Single script"} mode selected)`);
+      // Update current row to show success message
+      setSelectedReviewRow(prev => prev ? { ...prev, isSubmitted: true } : null);
       
       setForwardToTeacherText("");
       setShowForwardToTeacher(false);
-      setShowReviewWorkspace(false);
-      setSelectedReviewRow(null);
+
+      // Auto exit after a delay to show the message
+      setTimeout(() => {
+        setShowReviewWorkspace(false);
+        setSelectedReviewRow(null);
+      }, 3000);
     };
 
     return (
@@ -2737,8 +2827,8 @@ export default function App() {
           {/* Section 1: Question & Sample Answer Card (Matches screenshots exactly) */}
           <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-xs text-left">
             <div className="flex justify-between items-center border-b border-gray-100 pb-2.5 mb-3">
-              <span className="text-sm font-bold text-gray-900 font-sans">
-                Question : Unique Set: {uniqueSet}, Question Serial: {questionSerial}
+              <span className={`text-sm font-bold font-sans transition-all duration-300 px-2 py-0.5 rounded ${forwardMultipleChecked ? "bg-purple-100 text-[#7030a0] ring-1 ring-purple-300" : "text-gray-900"}`}>
+                Question : Unique Set: {uniqueSet}, Question Serial: {questionSerial} {forwardMultipleChecked && "(Group Selected)"}
               </span>
               <span className="text-sm font-bold text-gray-900 font-sans">
                 Full Marks : {fullMarks}
@@ -2926,6 +3016,27 @@ export default function App() {
                   referrerPolicy="no-referrer"
                 />
 
+                {/* Submitted Successfully Overlay */}
+                {selectedReviewRow?.isSubmitted && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[2px] z-50 pointer-events-none"
+                  >
+                    <div className="bg-emerald-600 text-white px-8 py-4 rounded-xl shadow-2xl flex flex-col items-center space-y-2 border-4 border-emerald-400/30 transform -rotate-1">
+                      <div className="bg-white/20 p-2 rounded-full mb-1">
+                        <Check className="w-10 h-10 text-white" />
+                      </div>
+                      <div className="text-xl font-black uppercase tracking-widest font-sans drop-shadow-md">
+                        Submitted Successfully
+                      </div>
+                      <div className="text-[11px] font-bold opacity-90 uppercase tracking-tighter">
+                        রি-চেক ও মূল্যায়ন সফলভাবে সম্পন্ন হয়েছে
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Custom Handwriting / Overlay Annotations from the student script images */}
                 {activeScript.annotations && activeScript.annotations.map((anno: any, idx: number) => {
                   if (anno.type === 'text') {
@@ -3068,6 +3179,20 @@ export default function App() {
                   ))}
                 </div>
               </div>
+
+              {/* Submitted Successfully Badge Below Script */}
+              {selectedReviewRow?.isSubmitted && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="w-full mt-4 py-2 px-4 bg-emerald-50 border border-emerald-200 rounded-md flex items-center justify-center space-x-2 text-emerald-700 shadow-sm"
+                >
+                  <Check className="w-4 h-4" />
+                  <span className="text-sm font-bold font-sans uppercase tracking-tight">
+                    Submitted Successfully (সফলভাবে সাবমিট করা হয়েছে)
+                  </span>
+                </motion.div>
+              )}
               
             </div>
           </div>
@@ -3269,7 +3394,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleSkipAndNext}
-                className="bg-[#4395d1] hover:bg-[#3484c0] text-white font-bold py-2.5 px-4 rounded text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+                className={`${allPaths.length > initialPathCount ? "bg-green-600 hover:bg-green-700" : "bg-[#4395d1] hover:bg-[#3484c0]"} text-white font-bold py-2.5 px-4 rounded text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer`}
               >
                 {allPaths.length > initialPathCount ? "Update & Next" : "Skip & Next"}
               </button>
@@ -3294,7 +3419,8 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleSaveAndExit}
-                className="bg-[#c9302c] hover:bg-[#ac2925] text-white font-bold py-2.5 px-4 rounded text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer"
+                disabled={selectedReviewRow?.isSubmitted}
+                className={`bg-[#c9302c] hover:bg-[#ac2925] text-white font-bold py-2.5 px-4 rounded text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer ${selectedReviewRow?.isSubmitted ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 Exit
               </button>
@@ -3352,7 +3478,8 @@ export default function App() {
                     <button
                       type="button"
                       onClick={handleSubmitForwardToTeacher}
-                      className="px-5 py-1.5 bg-[#7030a0] hover:bg-[#5b2782] text-white rounded text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                      disabled={selectedReviewRow?.isSubmitted}
+                      className={`px-5 py-1.5 bg-[#7030a0] hover:bg-[#5b2782] text-white rounded text-xs font-bold transition-colors shadow-xs cursor-pointer ${selectedReviewRow?.isSubmitted ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       Submit
                     </button>
@@ -3529,62 +3656,22 @@ export default function App() {
         };
       }).filter(group => group.subjects.length > 0);
 
-      const reviewRequests = [
-        { 
-          examiner: { id: "17304", name: "Sakib Imtiaz Rony (2021)", phone: "8801303067268" },
-          course: "NDC & SJC All Service [CAP - 2026]",
-          subject: "Chemistry [TW]",
-          exam: "Daily Exam For NDC Chemistry-03-04",
-          requests: 1,
-          pending: "1h 3m",
-          studentDoubt: "Chemistry short question answer check please."
-        },
-        { 
-          examiner: { id: "21350", name: "Shajed Ahmed Chowdhury (2022)", phone: "8801902139021" },
-          course: "NDC & SJC All Service [CAP - 2026]",
-          subject: "Biology [TW]",
-          exam: "Daily Exam For NDC Biology-03-04",
-          requests: 1,
-          pending: "3m",
-          studentDoubt: "Diagram drawing criteria evaluation query."
-        },
-        { 
-          examiner: { id: "21809", name: "Mujammal Miah (2017)", phone: "8801518901615" },
-          course: "HSC Bangla-English Full Course [Online] [HSC BE O - 2027]",
-          subject: "English [OW]",
-          exam: "Daily Live Written Exam English-01",
-          requests: 1,
-          pending: "11m",
-          studentDoubt: "Paragraph marks are lower than expected."
-        },
-        { 
-          examiner: { id: "25380", name: "Iftekhar Ahmed Tanha (2023)", phone: "8801959995571" },
-          course: "NDC & SJC All Service [CAP - 2026]",
-          subject: "Physics [OW]",
-          exam: "Daily Live Exam For NDC Physics-03-04",
-          requests: 1,
-          pending: "16m",
-          studentDoubt: "aita 26 no."
-        },
-        { 
-          examiner: { id: "28314", name: "Md. Ibrahim Khalil Sarker (2024)", phone: "8801731654815" },
-          course: "NDC & SJC All Service [CAP - 2026]",
-          subject: "Chemistry [TW]",
-          exam: "Daily Exam For NDC Chemistry-03-04",
-          requests: 1,
-          pending: "41m",
-          studentDoubt: "Please review balance of equations."
-        },
-        { 
-          examiner: { id: "29611", name: "Md. Sohag Ali (2024)", phone: "8801792789010" },
-          course: "NDC & SJC All Service [CAP - 2026]",
-          subject: "Physics [OW]",
-          exam: "Daily Live Exam For NDC Physics-03-04",
-          requests: 1,
-          pending: "-",
-          studentDoubt: "Calculation steps for average speed were correct."
-        }
-      ];
+      // Filter adminForwardedRequests into Student and Admin requests for the dashboard
+      const dashboardStudentRequests = adminForwardedRequests.filter(isStudentRequest).map(req => ({
+        examiner: req.examiner,
+        course: req.course,
+        subject: req.subject,
+        exam: req.exam,
+        requests: req.reviewCount || 1,
+        pending: getPendingDuration(req.date),
+        studentDoubt: req.note,
+        status: req.status,
+        originalData: req
+      }));
+
+      const dashboardAdminRequests = adminForwardedRequests.filter(req => !isStudentRequest(req));
+
+      const reviewRequests = dashboardStudentRequests;
 
       const handleViewDetails = (courseName: string, subjectName?: string) => {
         setSelectedDashboardDetail({
@@ -4043,7 +4130,7 @@ export default function App() {
                               reviewStatus: (req as any).reviewRequest || (req as any).status || 'Not Reviewed',
                               suppressNotes: false
                             };
-                            setSelectedReviewRow(constructed);
+                            setShowingAdminDetailRow(constructed);
                             setShowReviewWorkspace(false);
                           }}
                           className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-2.5 py-0.5 rounded text-[10px] font-bold transition-all shadow-xs"
@@ -4055,7 +4142,7 @@ export default function App() {
                   ))}
                   <tr className="bg-[#f1f3f5] font-bold">
                     <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total</td>
-                    <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono">6</td>
+                    <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono">{reviewRequests.length}</td>
                     <td className="px-3 py-2" colSpan={3}></td>
                   </tr>
                 </tbody>
@@ -4101,14 +4188,14 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {adminForwardedRequests.length === 0 ? (
+                  {dashboardAdminRequests.length === 0 ? (
                     <tr>
                       <td colSpan={12} className="px-3 py-5 text-center text-gray-400 font-medium italic">
                         No forwarded reviews at this moment.
                       </td>
                     </tr>
                   ) : (
-                    adminForwardedRequests.map((req, idx) => (
+                    dashboardAdminRequests.map((req, idx) => (
                       <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                         <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
                           <div className="font-bold text-blue-700 text-[11px] leading-tight">[{req.examiner.id}] - {req.examiner.name}</div>
@@ -4199,7 +4286,7 @@ export default function App() {
                                   examType: req.examType || 'Online Written',
                                   version: req.version || 'Bangla'
                                 };
-                                setSelectedReviewRow(constructed);
+                                setShowingAdminDetailRow(constructed);
                                 setShowReviewWorkspace(false);
                               }}
                               className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-2.5 py-1 rounded text-[10.5px] font-bold transition-all shadow-xs"
@@ -4217,11 +4304,11 @@ export default function App() {
                       </tr>
                     ))
                   )}
-                  {adminForwardedRequests.length > 0 && (
+                  {dashboardAdminRequests.length > 0 && (
                     <tr className="bg-[#f1f3f5] font-bold">
                       <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total Forwarded</td>
                       <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono" colSpan={4}>
-                        {adminForwardedRequests.length}
+                        {dashboardAdminRequests.length}
                       </td>
                     </tr>
                   )}
@@ -9091,6 +9178,43 @@ export default function App() {
           </main>
 
         </div>
+
+        {/* Global Confirmation Modals */}
+        <AnimatePresence>
+          {cancelConfirmId && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden font-sans"
+              >
+                <div className="bg-rose-600 text-white px-6 py-4 flex items-center">
+                  <AlertTriangle className="w-6 h-6 mr-3" />
+                  <h3 className="text-lg font-bold">Confirm Cancellation</h3>
+                </div>
+                <div className="p-6">
+                  <p className="text-gray-700 font-medium mb-1 text-left">Are you sure you want to cancel this review request?</p>
+                  <p className="text-gray-500 text-sm italic mb-6 text-left">(আপনি কি নিশ্চিত যে আপনি এই রিভিউ রিকোয়েস্টটি বাতিল করতে চান?)</p>
+                  <div className="flex gap-3 justify-end">
+                    <button 
+                      onClick={() => setCancelConfirmId(null)}
+                      className="px-5 py-2 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                    >
+                      No, Keep It
+                    </button>
+                    <button 
+                      onClick={() => handleCancelRequest(cancelConfirmId)}
+                      className="px-5 py-2 text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition-colors cursor-pointer"
+                    >
+                      Yes, Cancel
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
