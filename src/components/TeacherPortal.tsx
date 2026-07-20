@@ -465,22 +465,48 @@ export default function TeacherPortal({
     }
 
     if (reviewModalType === 'student') {
+      const pendingStudents = studentReviewRequests.filter(req => req.status === 'Pending');
+      const currentIndex = pendingStudents.findIndex(req => req.id === selectedReviewModal.id);
+
       setStudentReviewRequests(prev => prev.map(item => 
         item.id === selectedReviewModal.id ? { ...item, status: 'Resolved' } : item
       ));
       showToast(`Student Review ${selectedReviewModal.id} resolved! Revised Marks: ${marksNum}`);
+
+      if (currentIndex !== -1 && currentIndex + 1 < pendingStudents.length) {
+        const nextReq = pendingStudents[currentIndex + 1];
+        setSelectedReviewModal(nextReq);
+        setRevisedMarks(String(nextReq.originalMarks));
+        setRevisedRemarks('');
+      } else {
+        setSelectedReviewModal(null);
+        setRevisedMarks('');
+        setRevisedRemarks('');
+        showToast('All student review requests completed!');
+      }
     } else {
+      const pendingAdmins = adminForwardedRequests.filter(req => req.status === 'Pending Teacher Response' || req.status === 'In Progress');
+      const currentIndex = pendingAdmins.findIndex(req => req.id === selectedReviewModal.id);
+
       if (setAdminForwardedRequests) {
         setAdminForwardedRequests(prev => prev.map(item => 
           item.id === selectedReviewModal.id ? { ...item, status: 'Resolved by Teacher', note: revisedRemarks || item.note } : item
         ));
       }
       showToast(`Admin Review Request ${selectedReviewModal.id} resolved! Revised Marks: ${marksNum}`);
-    }
 
-    setSelectedReviewModal(null);
-    setRevisedMarks('');
-    setRevisedRemarks('');
+      if (currentIndex !== -1 && currentIndex + 1 < pendingAdmins.length) {
+        const nextReq = pendingAdmins[currentIndex + 1];
+        setSelectedReviewModal(nextReq);
+        setRevisedMarks(String(nextReq.originalMarks || nextReq.minMarks || '6'));
+        setRevisedRemarks('');
+      } else {
+        setSelectedReviewModal(null);
+        setRevisedMarks('');
+        setRevisedRemarks('');
+        showToast('All admin review requests completed!');
+      }
+    }
   };
 
   // Submit Question Answer
@@ -1192,27 +1218,10 @@ export default function TeacherPortal({
             >
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 className="text-base font-extrabold text-[#002d5b] border-b border-gray-100 pb-3 mb-4 font-sans">Payment Summary Report</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-gray-50 rounded p-4 border border-gray-100">
-                    <span className="text-[10px] font-bold text-gray-400 block uppercase font-sans">Lifetime Earnings</span>
-                    <strong className="text-lg font-mono text-gray-800 block mt-1">৳ ১,৮৪,৫০০</strong>
-                  </div>
-                  <div className="bg-gray-50 rounded p-4 border border-gray-100">
-                    <span className="text-[10px] font-bold text-gray-400 block uppercase font-sans">Total Scripts Evaluated</span>
-                    <strong className="text-lg font-mono text-gray-800 block mt-1">১,৪৫০ টি</strong>
-                  </div>
-                  <div className="bg-gray-50 rounded p-4 border border-gray-100">
-                    <span className="text-[10px] font-bold text-gray-400 block uppercase font-sans">Total Hours Lectured</span>
-                    <strong className="text-lg font-mono text-gray-800 block mt-1">৭২ ঘন্টা</strong>
-                  </div>
-                  <div className="bg-gray-50 rounded p-4 border border-gray-100">
-                    <span className="text-[10px] font-bold text-gray-400 block uppercase font-sans">Q&As Answered</span>
-                    <strong className="text-lg font-mono text-gray-800 block mt-1">১৮৬ টি</strong>
-                  </div>
-                </div>
-
-                <div className="bg-[#f0fdf4] border border-[#bbf7d0] text-[#15803d] rounded p-4 font-sans text-xs">
-                  <strong>Notice:</strong> All tax-related deductions (10% TDS) are automatically submitted to NBR. You can download the Tax Deduction Certificate (Form 50) directly from the dashboard after the financial year ends.
+                <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 font-sans">
+                  <span className="text-4xl mb-2">📁</span>
+                  <p className="text-sm font-semibold">No data available (কোনো তথ্য পাওয়া যায়নি)</p>
+                  <p className="text-xs text-gray-400">Payment summary report is empty.</p>
                 </div>
               </div>
             </motion.div>
@@ -1242,25 +1251,13 @@ export default function TeacherPortal({
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       <tr>
-                        <td className="px-4 py-3.5 text-gray-500 font-mono">2026-06-24</td>
-                        <td className="px-4 py-3.5 text-gray-700 font-bold">Engineering Admission</td>
-                        <td className="px-4 py-3.5 text-gray-600">P-02 Vector & Mechanics</td>
-                        <td className="px-4 py-3.5 text-center text-gray-500 font-mono">2.0 Hours</td>
-                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ১,৫০০</td>
-                      </tr>
-                      <tr>
-                        <td className="px-4 py-3.5 text-gray-500 font-mono">2026-06-22</td>
-                        <td className="px-4 py-3.5 text-gray-700 font-bold">Medical Admission</td>
-                        <td className="px-4 py-3.5 text-gray-600">B-04 Cell Biology Concepts</td>
-                        <td className="px-4 py-3.5 text-center text-gray-500 font-mono">2.0 Hours</td>
-                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ১,৫০০</td>
-                      </tr>
-                      <tr>
-                        <td className="px-4 py-3.5 text-gray-500 font-mono">2026-06-18</td>
-                        <td className="px-4 py-3.5 text-gray-700 font-bold">NDC & SJC All Service</td>
-                        <td className="px-4 py-3.5 text-gray-600">C-01 Chemistry Intro Lab</td>
-                        <td className="px-4 py-3.5 text-center text-gray-500 font-mono">1.5 Hours</td>
-                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ১,২০১</td>
+                        <td colSpan={5} className="px-4 py-12 text-center text-gray-400 font-sans">
+                          <div className="flex flex-col items-center justify-center">
+                            <span className="text-3xl mb-1">📁</span>
+                            <p className="text-sm font-semibold">No data available (কোনো তথ্য পাওয়া যায়নি)</p>
+                            <p className="text-xs text-gray-400">Class payment report is empty.</p>
+                          </div>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -1575,16 +1572,13 @@ export default function TeacherPortal({
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       <tr>
-                        <td className="px-4 py-3.5 text-gray-500 font-mono">2026-06-15</td>
-                        <td className="px-4 py-3.5 text-purple-700 font-semibold">Question Paper Designing</td>
-                        <td className="px-4 py-3.5 text-gray-600">Weekly Exam-04 Organic Chemistry Set B</td>
-                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ২,৫০০</td>
-                      </tr>
-                      <tr>
-                        <td className="px-4 py-3.5 text-gray-500 font-mono">2026-06-10</td>
-                        <td className="px-4 py-3.5 text-purple-700 font-semibold">Written Solution PDF Creation</td>
-                        <td className="px-4 py-3.5 text-gray-600">Daily Live Physics Solve sheet</td>
-                        <td className="px-4 py-3.5 text-right font-bold font-mono text-gray-800">৳ ১,৫০০</td>
+                        <td colSpan={4} className="px-4 py-12 text-center text-gray-400 font-sans">
+                          <div className="flex flex-col items-center justify-center">
+                            <span className="text-3xl mb-1">📁</span>
+                            <p className="text-sm font-semibold">No data available (কোনো তথ্য পাওয়া যায়নি)</p>
+                            <p className="text-xs text-gray-400">Materials payment report is empty.</p>
+                          </div>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -1604,21 +1598,10 @@ export default function TeacherPortal({
             >
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 className="text-base font-extrabold text-[#002d5b] border-b border-gray-100 pb-3 mb-4 font-sans">Q&A Desk Response Payments</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-amber-50 rounded-lg p-5 border border-amber-200 flex flex-col justify-between">
-                    <div>
-                      <strong className="text-xs text-amber-900 block font-sans">Q&A Single-Answer Fixed Rate</strong>
-                      <div className="text-2xl font-black text-amber-800 font-mono mt-1">৳ ৩০.০০ <span className="text-[10px] text-amber-700 font-sans">per question</span></div>
-                    </div>
-                    <span className="text-[11px] text-amber-700 font-sans mt-2">Answers are verified by senior coordinators for correctness.</span>
-                  </div>
-                  <div className="bg-purple-50 rounded-lg p-5 border border-purple-200 flex flex-col justify-between">
-                    <div>
-                      <strong className="text-xs text-purple-900 block font-sans">This Month’s Q&A Income</strong>
-                      <div className="text-2xl font-black text-purple-800 font-mono mt-1">৳ ৫,৫৮০ <span className="text-[10px] text-purple-700 font-sans">(186 approved answers)</span></div>
-                    </div>
-                    <span className="text-[11px] text-purple-700 font-sans mt-2">Automatically aggregated to the next payout routine.</span>
-                  </div>
+                <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 font-sans">
+                  <span className="text-4xl mb-2">📁</span>
+                  <p className="text-sm font-semibold">No data available (কোনো তথ্য পাওয়া যায়নি)</p>
+                  <p className="text-xs text-gray-400">Q&A response payment data is empty.</p>
                 </div>
               </div>
             </motion.div>
@@ -2417,44 +2400,33 @@ export default function TeacherPortal({
                     </button>
                   </div>
 
-                  {/* Grading */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 block font-sans">Original Grade</label>
-                      <div className="w-full bg-gray-100 border border-gray-200 text-gray-500 rounded px-3 py-2 text-xs font-mono font-bold">
-                        {reviewModalType === 'student' 
-                          ? `${selectedReviewModal.originalMarks} / 10` 
-                          : `${selectedReviewModal.originalMarks || selectedReviewModal.minMarks || '5'} / ${selectedReviewModal.maxMarks || '10'}`
-                        }
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 block font-sans">Updated Marks (সংশোধিত নম্বর)</label>
-                      <input 
-                        type="text" 
-                        required
-                        value={revisedMarks}
-                        onChange={(e) => setRevisedMarks(e.target.value)}
-                        placeholder="e.g. 7.5"
-                        className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#007bff]"
-                      />
-                    </div>
+                  {/* Grading Layout matching Screenshot exactly */}
+                  <div className="flex items-center gap-2 py-4 border-t border-gray-200 font-sans text-sm font-bold text-gray-800">
+                    <span className="text-gray-900 font-bold text-sm md:text-base">Obtained:</span>
+                    <input 
+                      type="text" 
+                      required
+                      value={revisedMarks}
+                      onChange={(e) => setRevisedMarks(e.target.value)}
+                      className="w-20 bg-[#9dfd9d] border border-gray-700 rounded-md px-2 py-1.5 text-center font-bold text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 font-mono"
+                    />
+                    <span className="text-gray-800 font-bold text-sm md:text-base">/ {Number(selectedReviewModal.maxMarks || 1).toFixed(2)}</span>
                   </div>
 
-                  {/* Buttons */}
-                  <div className="flex justify-between pt-4 border-t border-gray-100">
+                  {/* Buttons matching Screenshot exactly */}
+                  <div className="flex justify-start items-center gap-3 pt-4 border-t border-gray-100">
+                    <button 
+                      type="submit"
+                      className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white font-bold px-8 py-2.5 rounded-md text-sm transition-colors shadow-xs cursor-pointer font-sans"
+                    >
+                      Update & Next
+                    </button>
                     <button 
                       type="button"
                       onClick={() => setSelectedReviewModal(null)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded text-xs transition-colors cursor-pointer font-sans"
+                      className="bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold px-8 py-2.5 rounded-md text-sm transition-colors shadow-xs cursor-pointer font-sans"
                     >
                       Exit
-                    </button>
-                    <button 
-                      type="submit"
-                      className="bg-[#007bff] hover:bg-[#0069d9] text-white font-bold px-6 py-2 rounded text-xs transition-colors shadow-xs cursor-pointer font-sans"
-                    >
-                      Update & Next
                     </button>
                   </div>
                 </form>
