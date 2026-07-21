@@ -1,23 +1,26 @@
 import { initializeApp } from 'firebase/app';
 import { initializeFirestore, doc, setDoc, deleteDoc, getDocs, collection } from 'firebase/firestore';
+import firebaseAppletConfig from '../../firebase-applet-config.json';
 
 const firebaseConfig = {
-  projectId: "alien-geode-bn50x",
-  appId: "1:195530948037:web:24453c4532d12cb4e71fac",
-  apiKey: "AIzaSyDGyC41nr9dH-M6kaG9ermS-XbOgsgT_VQ",
-  authDomain: "alien-geode-bn50x.firebaseapp.com",
-  storageBucket: "alien-geode-bn50x.firebasestorage.app",
-  messagingSenderId: "195530948037"
+  projectId: firebaseAppletConfig?.projectId || "alien-geode-bn50x",
+  appId: firebaseAppletConfig?.appId || "1:195530948037:web:24453c4532d12cb4e71fac",
+  apiKey: firebaseAppletConfig?.apiKey || "AIzaSyDGyC41nr9dH-M6kaG9ermS-XbOgsgT_VQ",
+  authDomain: firebaseAppletConfig?.authDomain || "alien-geode-bn50x.firebaseapp.com",
+  storageBucket: firebaseAppletConfig?.storageBucket || "alien-geode-bn50x.firebasestorage.app",
+  messagingSenderId: firebaseAppletConfig?.messagingSenderId || "195530948037"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+const databaseId = firebaseAppletConfig?.firestoreDatabaseId || "ai-studio-orgeducationmana-8f4b46d2-1edd-4c11-b88c-39730d43ae1e";
+
 // Initialize Firestore with the custom database ID provisioned for this applet
 // and use experimentalForceLongPolling to prevent iframe/sandboxed network block issues
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
-}, "ai-studio-orgeducationmana-8f4b46d2-1edd-4c11-b88c-39730d43ae1e");
+}, databaseId);
 
 /**
  * Generic helper to save a document in Firestore

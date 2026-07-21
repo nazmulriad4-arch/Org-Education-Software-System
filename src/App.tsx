@@ -446,6 +446,28 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [bdCurrentTime, setBdCurrentTime] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      try {
+        const timeString = now.toLocaleTimeString('en-US', {
+          timeZone: 'Asia/Dhaka',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+        setBdCurrentTime(timeString);
+      } catch (e) {
+        setBdCurrentTime(now.toLocaleTimeString());
+      }
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -3848,7 +3870,7 @@ export default function App() {
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span className="font-semibold tracking-wide">Admin Dashboard <span className="text-blue-200">[{adminDashTime}]</span></span>
             </span>
-            <span className="text-blue-100 text-xs">Last update: 11:57:27 AM</span>
+            <span className="text-blue-100 text-xs">Last update: {bdCurrentTime}</span>
           </div>
 
           {selectedDashboardDetail ? (
@@ -8770,7 +8792,7 @@ export default function App() {
           <div className="flex items-center space-x-6">
             <div className="flex flex-col items-start leading-none group cursor-pointer">
               <span className="text-xl font-bold tracking-tight text-white">ORG</span>
-              <span className="text-[10px] text-blue-200">v223.8</span>
+              <span className="text-[10px] text-blue-200">v224</span>
             </div>
           </div>
 
@@ -8867,7 +8889,7 @@ export default function App() {
               setShowImageLog(false);
             }}>
               <span className="text-xl font-bold tracking-tight text-white font-sans">ORG</span>
-              <span className="text-[10px] text-blue-200 font-sans">v223.8</span>
+              <span className="text-[10px] text-blue-200 font-sans">v224</span>
             </div>
             
             {/* Tabs (Hidden on mobile or mobile-mode) */}

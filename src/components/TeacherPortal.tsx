@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { dbGetItems, dbSaveItem, dbDeleteItem } from '../services/firebase';
 import HandwrittenPaper from '../assets/images/bengali_handwritten_exam_paper_1784459875251.jpg';
+import PhysicsScript2 from '../assets/images/physics_script_2_1784375465674.jpg';
 import { 
   Calendar, 
   FileText, 
@@ -222,7 +223,7 @@ export default function TeacherPortal({
       try {
         const defaultScripts = [
           { id: 'SCR-101', studentName: 'Imtiaz Ahmed', roll: '37180701', subject: 'Chemistry [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 18:24', maxMarks: 10, image: HandwrittenPaper },
-          { id: 'SCR-102', studentName: 'Fahima Tabassum', roll: '37180702', subject: 'Physics [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 19:10', maxMarks: 10, image: HandwrittenPaper },
+          { id: 'SCR-102', studentName: 'Fahima Tabassum', roll: '37180702', subject: 'Physics [OW]', examName: 'Weekly Exam-03', status: 'Pending', submittedDate: '2026-07-03 19:10', maxMarks: 10, image: PhysicsScript2 },
           { id: 'SCR-103', studentName: 'Rafid Al-Hasan', roll: '37180703', subject: 'Higher Mathematics [TW]', examName: 'Daily Exam Chemistry-04', status: 'Pending', submittedDate: '2026-07-03 21:05', maxMarks: 10, image: HandwrittenPaper },
           { id: 'SCR-104', studentName: 'Sadia Rahman', roll: '37180704', subject: 'Biology [OW]', examName: 'Weekly Exam-03', status: 'Evaluated', marks: 8.5, maxMarks: 10, feedback: 'Excellent structural diagram drawing.', submittedDate: '2026-07-02 14:15' }
         ];
@@ -2297,7 +2298,7 @@ export default function TeacherPortal({
                       >
                         <div className="w-full flex flex-col pointer-events-none select-none">
                           <img 
-                            src={HandwrittenPaper} 
+                            src={evaluatingScript?.image || HandwrittenPaper} 
                             alt="Student Answer" 
                             className="w-full h-auto object-contain block opacity-85"
                           />
