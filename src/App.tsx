@@ -402,18 +402,11 @@ const getPendingDuration = (dateStr: string) => {
 };
 
 const getDisplayStatus = (req: any) => {
-  if (req && req.isMultiple) {
-    const checked = req.checkedScriptsCount || 0;
-    const total = req.totalScriptsCount || 10;
-    if (checked >= total) {
-      return "Reviewed";
-    }
-    if (checked > 0) {
-      return "In Progress";
-    }
-    return "Pending Teacher Response";
+  if (!req) return "Pending Teacher Response";
+  if (req.isMultiple) {
+    return "In Progress";
   }
-  return req ? req.status : "";
+  return "Pending Teacher Response";
 };
 
 const isStudentRequest = (req: any) => {
@@ -2279,13 +2272,6 @@ export default function App() {
         subItems: [
           { id: 'attendance-adjustment', label: 'Attendance Adjustment' },
           { id: 'leave', label: 'Leave' },
-        ]
-      },
-      { 
-        id: 'team-management', 
-        label: 'Member Management',
-        subItems: [
-          { id: 'member-directory', label: 'Member Directory' },
         ]
       },
     ],
@@ -4289,7 +4275,7 @@ export default function App() {
                           )}
                         </td>
                         <td className="border-r border-gray-200 px-3 py-3 text-center">
-                          {getDisplayStatus(req) === 'Reviewed' || getDisplayStatus(req) === 'Completed' ? (
+                          {req.status === 'Resolved by Teacher' || req.status === 'Completed' || req.status === 'Reviewed' || req.status === 'Resolved' || (req.isMultiple && req.checkedScriptsCount >= req.totalScriptsCount) ? (
                             <span className="text-gray-400 font-medium font-sans">--</span>
                           ) : (
                             <span className="inline-block bg-rose-50 text-rose-700 border border-rose-100 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10px] shadow-3xs whitespace-nowrap">
@@ -8443,7 +8429,7 @@ export default function App() {
                                 )}
                               </td>
                               <td className="border-r border-gray-200 px-3 py-3 text-center">
-                                {getDisplayStatus(req) === 'Reviewed' || getDisplayStatus(req) === 'Completed' ? (
+                                {req.status === 'Resolved by Teacher' || req.status === 'Completed' || req.status === 'Reviewed' || req.status === 'Resolved' || (req.isMultiple && req.checkedScriptsCount >= req.totalScriptsCount) ? (
                                   <span className="text-gray-400 font-medium font-sans">--</span>
                                 ) : (
                                   <span className="inline-block bg-rose-50 text-rose-700 border border-rose-100 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10px] shadow-3xs whitespace-nowrap">
@@ -8600,7 +8586,7 @@ export default function App() {
                                 )}
                               </td>
                               <td className="border-r border-gray-200 px-3 py-3 text-center">
-                                {getDisplayStatus(req) === 'Reviewed' || getDisplayStatus(req) === 'Completed' ? (
+                                {req.status === 'Resolved by Teacher' || req.status === 'Completed' || req.status === 'Reviewed' || req.status === 'Resolved' || (req.isMultiple && req.checkedScriptsCount >= req.totalScriptsCount) ? (
                                   <span className="text-gray-400 font-medium font-sans">--</span>
                                 ) : (
                                   <span className="inline-block bg-rose-50 text-rose-700 border border-rose-100 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10px] shadow-3xs whitespace-nowrap">
