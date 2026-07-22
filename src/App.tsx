@@ -529,6 +529,211 @@ export default function App() {
 
   const [reviewScripts, setReviewScripts] = useState([
     {
+      id: 'REV-SCRIPT-8',
+      rollNumber: '37180701104',
+      registrationNo: '9928374',
+      subject: 'Physics',
+      examSubject: '[131] - Physics 2nd Paper',
+      examName: 'Weekly Exam-04',
+      course: 'College Admission Program (Online)',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'Bangla',
+      question: 'তড়িৎ দ্বিমেরুর অক্ষের উপরস্থ কোনো বিন্দুতে তড়িৎ প্রাবল্য কোন অভিমুখে ক্রিয়া করে?',
+      uniqueSet: '2',
+      questionSerial: '12',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswer: 'দ্বিমেরু ভ্রামকের অভিমুখে',
+      sampleAnswerNotes: [
+        'দ্বিমেরু ভ্রামকের অভিমুখে',
+        'নম্বর বণ্টনঃ',
+        'সঠিক উত্তরের জন্য ০১ নম্বর।'
+      ],
+      scriptImage: '/src/assets/images/physics_script_1_1784375451233.jpg',
+      examinerName: '[816] Mostafiz (2012)',
+      evaluationTime: '2026-07-21 09:15 AM',
+      annotations: [
+        { type: 'text', text: '১২। দ্বিমেরু ভ্রামকের অভিমুখে ক্রিয়া করে।', top: 38, left: 12, fontSize: '26px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 12, width: 34, height: 3, color: '#dc2626', angle: 2 },
+        { type: 'tick', top: 28, left: 48 },
+        { type: 'text', text: '01', top: 36, left: 58, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 64, width: 12, height: 3, color: '#dc2626', angle: -60 }
+      ]
+    },
+    {
+      id: 'REV-SCRIPT-9',
+      rollNumber: '42190800552',
+      registrationNo: '8837192',
+      subject: 'Chemistry',
+      examSubject: '[137] - Chemistry 1st Paper',
+      examName: 'Weekly Exam-04',
+      course: 'College Admission Program (Online)',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'Bangla',
+      question: 'নিকেল অনুঘটকের উপস্থিতিতে অ্যালকাইনকে হাইড্রোজেনের সাথে ৩০০°C তাপমাত্রায় উত্তপ্ত করলে কি উৎপন্ন হয়?',
+      uniqueSet: '2',
+      questionSerial: '18',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswer: 'অ্যালকেন',
+      sampleAnswerNotes: [
+        'অ্যালকেন (বা ইথেন/অ্যালকেন সমূহ)',
+        'নম্বর বণ্টনঃ',
+        'অ্যালকেন বা সমীকরণসহ সঠিক উত্তরের জন্য ০১ নম্বর।'
+      ],
+      scriptImage: '/src/assets/images/physics_script_2_1784375465674.jpg',
+      examinerName: '[816] Mostafiz (2012)',
+      evaluationTime: '2026-07-21 09:40 AM',
+      annotations: [
+        { type: 'text', text: '১৮। অ্যালকেন (যেমন: CH3-CH3 ইথেন)', top: 38, left: 12, fontSize: '26px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 12, width: 36, height: 3, color: '#dc2626', angle: 2 },
+        { type: 'tick', top: 28, left: 50 },
+        { type: 'text', text: '01', top: 36, left: 60, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 66, width: 12, height: 3, color: '#dc2626', angle: -60 }
+      ]
+    },
+    {
+      id: 'REV-SCRIPT-10',
+      rollNumber: '38192004712',
+      registrationNo: '7728190',
+      subject: 'Biology',
+      examSubject: '[143] - Biology 1st Paper',
+      examName: 'Weekly Exam-04',
+      course: 'College Admission Program (Online)',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'Bangla',
+      question: 'গ্লাইকোলাইসিস প্রক্রিয়ায় মোট কতটি ATP অণু সরাসরি উৎপন্ন হয়?',
+      uniqueSet: '1',
+      questionSerial: '8',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswer: '৪টি',
+      sampleAnswerNotes: [
+        '৪টি ATP অণু সরাসরি উৎপন্ন হয় (নিট লাভ ২টি)',
+        'নম্বর বণ্টনঃ',
+        'সরাসরি উৎপন্ন ৪টি ATP লেখার জন্য ০১ নম্বর।'
+      ],
+      scriptImage: '/src/assets/images/bengali_handwritten_exam_paper_1784459875251.jpg',
+      examinerName: '[816] Mostafiz (2012)',
+      evaluationTime: '2026-07-21 10:10 AM',
+      annotations: [
+        { type: 'text', text: '৮। গ্লাইকোলাইসিসে সরাসরি ৪টি ATP উৎপন্ন হয়।', top: 38, left: 12, fontSize: '26px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 12, width: 40, height: 3, color: '#dc2626', angle: 2 },
+        { type: 'tick', top: 28, left: 54 },
+        { type: 'text', text: '01', top: 36, left: 64, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 70, width: 12, height: 3, color: '#dc2626', angle: -60 }
+      ]
+    },
+    {
+      id: 'REV-SCRIPT-5',
+      rollNumber: '18202200229',
+      registrationNo: '2339994',
+      subject: 'English',
+      examSubject: '[107] - English 2nd Paper',
+      examName: 'Weekly Exam-03',
+      course: 'College Admission Program (Online)',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'English',
+      question: "Taking exercise is a good habit. Here 'Taking' is a/an ____.",
+      uniqueSet: '2',
+      questionSerial: '35',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswer: 'gerund',
+      sampleAnswerNotes: [
+        'gerund',
+        'Mark Distribution:',
+        '01 mark for writing "gerund"'
+      ],
+      scriptImage: '/src/assets/images/scanned_exam_script_1782972819954.jpg',
+      examinerName: '[816] Mostafiz (2012)',
+      evaluationTime: '2026-07-20 08:06 PM',
+      annotations: [
+        { type: 'text', text: '৩৫। Gerund.', top: 38, left: 12, fontSize: '28px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 12, width: 22, height: 3, color: '#dc2626', angle: 3 },
+        { type: 'tick', top: 28, left: 38 },
+        { type: 'text', text: '01', top: 36, left: 48, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 54, width: 12, height: 3, color: '#dc2626', angle: -60 }
+      ]
+    },
+    {
+      id: 'REV-SCRIPT-6',
+      rollNumber: '52203001139',
+      registrationNo: '5200989',
+      subject: 'Bangla',
+      examSubject: '[101] - Bangla 1st Paper',
+      examName: 'Weekly Exam-03',
+      course: 'College Admission Program (Online)',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'Bangla',
+      question: 'মাইকেল মধুসূদন দত্ত কত খ্রিষ্টাব্দে খ্রিষ্টধর্মে দীক্ষিত হন?',
+      uniqueSet: '2',
+      questionSerial: '24',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswer: '১৮৪৩ খ্রিষ্টাব্দে',
+      sampleAnswerNotes: [
+        '১৮৪৩ খ্রিষ্টাব্দে',
+        'নম্বর বণ্টনঃ',
+        '১৮৪৩ খ্রিষ্টাব্দে; লেখার জন্য ০১ নম্বর।'
+      ],
+      scriptImage: '/src/assets/images/scanned_exam_script_1782972819954.jpg',
+      examinerName: '[816] Mostafiz (2012)',
+      evaluationTime: '2026-07-20 09:20 PM',
+      annotations: [
+        { type: 'text', text: '২৪। ১৮৪৩ খ্রিষ্টাব্দে', top: 38, left: 12, fontSize: '28px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 12, width: 28, height: 3, color: '#dc2626', angle: 3 },
+        { type: 'tick', top: 28, left: 44 },
+        { type: 'text', text: '01', top: 36, left: 54, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 60, width: 12, height: 3, color: '#dc2626', angle: -60 }
+      ]
+    },
+    {
+      id: 'REV-SCRIPT-7',
+      rollNumber: '58218800777',
+      registrationNo: '5211171',
+      subject: 'Bangla',
+      examSubject: '[102] - Bangla 2nd Paper',
+      examName: 'Weekly Exam-03',
+      course: 'College Admission Program (Online)',
+      program: 'College Admission Program',
+      session: '2026',
+      examType: 'Online Written',
+      version: 'Bangla',
+      question: 'তৎপুরুষ সমাসে ______ অর্থ প্রাধান্য পায়।',
+      uniqueSet: '1',
+      questionSerial: '20',
+      maxMarks: '1.00',
+      obtainedMarks: '1.00',
+      sampleAnswer: 'পরপদের',
+      sampleAnswerNotes: [
+        'পরপদের',
+        'নম্বর বণ্টনঃ',
+        'পরপদের; লেখার জন্য ০১ নম্বর।',
+        '[বি: দ্র: বানান ভুল হলে পূর্ণ নম্বর কর্তন করা হবে।]'
+      ],
+      scriptImage: '/src/assets/images/scanned_exam_script_1782972819954.jpg',
+      examinerName: '[816] Mostafiz (2012)',
+      evaluationTime: '2026-07-20 09:30 PM',
+      annotations: [
+        { type: 'text', text: '২০। পরপদের।', top: 38, left: 12, fontSize: '28px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 12, width: 22, height: 3, color: '#dc2626', angle: 3 },
+        { type: 'tick', top: 28, left: 38 },
+        { type: 'text', text: '01', top: 36, left: 48, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 54, width: 12, height: 3, color: '#dc2626', angle: -60 }
+      ]
+    },
+    {
       id: 'REV-SCRIPT-1',
       rollNumber: '57210800687',
       registrationNo: '4297721',
@@ -556,8 +761,11 @@ export default function App() {
       examinerName: '[21192] Fahim (2023)',
       evaluationTime: '2026-07-17 07:36 PM',
       annotations: [
-        { type: 'text', text: '০১', top: 40, left: 5, fontSize: '42px', fontColor: 'red', isBold: true, fontFamily: '"Comic Sans MS", cursive' },
-        { type: 'tick', top: 35, left: 12 }
+        { type: 'text', text: '১। ১০^২৪ পিকোগ্রাম', top: 38, left: 12, fontSize: '26px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 12, width: 28, height: 3, color: '#dc2626', angle: 2 },
+        { type: 'tick', top: 28, left: 44 },
+        { type: 'text', text: '01', top: 36, left: 54, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 60, width: 12, height: 3, color: '#dc2626', angle: -60 }
       ]
     },
     {
@@ -588,9 +796,11 @@ export default function App() {
       examinerName: '[21192] Fahim (2023)',
       evaluationTime: '2026-07-17 07:36 PM',
       annotations: [
-        { type: 'text', text: '০১', top: 40, left: 5, fontSize: '42px', fontColor: 'red', isBold: true, fontFamily: '"Comic Sans MS", cursive' },
-        { type: 'tick', top: 35, left: 12 },
-        { type: 'line', top: 50, left: 10, width: 70, height: 2, color: 'red', angle: -15 }
+        { type: 'text', text: '১। ১০^২৪ পিকোগ্রাম', top: 38, left: 12, fontSize: '26px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 12, width: 28, height: 3, color: '#dc2626', angle: 2 },
+        { type: 'tick', top: 28, left: 44 },
+        { type: 'text', text: '01', top: 36, left: 54, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 60, width: 12, height: 3, color: '#dc2626', angle: -60 }
       ]
     },
     {
@@ -618,11 +828,11 @@ export default function App() {
       examinerName: '[10089] Manar (2021)',
       evaluationTime: '2026-07-17 07:41 PM',
       annotations: [
-        { type: 'text', text: "২ । didn't come", top: 35, left: 12, fontSize: '24px', fontColor: 'black', isBold: true },
-        { type: 'line', top: 41, left: 11, width: 20, height: 2, color: 'black' },
-        { type: 'circle', top: 31, left: 5, width: 27, height: 16, color: 'red' },
-        { type: 'text', text: "hasn't come", top: 48, left: 34, fontSize: '28px', fontColor: 'red', isBold: true },
-        { type: 'text', text: '00 /', top: 51, left: 11, fontSize: '42px', fontColor: 'red', isBold: true, fontFamily: '"Comic Sans MS", cursive' }
+        { type: 'text', text: "২। didn't come", top: 38, left: 12, fontSize: '26px', fontColor: '#1e293b', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 50, left: 12, width: 20, height: 2, color: '#dc2626' },
+        { type: 'text', text: "hasn't come", top: 38, left: 36, fontSize: '26px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'text', text: '00', top: 36, left: 56, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 62, width: 12, height: 3, color: '#dc2626', angle: -60 }
       ]
     },
     {
@@ -652,12 +862,11 @@ export default function App() {
       examinerName: '[17304] Rony (2021)',
       evaluationTime: '2026-07-18 10:18 AM',
       annotations: [
-        { type: 'text', text: 'm = tan θ', top: 58, left: 8, fontSize: '18px', fontColor: 'black', isBold: true },
-        { type: 'text', text: '.-. θ = 120', top: 58, left: 28, fontSize: '18px', fontColor: 'black', isBold: true },
-        { type: 'text', text: 'o', top: 55, left: 39, fontSize: '11px', fontColor: 'black', isBold: true },
-        { type: 'text', text: '-√3 = tan θ', top: 64, left: 6, fontSize: '18px', fontColor: 'black', isBold: true },
-        { type: 'tick', top: 56, left: 41 },
-        { type: 'line', top: 62, left: 3, width: 23, height: 2, color: 'red', angle: -20 }
+        { type: 'text', text: '২। m = -√3  ⇒  tan θ = -√3  ∴ θ = 120°', top: 38, left: 10, fontSize: '24px', fontColor: '#1e3a8a', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 62, left: 10, width: 44, height: 3, color: '#dc2626', angle: 2 },
+        { type: 'tick', top: 28, left: 58 },
+        { type: 'text', text: '01', top: 36, left: 68, fontSize: '44px', fontColor: '#dc2626', isBold: true, fontFamily: '"Kalam", "Caveat", cursive' },
+        { type: 'line', top: 36, left: 74, width: 12, height: 3, color: '#dc2626', angle: -60 }
       ]
     }
   ]);
@@ -3026,13 +3235,25 @@ export default function App() {
                 }}
               >
                 <div className="w-full flex flex-col pointer-events-none select-none">
-                  <div style={{ aspectRatio: '16/4.5', width: '100%' }} className="relative">
-                    <img
-                      src={scriptImage}
-                      alt="Student Answer sheet"
-                      className="w-full h-full object-cover block"
-                      referrerPolicy="no-referrer"
-                    />
+                  <div style={{ aspectRatio: '16/4.5', width: '100%' }} className="relative bg-[#fafbfd] border border-dashed border-gray-300 rounded-sm overflow-hidden shadow-xs">
+                    {/* Clean Scanned Answer Sheet Paper Ruling & Margins */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {/* Left Red Margin Line */}
+                      <div className="absolute left-[8%] top-0 bottom-0 w-[1.5px] bg-red-300/50 border-r border-red-300/30"></div>
+                      {/* Top & Bottom Dashed Cut Borders */}
+                      <div className="absolute top-0 inset-x-0 h-[2px] border-t-2 border-dashed border-gray-300"></div>
+                      <div className="absolute bottom-0 inset-x-0 h-[2px] border-b-2 border-dashed border-gray-300"></div>
+                      {/* Right Margin Page Dash Marks */}
+                      <div className="absolute right-[2%] top-0 bottom-0 w-[6px] flex flex-col justify-around py-1 opacity-25">
+                        {[...Array(8)].map((_, i) => (
+                          <div key={i} className="h-[1px] w-full bg-gray-600"></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Page number indicator */}
+                  <div className="text-center text-[11px] font-semibold text-gray-500 my-1 font-sans">
+                    1/1
                   </div>
                   {/* Extra white page space at the bottom */}
                   <div style={{ height: `${extraBottomSpace}px` }} className="w-full bg-white transition-all"></div>
