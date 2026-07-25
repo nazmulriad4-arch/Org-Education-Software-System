@@ -891,7 +891,12 @@ export default function App() {
   const [currentScriptPage, setCurrentScriptPage] = useState(1);
   const [pageStore, setPageStore] = useState<{[pageNum: number]: { paths: string[], comments: any[] }}>({});
   const [actionHistory, setActionHistory] = useState<{ type: 'path' | 'comment'; value: any }[]>([]);
-  const [redoHistory, setRedoHistory] = useState<{ type: 'path' | 'comment'; value: any }[]>([]);
+  const [redoHistory, setRedoHistory] = useState<{ type: 'path' | 'comment' | 'extraPath' | 'extraComment'; value: any }[]>([]);
+  const [extraPaths, setExtraPaths] = useState<string[]>([]);
+  const [extraComments, setExtraComments] = useState<{ x: number; y: number; text: string }[]>([]);
+  const [activeExtraTextInput, setActiveExtraTextInput] = useState<{ x: number; y: number } | null>(null);
+  const [currentExtraPath, setCurrentExtraPath] = useState<string>("");
+  const [isExtraDrawing, setIsExtraDrawing] = useState<boolean>(false);
 
   useEffect(() => {
     if (selectedReviewRow) {
@@ -900,6 +905,8 @@ export default function App() {
       setAllPaths(paths);
       setInitialPathCount(paths.length);
       setScriptComments(comments);
+      setExtraPaths([]);
+      setExtraComments([]);
       setTotalScriptPages(1);
       setCurrentScriptPage(1);
       setPageStore({
@@ -912,6 +919,8 @@ export default function App() {
     } else {
       setAllPaths([]);
       setScriptComments([]);
+      setExtraPaths([]);
+      setExtraComments([]);
       setTotalScriptPages(1);
       setCurrentScriptPage(1);
       setPageStore({});
@@ -2718,6 +2727,54 @@ export default function App() {
     const questionSerial = matchQSerial ? matchQSerial[1] : "2";
     const fullMarks = activeScript.maxMarks || "1.00";
 
+    const handleExtraCanvasMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
+      if (activeDrawingTool !== 'pencil') return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setIsExtraDrawing(true);
+      setCurrentExtraPath(`M ${x.toFixed(2)} ${y.toFixed(2)}`);
+    };
+
+    const handleExtraCanvasMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+      if (!isExtraDrawing || activeDrawingTool !== 'pencil') return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setCurrentExtraPath(prev => `${prev} L ${x.toFixed(2)} ${y.toFixed(2)}`);
+    };
+
+    const handleExtraCanvasMouseUp = () => {
+      if (!isExtraDrawing || activeDrawingTool !== 'pencil') return;
+      setIsExtraDrawing(false);
+      if (currentExtraPath) {
+        setExtraPaths(prev => [...prev, currentExtraPath]);
+        setActionHistory(prev => [...prev, { type: 'extraPath', value: currentExtraPath }]);
+        setRedoHistory([]);
+        setCurrentExtraPath("");
+      }
+    };
+
+    const handleExtraSpaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      if ((e.target as HTMLElement).tagName === 'INPUT') return;
+      if (activeDrawingTool !== 'comment') return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      
+      setActiveExtraTextInput({ x, y });
+    };
+
+    const handleExtraTextInputSubmit = (text: string, x: number, y: number) => {
+      if (text.trim()) {
+        const newComment = { x, y, text: text.trim() };
+        setExtraComments(prev => [...prev, newComment]);
+        setActionHistory(prev => [...prev, { type: 'extraComment', value: newComment }]);
+        setRedoHistory([]);
+      }
+      setActiveExtraTextInput(null);
+    };
+
     const handleCanvasMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
       if (activeDrawingTool !== 'pencil') return;
       const rect = e.currentTarget.getBoundingClientRect();
@@ -2808,6 +2865,10 @@ export default function App() {
             comments: updatedComments
           }
         }));
+      } else if (lastAction.type === 'extraPath') {
+        setExtraPaths(prev => prev.filter(p => p !== lastAction.value));
+      } else if (lastAction.type === 'extraComment') {
+        setExtraComments(prev => prev.filter(c => c !== lastAction.value));
       }
     };
 
@@ -2837,6 +2898,10 @@ export default function App() {
             comments: updatedComments
           }
         }));
+      } else if (actionToRestore.type === 'extraPath') {
+        setExtraPaths(prev => [...prev, actionToRestore.value]);
+      } else if (actionToRestore.type === 'extraComment') {
+        setExtraComments(prev => [...prev, actionToRestore.value]);
       }
     };
 
@@ -2844,6 +2909,8 @@ export default function App() {
       if (confirm("Are you sure you want to clear all annotations? / আপনি কি নিশ্চিত যে আপনি সব চিহ্ন মুছে ফেলবেন?")) {
         setAllPaths([]);
         setScriptComments([]);
+        setExtraPaths([]);
+        setExtraComments([]);
         setActionHistory([]);
         setRedoHistory([]);
         setPageStore(prev => ({
@@ -3225,17 +3292,19 @@ export default function App() {
             {/* Script Paper Canvas Card */}
             <div className="bg-white border-x border-b border-gray-200 border-t-0 border-dashed border-t-gray-400 p-4 pt-6 flex flex-col items-center justify-center relative overflow-hidden shadow-xs">
               <div 
-                onClick={handleImageClick}
-                className="relative border border-dashed border-gray-300 bg-white transition-all duration-300 mx-auto"
+                className="relative border border-dashed border-gray-300 bg-white transition-all duration-300 mx-auto w-full flex flex-col"
                 style={{
                   transform: `rotate(${studentPaperRotate}deg) scale(${imageScale})`,
                   transformOrigin: 'center center',
-                  width: '100%',
                   maxWidth: '520px'
                 }}
               >
-                <div className="w-full flex flex-col pointer-events-none select-none">
-                  <div style={{ aspectRatio: '16/4.5', width: '100%' }} className="relative bg-[#fafbfd] border border-dashed border-gray-300 rounded-sm overflow-hidden shadow-xs">
+                {/* Main Answer Script Sheet Container (Fixed Height Aspect Ratio) */}
+                <div 
+                  onClick={handleImageClick}
+                  className="relative w-full select-none"
+                >
+                  <div style={{ aspectRatio: '16/4.5', width: '100%' }} className="relative bg-[#fafbfd] border border-dashed border-gray-300 rounded-sm overflow-hidden shadow-xs pointer-events-none">
                     {/* Clean Scanned Answer Sheet Paper Ruling & Margins */}
                     <div className="absolute inset-0 pointer-events-none">
                       {/* Left Red Margin Line */}
@@ -3251,204 +3320,316 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-                  {/* Page number indicator */}
-                  <div className="text-center text-[11px] font-semibold text-gray-500 my-1 font-sans">
-                    1/1
-                  </div>
-                  {/* Extra white page space at the bottom */}
-                  <div style={{ height: `${extraBottomSpace}px` }} className="w-full bg-white transition-all"></div>
-                </div>
 
-                {/* Submitted Successfully Overlay */}
-                {selectedReviewRow?.isSubmitted && (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[2px] z-50 pointer-events-none"
+                  {/* Submitted Successfully Overlay */}
+                  {selectedReviewRow?.isSubmitted && (
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[2px] z-50 pointer-events-none"
+                    >
+                      <div className="bg-emerald-600 text-white px-8 py-4 rounded-xl shadow-2xl flex flex-col items-center space-y-2 border-4 border-emerald-400/30 transform -rotate-1">
+                        <div className="bg-white/20 p-2 rounded-full mb-1">
+                          <Check className="w-10 h-10 text-white" />
+                        </div>
+                        <div className="text-xl font-black uppercase tracking-widest font-sans drop-shadow-md">
+                          Submitted Successfully
+                        </div>
+                        <div className="text-[11px] font-bold opacity-90 uppercase tracking-tighter">
+                          রি-চেক ও মূল্যায়ন সফলভাবে সম্পন্ন হয়েছে
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Custom Handwriting / Overlay Annotations */}
+                  {activeScript.annotations && activeScript.annotations.map((anno: any, idx: number) => {
+                    if (anno.type === 'text') {
+                      return (
+                        <div 
+                          key={`anno-${idx}`}
+                          className="absolute select-none pointer-events-none font-handwriting leading-none"
+                          style={{
+                            top: `${anno.top}%`,
+                            left: `${anno.left}%`,
+                            fontSize: anno.fontSize || '16px',
+                            color: anno.fontColor || '#dc2626',
+                            fontWeight: anno.isBold ? 'bold' : 'normal',
+                            fontFamily: anno.fontFamily || 'var(--font-handwriting)',
+                            transform: anno.transform || 'translateY(-50%)',
+                            whiteSpace: 'nowrap',
+                            zIndex: 10
+                          }}
+                        >
+                          {anno.text}
+                        </div>
+                      );
+                    }
+                    if (anno.type === 'line') {
+                      return (
+                        <div 
+                          key={`anno-${idx}`}
+                          className="absolute select-none pointer-events-none"
+                          style={{
+                            top: `${anno.top}%`,
+                            left: `${anno.left}%`,
+                            width: `${anno.width}%`,
+                            height: `${anno.height || 2}px`,
+                            backgroundColor: anno.color || '#dc2626',
+                            transform: anno.angle ? `rotate(${anno.angle}deg)` : 'none',
+                            transformOrigin: 'left center',
+                            borderRadius: '1px',
+                            zIndex: 10
+                          }}
+                        />
+                      );
+                    }
+                    if (anno.type === 'circle') {
+                      return (
+                        <div 
+                          key={`anno-${idx}`}
+                          className="absolute select-none pointer-events-none"
+                          style={{
+                            top: `${anno.top}%`,
+                            left: `${anno.left}%`,
+                            width: `${anno.width}%`,
+                            height: `${anno.height}%`,
+                            border: `2.5px solid ${anno.color || '#dc2626'}`,
+                            borderRadius: '50%',
+                            transform: 'rotate(-3deg)',
+                            zIndex: 10
+                          }}
+                        />
+                      );
+                    }
+                    if (anno.type === 'tick') {
+                      return (
+                        <div 
+                          key={`anno-${idx}`}
+                          className="absolute select-none pointer-events-none font-sans font-black text-red-600 leading-none drop-shadow-sm"
+                          style={{
+                            top: `${anno.top}%`,
+                            left: `${anno.left}%`,
+                            fontSize: '32px',
+                            zIndex: 10
+                          }}
+                        >
+                          ✓
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+
+                  {/* Responsive SVG Drawing & Overlay Layer for Main Script Paper */}
+                  <svg
+                    viewBox="0 0 100 100"
+                    className="absolute inset-0 w-full h-full select-none"
+                    onMouseDown={handleCanvasMouseDown}
+                    onMouseMove={handleCanvasMouseMove}
+                    onMouseUp={handleCanvasMouseUp}
+                    style={{
+                      cursor: activeDrawingTool === 'pencil' ? 'crosshair' : activeDrawingTool === 'comment' ? 'cell' : 'default',
+                      pointerEvents: 'auto'
+                    }}
                   >
-                    <div className="bg-emerald-600 text-white px-8 py-4 rounded-xl shadow-2xl flex flex-col items-center space-y-2 border-4 border-emerald-400/30 transform -rotate-1">
-                      <div className="bg-white/20 p-2 rounded-full mb-1">
-                        <Check className="w-10 h-10 text-white" />
-                      </div>
-                      <div className="text-xl font-black uppercase tracking-widest font-sans drop-shadow-md">
-                        Submitted Successfully
-                      </div>
-                      <div className="text-[11px] font-bold opacity-90 uppercase tracking-tighter">
-                        রি-চেক ও মূল্যায়ন সফলভাবে সম্পন্ন হয়েছে
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
+                    {allPaths.map((pathStr, index) => (
+                      <path
+                        key={index}
+                        d={pathStr}
+                        fill="none"
+                        stroke="#dc2626"
+                        strokeWidth="0.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    ))}
+                    {currentPath && (
+                      <path
+                        d={currentPath}
+                        fill="none"
+                        stroke="#dc2626"
+                        strokeWidth="0.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    )}
+                  </svg>
 
-                {/* Custom Handwriting / Overlay Annotations from the student script images */}
-                {activeScript.annotations && activeScript.annotations.map((anno: any, idx: number) => {
-                  if (anno.type === 'text') {
-                    return (
-                      <div 
-                        key={`anno-${idx}`}
-                        className="absolute select-none pointer-events-none font-handwriting leading-none"
+                  {/* Pin Comments Container on Main Script */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {scriptComments.map((comment, index) => (
+                      <div
+                        key={index}
+                        className="absolute group pointer-events-auto"
                         style={{
-                          top: `${anno.top}%`,
-                          left: `${anno.left}%`,
-                          fontSize: anno.fontSize || '16px',
-                          color: anno.fontColor || '#dc2626',
-                          fontWeight: anno.isBold ? 'bold' : 'normal',
-                          fontFamily: anno.fontFamily || 'var(--font-handwriting)',
-                          transform: anno.transform || 'translateY(-50%)',
-                          whiteSpace: 'nowrap',
-                          zIndex: 10
+                          left: `${comment.x}%`,
+                          top: `${comment.y}%`,
+                          transform: 'translate(-50%, -50%)'
                         }}
                       >
-                        {anno.text}
+                        {/* Floating Bubble Pin */}
+                        <div className="w-6 h-6 bg-amber-500 hover:bg-amber-600 border-2 border-white rounded-full flex items-center justify-center text-gray-900 text-[10px] font-black shadow-lg cursor-pointer transform hover:scale-110 transition-all duration-150">
+                          {index + 1}
+                        </div>
+
+                        {/* Tooltip Hover Box */}
+                        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900/95 border border-gray-700 text-white p-3 rounded shadow-2xl z-50 text-xs min-w-[200px] leading-relaxed backdrop-blur-xs font-sans">
+                          <div className="font-bold text-amber-400 mb-1">Comment #{index + 1}:</div>
+                          <p className="text-gray-200">{comment.text}</p>
+                        </div>
                       </div>
-                    );
-                  }
-                  if (anno.type === 'line') {
-                    return (
-                      <div 
-                        key={`anno-${idx}`}
-                        className="absolute select-none pointer-events-none"
+                    ))}
+
+                    {/* Active Text Input */}
+                    {activeTextInput && (
+                      <div
+                        className="absolute pointer-events-auto"
                         style={{
-                          top: `${anno.top}%`,
-                          left: `${anno.left}%`,
-                          width: `${anno.width}%`,
-                          height: `${anno.height || 2}px`,
-                          backgroundColor: anno.color || '#dc2626',
-                          transform: anno.angle ? `rotate(${anno.angle}deg)` : 'none',
-                          transformOrigin: 'left center',
-                          borderRadius: '1px',
-                          zIndex: 10
-                        }}
-                      />
-                    );
-                  }
-                  if (anno.type === 'circle') {
-                    return (
-                      <div 
-                        key={`anno-${idx}`}
-                        className="absolute select-none pointer-events-none"
-                        style={{
-                          top: `${anno.top}%`,
-                          left: `${anno.left}%`,
-                          width: `${anno.width}%`,
-                          height: `${anno.height}%`,
-                          border: `2.5px solid ${anno.color || '#dc2626'}`,
-                          borderRadius: '50%',
-                          transform: 'rotate(-3deg)',
-                          zIndex: 10
-                        }}
-                      />
-                    );
-                  }
-                  if (anno.type === 'tick') {
-                    return (
-                      <div 
-                        key={`anno-${idx}`}
-                        className="absolute select-none pointer-events-none font-sans font-black text-red-600 leading-none drop-shadow-sm"
-                        style={{
-                          top: `${anno.top}%`,
-                          left: `${anno.left}%`,
-                          fontSize: '32px',
-                          zIndex: 10
+                          left: `${activeTextInput.x}%`,
+                          top: `${activeTextInput.y}%`,
+                          transform: 'translate(-50%, -50%)',
+                          zIndex: 100
                         }}
                       >
-                        ✓
+                        <input
+                          type="text"
+                          autoFocus
+                          placeholder="Type text..."
+                          className="px-2 py-1 bg-white border border-red-500 rounded shadow-lg text-sm text-red-600 font-bold outline-none ring-2 ring-red-500/30 min-w-[150px]"
+                          onBlur={(e) => handleTextInputSubmit(e.target.value, activeTextInput.x, activeTextInput.y)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleTextInputSubmit(e.currentTarget.value, activeTextInput.x, activeTextInput.y);
+                            } else if (e.key === 'Escape') {
+                              setActiveTextInput(null);
+                            }
+                          }}
+                        />
                       </div>
-                    );
-                  }
-                  return null;
-                })}
-
-                {/* Responsive SVG Drawing & Overlay Layer */}
-                <svg
-                  viewBox="0 0 100 100"
-                  className="absolute inset-0 w-full h-full select-none"
-                  onMouseDown={handleCanvasMouseDown}
-                  onMouseMove={handleCanvasMouseMove}
-                  onMouseUp={handleCanvasMouseUp}
-                  style={{
-                    cursor: activeDrawingTool === 'pencil' ? 'crosshair' : activeDrawingTool === 'comment' ? 'cell' : 'default',
-                    pointerEvents: 'auto'
-                  }}
-                >
-                  {allPaths.map((pathStr, index) => (
-                    <path
-                      key={index}
-                      d={pathStr}
-                      fill="none"
-                      stroke="#dc2626"
-                      strokeWidth="0.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  ))}
-                  {currentPath && (
-                    <path
-                      d={currentPath}
-                      fill="none"
-                      stroke="#dc2626"
-                      strokeWidth="0.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                  )}
-                </svg>
-
-                {/* Pin Comments Container */}
-                <div className="absolute inset-0 pointer-events-none">
-                  {scriptComments.map((comment, index) => (
-                    <div
-                      key={index}
-                      className="absolute group pointer-events-auto"
-                      style={{
-                        left: `${comment.x}%`,
-                        top: `${comment.y}%`,
-                        transform: 'translate(-50%, -50%)'
-                      }}
-                    >
-                      {/* Floating Bubble Pin */}
-                      <div className="w-6 h-6 bg-amber-500 hover:bg-amber-600 border-2 border-white rounded-full flex items-center justify-center text-gray-900 text-[10px] font-black shadow-lg cursor-pointer transform hover:scale-110 transition-all duration-150">
-                        {index + 1}
-                      </div>
-
-                      {/* Tooltip Hover Box */}
-                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900/95 border border-gray-700 text-white p-3 rounded shadow-2xl z-50 text-xs min-w-[200px] leading-relaxed backdrop-blur-xs font-sans">
-                        <div className="font-bold text-amber-400 mb-1">Comment #{index + 1}:</div>
-                        <p className="text-gray-200">{comment.text}</p>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Active Text Input */}
-                  {activeTextInput && (
-                    <div
-                      className="absolute pointer-events-auto"
-                      style={{
-                        left: `${activeTextInput.x}%`,
-                        top: `${activeTextInput.y}%`,
-                        transform: 'translate(-50%, -50%)',
-                        zIndex: 100
-                      }}
-                    >
-                      <input
-                        type="text"
-                        autoFocus
-                        placeholder="Type text..."
-                        className="px-2 py-1 bg-white border border-red-500 rounded shadow-lg text-sm text-red-600 font-bold outline-none ring-2 ring-red-500/30 min-w-[150px]"
-                        onBlur={(e) => handleTextInputSubmit(e.target.value, activeTextInput.x, activeTextInput.y)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleTextInputSubmit(e.currentTarget.value, activeTextInput.x, activeTextInput.y);
-                          } else if (e.key === 'Escape') {
-                            setActiveTextInput(null);
-                          }
-                        }}
-                      />
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
+
+                {/* Page number indicator */}
+                <div className="text-center text-[11px] font-semibold text-gray-500 my-1 font-sans select-none pointer-events-none">
+                  1/1
+                </div>
+
+                {/* Extra Page Space Container (Appended Below Page Number) */}
+                {extraBottomSpace > 0 && (
+                  <div 
+                    style={{ height: `${extraBottomSpace}px` }} 
+                    className="w-full bg-[#fafbfd] border-t-2 border-dashed border-gray-300 transition-all relative select-none overflow-hidden"
+                    onClick={handleExtraSpaceClick}
+                  >
+                    <div className="absolute inset-0 pointer-events-none">
+                      {/* Left Red Margin Line */}
+                      <div className="absolute left-[8%] top-0 bottom-0 w-[1.5px] bg-red-300/50 border-r border-red-300/30"></div>
+                      <div className="absolute right-[2%] top-0 bottom-0 w-[6px] flex flex-col justify-around py-1 opacity-25">
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} className="h-[1px] w-full bg-gray-600"></div>
+                        ))}
+                      </div>
+                      <div className="absolute top-2 left-10 text-[10px] font-bold text-gray-400 font-sans italic">
+                        Extra Page Space / অতিরিক্ত পৃষ্ঠা
+                      </div>
+                    </div>
+
+                    {/* SVG Canvas for Extra Space */}
+                    <svg
+                      viewBox="0 0 100 100"
+                      className="absolute inset-0 w-full h-full select-none"
+                      onMouseDown={handleExtraCanvasMouseDown}
+                      onMouseMove={handleExtraCanvasMouseMove}
+                      onMouseUp={handleExtraCanvasMouseUp}
+                      style={{
+                        cursor: activeDrawingTool === 'pencil' ? 'crosshair' : activeDrawingTool === 'comment' ? 'cell' : 'default',
+                        pointerEvents: 'auto'
+                      }}
+                    >
+                      {extraPaths.map((pathStr, index) => (
+                        <path
+                          key={`extra-path-${index}`}
+                          d={pathStr}
+                          fill="none"
+                          stroke="#dc2626"
+                          strokeWidth="0.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      ))}
+                      {currentExtraPath && (
+                        <path
+                          d={currentExtraPath}
+                          fill="none"
+                          stroke="#dc2626"
+                          strokeWidth="0.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      )}
+                    </svg>
+
+                    {/* Pin Comments Container for Extra Page Space */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {extraComments.map((comment, index) => (
+                        <div
+                          key={`extra-comment-${index}`}
+                          className="absolute group pointer-events-auto"
+                          style={{
+                            left: `${comment.x}%`,
+                            top: `${comment.y}%`,
+                            transform: 'translate(-50%, -50%)'
+                          }}
+                        >
+                          {/* Floating Bubble Pin */}
+                          <div className="w-6 h-6 bg-amber-500 hover:bg-amber-600 border-2 border-white rounded-full flex items-center justify-center text-gray-900 text-[10px] font-black shadow-lg cursor-pointer transform hover:scale-110 transition-all duration-150">
+                            {scriptComments.length + index + 1}
+                          </div>
+
+                          {/* Tooltip Hover Box */}
+                          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900/95 border border-gray-700 text-white p-3 rounded shadow-2xl z-50 text-xs min-w-[200px] leading-relaxed backdrop-blur-xs font-sans">
+                            <div className="font-bold text-amber-400 mb-1">Comment #{scriptComments.length + index + 1}:</div>
+                            <p className="text-gray-200">{comment.text}</p>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Active Text Input on Extra Space */}
+                      {activeExtraTextInput && (
+                        <div
+                          className="absolute pointer-events-auto"
+                          style={{
+                            left: `${activeExtraTextInput.x}%`,
+                            top: `${activeExtraTextInput.y}%`,
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 100
+                          }}
+                        >
+                          <input
+                            type="text"
+                            autoFocus
+                            placeholder="Type text..."
+                            className="px-2 py-1 bg-white border border-red-500 rounded shadow-lg text-sm text-red-600 font-bold outline-none ring-2 ring-red-500/30 min-w-[150px]"
+                            onBlur={(e) => handleExtraTextInputSubmit(e.target.value, activeExtraTextInput.x, activeExtraTextInput.y)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleExtraTextInputSubmit(e.currentTarget.value, activeExtraTextInput.x, activeExtraTextInput.y);
+                              } else if (e.key === 'Escape') {
+                                setActiveExtraTextInput(null);
+                              }
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Submitted Successfully Badge Below Script */}
@@ -3464,7 +3645,6 @@ export default function App() {
                   </span>
                 </motion.div>
               )}
-              
             </div>
           </div>
 

@@ -131,8 +131,66 @@ export default function TeacherPortal({
   const [currentPath, setCurrentPath] = useState("");
   const [allPaths, setAllPaths] = useState<string[]>([]);
   const [scriptComments, setScriptComments] = useState<{x: number, y: number, text: string}[]>([]);
-  const [actionHistory, setActionHistory] = useState<{type: 'path'|'comment', value: string | any}[]>([]);
-  const [redoHistory, setRedoHistory] = useState<{type: 'path'|'comment', value: string | any}[]>([]);
+  const [actionHistory, setActionHistory] = useState<{type: 'path'|'comment'|'extraPath'|'extraComment', value: string | any}[]>([]);
+  const [redoHistory, setRedoHistory] = useState<{type: 'path'|'comment'|'extraPath'|'extraComment', value: string | any}[]>([]);
+
+  const [extraPaths, setExtraPaths] = useState<string[]>([]);
+  const [extraComments, setExtraComments] = useState<{x: number, y: number, text: string}[]>([]);
+  const [activeExtraTextInput, setActiveExtraTextInput] = useState<{x: number, y: number} | null>(null);
+  const [currentExtraPath, setCurrentExtraPath] = useState("");
+  const [isExtraDrawing, setIsExtraDrawing] = useState(false);
+
+  // Extra space drawing & comment handlers
+  const handleExtraCanvasMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (activeDrawingTool !== 'pencil' && activeDrawingTool !== 'eraser') return;
+    setIsExtraDrawing(true);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setCurrentExtraPath(`M ${x.toFixed(2)} ${y.toFixed(2)}`);
+  };
+
+  const handleExtraCanvasMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!isExtraDrawing) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    if (activeDrawingTool === 'pencil') {
+      setCurrentExtraPath(prev => `${prev} L ${x.toFixed(2)} ${y.toFixed(2)}`);
+    }
+  };
+
+  const handleExtraCanvasMouseUp = () => {
+    if (!isExtraDrawing) return;
+    setIsExtraDrawing(false);
+    if (activeDrawingTool === 'pencil' && currentExtraPath) {
+      setExtraPaths(prev => [...prev, currentExtraPath]);
+      setActionHistory(prev => [...prev, { type: 'extraPath', value: currentExtraPath }]);
+      setRedoHistory([]);
+      setCurrentExtraPath("");
+    }
+  };
+
+  const handleExtraSpaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+    if (activeDrawingTool === 'text') {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setActiveExtraTextInput({ x, y });
+    }
+  };
+
+  const handleExtraTextInputSubmit = (text: string, x: number, y: number) => {
+    if (text.trim()) {
+      const newComment = { x, y, text: text.trim() };
+      setExtraComments(prev => [...prev, newComment]);
+      setActionHistory(prev => [...prev, { type: 'extraComment', value: newComment }]);
+      setRedoHistory([]);
+    }
+    setActiveExtraTextInput(null);
+  };
 
   // Mouse handlers for drawing
   const handleCanvasMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -201,6 +259,10 @@ export default function TeacherPortal({
       setAllPaths(prev => prev.slice(0, -1));
     } else if (lastAction.type === 'comment') {
       setScriptComments(prev => prev.slice(0, -1));
+    } else if (lastAction.type === 'extraPath') {
+      setExtraPaths(prev => prev.slice(0, -1));
+    } else if (lastAction.type === 'extraComment') {
+      setExtraComments(prev => prev.slice(0, -1));
     }
     setRedoHistory(prev => [...prev, lastAction]);
     setActionHistory(prev => prev.slice(0, -1));
@@ -213,6 +275,10 @@ export default function TeacherPortal({
       setAllPaths(prev => [...prev, nextAction.value]);
     } else if (nextAction.type === 'comment') {
       setScriptComments(prev => [...prev, nextAction.value]);
+    } else if (nextAction.type === 'extraPath') {
+      setExtraPaths(prev => [...prev, nextAction.value]);
+    } else if (nextAction.type === 'extraComment') {
+      setExtraComments(prev => [...prev, nextAction.value]);
     }
     setActionHistory(prev => [...prev, nextAction]);
     setRedoHistory(prev => prev.slice(0, -1));
@@ -2287,8 +2353,7 @@ export default function TeacherPortal({
                     {/* Canvas Area */}
                     <div className="p-4 w-full flex justify-center bg-gray-50 overflow-hidden">
                       <div 
-                        onClick={handleImageClick}
-                        className="relative border-2 border-dashed border-gray-400 bg-white"
+                        className="relative border-2 border-dashed border-gray-400 bg-white flex flex-col"
                         style={{
                           transform: `rotate(${studentPaperRotate}deg) scale(${imageScale})`,
                           transformOrigin: 'center center',
@@ -2296,92 +2361,190 @@ export default function TeacherPortal({
                           maxWidth: '700px'
                         }}
                       >
-                        <div className="w-full flex flex-col pointer-events-none select-none">
+                        {/* Main Answer Script Sheet Container */}
+                        <div 
+                          onClick={handleImageClick}
+                          className="relative w-full select-none"
+                        >
                           <img 
                             src={evaluatingScript?.image || HandwrittenPaper} 
                             alt="Student Answer" 
-                            className="w-full h-auto object-contain block opacity-85"
+                            className="w-full h-auto object-contain block opacity-85 pointer-events-none"
                           />
-                          {/* Extra white page space at the bottom */}
-                          <div style={{ height: `${extraBottomSpace}px` }} className="w-full bg-white transition-all"></div>
-                        </div>
 
-                        {/* Drawing Canvas Overlay */}
-                        <svg
-                          className="absolute inset-0 w-full h-full pointer-events-auto"
-                          onMouseDown={handleCanvasMouseDown}
-                          onMouseMove={handleCanvasMouseMove}
-                          onMouseUp={handleCanvasMouseUp}
-                          onMouseLeave={handleCanvasMouseLeave}
-                          style={{
-                            cursor: activeDrawingTool === 'pencil' ? 'crosshair' : activeDrawingTool === 'text' ? 'text' : activeDrawingTool === 'eraser' ? 'cell' : 'default',
-                            zIndex: 10
-                          }}
-                        >
-                          {allPaths.map((pathStr, index) => (
-                            <path
-                              key={index}
-                              d={pathStr}
-                              stroke="red"
-                              strokeWidth="3"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          ))}
-                          {isDrawing && currentPath && (
-                            <path
-                              d={currentPath}
-                              stroke="red"
-                              strokeWidth="3"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          )}
-                        </svg>
-
-                        {/* Text Comments Overlay */}
-                        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 15 }}>
-                          {scriptComments.map((comment, index) => (
-                            <div
-                              key={index}
-                              className="absolute bg-white px-2 py-1 rounded shadow-md text-red-600 font-bold text-sm"
-                              style={{
-                                left: `${comment.x}%`,
-                                top: `${comment.y}%`,
-                                transform: 'translate(-50%, -50%)',
-                                pointerEvents: 'auto'
-                              }}
-                            >
-                              {comment.text}
-                            </div>
-                          ))}
-
-                          {/* Active Text Input */}
-                          {activeTextInput && (
-                            <div
-                              className="absolute pointer-events-auto"
-                              style={{
-                                left: `${activeTextInput.x}%`,
-                                top: `${activeTextInput.y}%`,
-                                transform: 'translate(-50%, -50%)'
-                              }}
-                            >
-                              <input
-                                type="text"
-                                autoFocus
-                                placeholder="Type..."
-                                className="px-2 py-1 bg-white border border-red-500 rounded shadow-md text-sm text-red-600 font-bold outline-none ring-2 ring-red-500/30"
-                                onBlur={(e) => handleTextInputSubmit(e.target.value, activeTextInput.x, activeTextInput.y)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') handleTextInputSubmit(e.currentTarget.value, activeTextInput.x, activeTextInput.y);
-                                  if (e.key === 'Escape') setActiveTextInput(null);
-                                }}
+                          {/* Drawing Canvas Overlay on Main Script */}
+                          <svg
+                            viewBox="0 0 100 100"
+                            className="absolute inset-0 w-full h-full pointer-events-auto"
+                            onMouseDown={handleCanvasMouseDown}
+                            onMouseMove={handleCanvasMouseMove}
+                            onMouseUp={handleCanvasMouseUp}
+                            onMouseLeave={handleCanvasMouseLeave}
+                            style={{
+                              cursor: activeDrawingTool === 'pencil' ? 'crosshair' : activeDrawingTool === 'text' ? 'text' : activeDrawingTool === 'eraser' ? 'cell' : 'default',
+                              zIndex: 10
+                            }}
+                          >
+                            {allPaths.map((pathStr, index) => (
+                              <path
+                                key={index}
+                                d={pathStr}
+                                stroke="red"
+                                strokeWidth="0.8"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                vectorEffect="non-scaling-stroke"
                               />
-                            </div>
-                          )}
+                            ))}
+                            {isDrawing && currentPath && (
+                              <path
+                                d={currentPath}
+                                stroke="red"
+                                strokeWidth="0.8"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                vectorEffect="non-scaling-stroke"
+                              />
+                            )}
+                          </svg>
+
+                          {/* Text Comments Overlay on Main Script */}
+                          <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 15 }}>
+                            {scriptComments.map((comment, index) => (
+                              <div
+                                key={index}
+                                className="absolute bg-white px-2 py-1 rounded shadow-md text-red-600 font-bold text-sm"
+                                style={{
+                                  left: `${comment.x}%`,
+                                  top: `${comment.y}%`,
+                                  transform: 'translate(-50%, -50%)',
+                                  pointerEvents: 'auto'
+                                }}
+                              >
+                                {comment.text}
+                              </div>
+                            ))}
+
+                            {/* Active Text Input */}
+                            {activeTextInput && (
+                              <div
+                                className="absolute pointer-events-auto"
+                                style={{
+                                  left: `${activeTextInput.x}%`,
+                                  top: `${activeTextInput.y}%`,
+                                  transform: 'translate(-50%, -50%)'
+                                }}
+                              >
+                                <input
+                                  type="text"
+                                  autoFocus
+                                  placeholder="Type..."
+                                  className="px-2 py-1 bg-white border border-red-500 rounded shadow-md text-sm text-red-600 font-bold outline-none ring-2 ring-red-500/30"
+                                  onBlur={(e) => handleTextInputSubmit(e.target.value, activeTextInput.x, activeTextInput.y)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleTextInputSubmit(e.currentTarget.value, activeTextInput.x, activeTextInput.y);
+                                    if (e.key === 'Escape') setActiveTextInput(null);
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
                         </div>
+
+                        {/* Extra Page Space Container Appended Below Main Script */}
+                        {extraBottomSpace > 0 && (
+                          <div 
+                            style={{ height: `${extraBottomSpace}px` }} 
+                            className="w-full bg-[#fafbfd] border-t-2 border-dashed border-gray-300 transition-all relative select-none overflow-hidden"
+                            onClick={handleExtraSpaceClick}
+                          >
+                            <div className="absolute inset-0 pointer-events-none">
+                              <div className="absolute top-2 left-4 text-[10px] font-bold text-gray-400 font-sans italic">
+                                Extra Page Space / অতিরিক্ত পৃষ্ঠা
+                              </div>
+                            </div>
+
+                            {/* Drawing Canvas Overlay on Extra Page Space */}
+                            <svg
+                              viewBox="0 0 100 100"
+                              className="absolute inset-0 w-full h-full pointer-events-auto"
+                              onMouseDown={handleExtraCanvasMouseDown}
+                              onMouseMove={handleExtraCanvasMouseMove}
+                              onMouseUp={handleExtraCanvasMouseUp}
+                              style={{
+                                cursor: activeDrawingTool === 'pencil' ? 'crosshair' : activeDrawingTool === 'text' ? 'text' : activeDrawingTool === 'eraser' ? 'cell' : 'default',
+                                zIndex: 10
+                              }}
+                            >
+                              {extraPaths.map((pathStr, index) => (
+                                <path
+                                  key={`extra-path-${index}`}
+                                  d={pathStr}
+                                  stroke="red"
+                                  strokeWidth="0.8"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                              ))}
+                              {isExtraDrawing && currentExtraPath && (
+                                <path
+                                  d={currentExtraPath}
+                                  stroke="red"
+                                  strokeWidth="0.8"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                              )}
+                            </svg>
+
+                            {/* Text Comments Overlay on Extra Page Space */}
+                            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 15 }}>
+                              {extraComments.map((comment, index) => (
+                                <div
+                                  key={`extra-comment-${index}`}
+                                  className="absolute bg-white px-2 py-1 rounded shadow-md text-red-600 font-bold text-sm pointer-events-auto"
+                                  style={{
+                                    left: `${comment.x}%`,
+                                    top: `${comment.y}%`,
+                                    transform: 'translate(-50%, -50%)'
+                                  }}
+                                >
+                                  {comment.text}
+                                </div>
+                              ))}
+
+                              {/* Active Text Input on Extra Space */}
+                              {activeExtraTextInput && (
+                                <div
+                                  className="absolute pointer-events-auto"
+                                  style={{
+                                    left: `${activeExtraTextInput.x}%`,
+                                    top: `${activeExtraTextInput.y}%`,
+                                    transform: 'translate(-50%, -50%)'
+                                  }}
+                                >
+                                  <input
+                                    type="text"
+                                    autoFocus
+                                    placeholder="Type..."
+                                    className="px-2 py-1 bg-white border border-red-500 rounded shadow-md text-sm text-red-600 font-bold outline-none ring-2 ring-red-500/30"
+                                    onBlur={(e) => handleExtraTextInputSubmit(e.target.value, activeExtraTextInput.x, activeExtraTextInput.y)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') handleExtraTextInputSubmit(e.currentTarget.value, activeExtraTextInput.x, activeExtraTextInput.y);
+                                      if (e.key === 'Escape') setActiveExtraTextInput(null);
+                                    }}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="w-full text-center py-2 text-gray-500 text-sm font-medium border-t border-gray-200">
