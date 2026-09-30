@@ -55,6 +55,7 @@ import { evaluateScript, type Annotation, type EvaluationResult as AIEvaluationR
 import TeacherPortal from './components/TeacherPortal';
 import UserManagementPanel from './components/UserManagement';
 import PasswordChange from './components/PasswordChange';
+import ViewAssignTemplate from './components/ViewAssignTemplate';
 import { dbGetItems, dbSaveItem, dbDeleteItem } from './services/firebase';
 
 // --- Types ---
@@ -991,7 +992,8 @@ export default function App() {
       examName: "VAP Daily MCQ and Written Exam P-01",
       examType: "Templated Written",
       examinerPermission: "Yes",
-      examinerDateTime: "2025-09-08 15:00",
+      examinerDateTime: "---",
+      examinerEndDateTime: "---",
       analysisPermission: "Yes",
       analysisDateTime: "2025-08-22 15:21 PM",
       meritPermission: "Yes",
@@ -1228,10 +1230,10 @@ export default function App() {
   const [modalPermissionValue, setModalPermissionValue] = useState<boolean>(true);
   const [modalStartTime, setModalStartTime] = useState<string>("");
   const [modalEndTime, setModalEndTime] = useState<string>("");
-  const [modalSubjects, setModalSubjects] = useState<Array<{ id: string; name: string; checked: boolean }>>([
-    { id: "physics", name: "Physics", checked: false },
-    { id: "chemistry", name: "Chemistry", checked: false },
-    { id: "higherMath", name: "Higher Math", checked: false },
+  const [modalSubjects, setModalSubjects] = useState<Array<{ id: string; name: string; checked: boolean; startTime?: string; endTime?: string }>>([
+    { id: "physics", name: "Physics", checked: false, startTime: "", endTime: "" },
+    { id: "chemistry", name: "Chemistry", checked: false, startTime: "", endTime: "" },
+    { id: "higherMath", name: "Higher Math", checked: false, startTime: "", endTime: "" },
   ]);
   const [modalAllSubjectsChecked, setModalAllSubjectsChecked] = useState<boolean>(false);
 
@@ -1482,12 +1484,116 @@ export default function App() {
 
   const [adminForwardedRequests, setAdminForwardedRequests] = useState([
     {
+      id: "FWD-IMG-001",
+      examiner: { id: "17304", name: "Sakib Imtiaz Rony", phone: "8801303067268" },
+      course: "Engineering Online Exam 2026",
+      subject: "Physics",
+      exam: "VAP KA Weekly Live Exam W-05",
+      examCode: "270",
+      adminId: "nazmul.2853@udvash.net",
+      note: "রিভিউ রিকোয়েস্ট",
+      date: "2026-07-18 06:18 PM",
+      status: "Pending Teacher Response",
+      organization: "UDVASH",
+      program: "Engineering Admission Program",
+      session: "2026",
+      examType: "Online Written",
+      version: "Bangla",
+      questionSerial: "2",
+      uniqueSet: "1",
+      evaluationType: "Regular",
+      reviewRequest: "Rechecked from Student",
+      rollNumber: "24171101007",
+      minMarks: "0",
+      maxMarks: "0",
+      reviewCount: 1,
+      totalScript: 1
+    },
+    {
+      id: "FWD-IMG-002",
+      examiner: { id: "30645", name: "Labonnya", phone: "" },
+      course: "Varsity 'KA' Online Exam 2026",
+      subject: "Chemistry",
+      exam: "VAP KA Weekly Live Exam W-04",
+      examCode: "317",
+      adminId: "Rakib.9474@udvash.net",
+      note: "রিভিউ রিকোয়েস্ট",
+      date: "2026-07-18 06:55 PM",
+      status: "Pending Teacher Response",
+      organization: "UDVASH",
+      program: "Varsity 'KA' Admission Program",
+      session: "2026",
+      examType: "Online Written",
+      version: "Bangla",
+      questionSerial: "6",
+      uniqueSet: "1",
+      evaluationType: "Regular",
+      reviewRequest: "Rechecked from Student",
+      rollNumber: "14216600394",
+      minMarks: "0.5",
+      maxMarks: "0.5",
+      reviewCount: 1,
+      totalScript: 1
+    },
+    {
+      id: "FWD-IMG-003",
+      examiner: { id: "29974", name: "Reyad", phone: "" },
+      course: "Varsity 'KA' Online Exam 2026",
+      subject: "Chemistry",
+      exam: "VAP KA Weekly Live Exam W-04",
+      examCode: "317",
+      adminId: "Shoyaib.9931@udvash.net",
+      note: "রিভিউ রিকোয়েস্ট",
+      date: "2026-07-18 06:13 PM",
+      status: "Pending Teacher Response",
+      organization: "UDVASH",
+      program: "Varsity 'KA' Admission Program",
+      session: "2026",
+      examType: "Online Written",
+      version: "Bangla",
+      questionSerial: "7",
+      uniqueSet: "1",
+      evaluationType: "Regular",
+      reviewRequest: "Rechecked from Student",
+      rollNumber: "10130400401",
+      minMarks: "2",
+      maxMarks: "2",
+      reviewCount: 1,
+      totalScript: 1
+    },
+    {
+      id: "FWD-IMG-004",
+      examiner: { id: "10321", name: "M. Nazmul Alam", phone: "8801701234567" },
+      course: "Varsity 'KA' Online Exam 2026",
+      subject: "Higher Mathematics",
+      exam: "VAP KA Weekly Live Exam W-04",
+      examCode: "317",
+      adminId: "Jobayer.8687@udvash.net",
+      note: "রিভিউ রিকোয়েস্ট",
+      date: "2026-07-04 11:30 AM",
+      status: "Pending Teacher Response",
+      organization: "UDVASH",
+      program: "Varsity 'KA' Admission Program",
+      session: "2026",
+      examType: "Online Written",
+      version: "Bangla",
+      questionSerial: "12",
+      uniqueSet: "1",
+      evaluationType: "Regular",
+      reviewRequest: "Rechecked from Student",
+      rollNumber: "902150",
+      minMarks: "0",
+      maxMarks: "0",
+      reviewCount: 1,
+      totalScript: 1
+    },
+    {
       id: "FWD-STU-001",
       examiner: { id: "7380", name: "Nafisa", phone: "" },
       course: "NDC & SJC All Service [CAP - 2026]",
       subject: "Islam [TW]",
       exam: "Daily Exam For NDC Islam-03-04",
-      adminId: "Suja.7146@udvash.net",
+      adminId: "nazmul.2853@udvash.net",
       note: "Boi dekhen, bissobasi hobe",
       date: "2026-07-18 06:18 PM",
       status: "Pending Teacher Response",
@@ -1511,7 +1617,7 @@ export default function App() {
       course: "HSC Bangla-English Full Course [Online]",
       subject: "Bangla [TW]",
       exam: "Daily Live Written Exam Bangla-01",
-      adminId: "nazmul.2853@udvash.net",
+      adminId: "Rakib.9474@udvash.net",
       note: "Kebol bohubrihi lekhle Hoy na?",
       date: "2026-07-18 06:55 PM",
       status: "Pending Teacher Response",
@@ -1535,7 +1641,7 @@ export default function App() {
       course: "NDC & SJC All Service [CAP - 2026]",
       subject: "Physics [TW]",
       exam: "Daily Live Exam For NDC Physics-03-04",
-      adminId: "faisal.7402@udvash.net",
+      adminId: "Shoyaib.9931@udvash.net",
       note: "সেটিই তো লিখছি",
       date: "2026-07-18 06:13 PM",
       status: "Pending Teacher Response",
@@ -1587,7 +1693,7 @@ export default function App() {
       course: "Engineering Admission Program [EAP - 2026]",
       subject: "Physics [TW]",
       exam: "Weekly Engineering Written Test-02",
-      adminId: "nazmul.7413@udvash.net",
+      adminId: "Rakib.9474@udvash.net",
       note: "৩ নং প্রশ্নের উত্তরটি আবার চেক করুন। শিক্ষার্থীর দাবী আংশিক সঠিক মনে হচ্ছে।",
       date: "2026-07-02 10:15 AM",
       status: "Pending Teacher Response",
@@ -1614,7 +1720,7 @@ export default function App() {
       course: "NDC & SJC All Service [CAP - 2026]",
       subject: "Biology [TW]",
       exam: "Daily Exam For NDC Biology-03-04",
-      adminId: "faisal.7402@udvash.net",
+      adminId: "Shoyaib.9931@udvash.net",
       note: "৪ নং প্রশ্নের উত্তরটির ডায়াগ্রাম লেবেলিং নিয়ম অনুযায়ী রি-ভ্যালু করুন।",
       date: "2026-07-02 12:40 PM",
       status: "In Progress",
@@ -1638,7 +1744,7 @@ export default function App() {
       course: "Varsity 'KA' + GST Full Course 2025 [Offline]",
       subject: "Chemistry [TW]",
       exam: "GST Chemistry Model Test-05",
-      adminId: "Suja.7146@udvash.net",
+      adminId: "Jobayer.8687@udvash.net",
       note: "শিক্ষার্থীর অভিযোগের প্রেক্ষিতে রসায়নের ২নং সমীকরণটি পুনরায় মূল্যায়ন করুন।",
       date: "2026-07-03 09:30 AM",
       status: "In Progress",
@@ -1662,7 +1768,7 @@ export default function App() {
       course: "Medical Weekly Exam Varsity Students Service",
       subject: "English [TW]",
       exam: "Weekly English Grammer Test-01",
-      adminId: "yeasin.9206@udvash.net",
+      adminId: "nazmul.2853@udvash.net",
       note: "অ্যাডমিন প্যানেল থেকে প্রাপ্ত নির্দেশনা অনুযায়ী ৫নং সিনট্যাক্স ইরর পুনরায় খতিয়ে দেখুন।",
       date: "2026-07-03 03:15 PM",
       status: "Pending Teacher Response",
@@ -2092,7 +2198,8 @@ export default function App() {
       permissions: [
         'Exam', 'Team', 'Administration',
         'teacher-management', 'user-management',
-        'online-script-eval', 'admin-dash', 'examiner-perm', 'eval-report', 'admin-review', 'exam-perm', 'admin-review-req', 'teacher-user-perm',
+        'online-script-eval', 'admin-dash', 'examiner-perm', 'eval-report', 'admin-review', 'exam-perm', 'admin-review-req',
+        'script-eval', 'view-assign-template',
         'ai-script-eval', 'ai-eval', 'ai-review', 'eval-history',
         'team-hr', 'team-account', 'my-profile', 'my-attendance', 'my-notice',
         'team-apply', 'attendance-adjustment', 'leave',
@@ -2157,7 +2264,8 @@ export default function App() {
             permissions: [
               'Exam', 'Team', 'Administration',
               'teacher-management', 'user-management',
-              'online-script-eval', 'admin-dash', 'examiner-perm', 'eval-report', 'admin-review', 'exam-perm', 'admin-review-req', 'teacher-user-perm',
+              'online-script-eval', 'admin-dash', 'examiner-perm', 'eval-report', 'admin-review', 'exam-perm', 'admin-review-req',
+              'script-eval', 'view-assign-template',
               'ai-script-eval', 'ai-eval', 'ai-review', 'eval-history',
               'team-hr', 'team-account', 'my-profile', 'my-attendance', 'my-notice',
               'team-apply', 'attendance-adjustment', 'leave',
@@ -2482,7 +2590,13 @@ export default function App() {
           { id: 'admin-review', label: 'Admin Review' },
           { id: 'exam-perm', label: 'Exam Permission' },
           { id: 'admin-review-req', label: 'Review Request' },
-          { id: 'teacher-user-perm', label: 'Assign Teacher User Permission' },
+        ]
+      },
+      { 
+        id: 'script-eval', 
+        label: 'Script Evaluation',
+        subItems: [
+          { id: 'view-assign-template', label: 'View Assign Template' },
         ]
       },
       { 
@@ -3959,40 +4073,40 @@ export default function App() {
               Details
             </div>
             <div className="bg-white border-x border-b border-gray-300 p-6 rounded-b shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300 text-[11.5px] font-sans">
+              <div className="overflow-x-auto relative">
+                <table className="w-full border-separate border-spacing-0 border border-gray-300 text-[11.5px] font-sans">
                   <thead>
-                    <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-300">
-                      <th className="border border-gray-300 px-4 py-3 text-center font-bold text-gray-800">Program</th>
-                      <th className="border border-gray-300 px-4 py-3 text-left font-bold text-gray-800">Course</th>
-                      <th className="border border-gray-300 px-4 py-3 text-left font-bold text-gray-800">[Code] Exam Name (Subject)</th>
-                      <th className="border border-gray-300 px-4 py-3 text-center font-bold text-gray-800">Version</th>
-                      <th className="border border-gray-300 px-4 py-3 text-left font-bold text-gray-800">Question</th>
-                      <th className="border border-gray-300 px-4 py-3 text-center font-bold text-gray-800">Review Request</th>
-                      <th className="border border-gray-300 px-4 py-3 text-center font-bold text-gray-800">Action</th>
+                    <tr className="bg-[#f8f9fa] text-gray-700 font-bold">
+                      <th className="border-r border-b border-gray-300 px-4 py-3 text-center font-bold text-gray-800">Program</th>
+                      <th className="border-r border-b border-gray-300 px-4 py-3 text-left font-bold text-gray-800">Course</th>
+                      <th className="border-r border-b border-gray-300 px-4 py-3 text-left font-bold text-gray-800">[Code] Exam Name (Subject)</th>
+                      <th className="border-r border-b border-gray-300 px-4 py-3 text-center font-bold text-gray-800">Version</th>
+                      <th className="border-r border-b border-gray-300 px-4 py-3 text-left font-bold text-gray-800">Question</th>
+                      <th className="border-r border-b border-gray-300 px-4 py-3 text-center font-bold text-gray-800">Review Request</th>
+                      <th className="sticky right-0 z-20 bg-[#f8f9fa] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-300 px-4 py-3 text-center font-bold text-gray-800 min-w-[120px]">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="hover:bg-gray-50/40 text-gray-800 font-medium">
-                      <td className="border border-gray-300 px-4 py-3.5 text-center">
+                    <tr className="hover:bg-gray-50/40 text-gray-800 font-medium group">
+                      <td className="border-r border-b border-gray-300 px-4 py-3.5 text-center">
                         {showingAdminDetailRow.program || "HSC BE O-2027"}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3.5 text-left">
+                      <td className="border-r border-b border-gray-300 px-4 py-3.5 text-left">
                         {showingAdminDetailRow.course || "HSC Bangla-English Full Course [Online]"}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3.5 text-left font-sans">
+                      <td className="border-r border-b border-gray-300 px-4 py-3.5 text-left font-sans">
                         [{showingAdminDetailRow.examCode || "130 "}] {showingAdminDetailRow.examName || showingAdminDetailRow.exam} ({showingAdminDetailRow.subject})
                       </td>
-                      <td className="border border-gray-300 px-4 py-3.5 text-center">
+                      <td className="border-r border-b border-gray-300 px-4 py-3.5 text-center">
                         {showingAdminDetailRow.version || "Bangla"}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3.5 text-left">
+                      <td className="border-r border-b border-gray-300 px-4 py-3.5 text-left">
                         Unique Set {showingAdminDetailRow.uniqueSet || "1"}, Question Serial {showingAdminDetailRow.questionSerial || "2"}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3.5 text-center font-bold font-mono">
+                      <td className="border-r border-b border-gray-300 px-4 py-3.5 text-center font-bold font-mono">
                         {showingAdminDetailRow.reviewCount || 2}
                       </td>
-                      <td className="border border-gray-300 px-4 py-3 text-center">
+                      <td className="sticky right-0 z-10 bg-white group-hover:bg-[#f5f8fa] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-300 px-4 py-3 text-center min-w-[120px]">
                         <button 
                           onClick={() => {
                             setSelectedReviewRow(showingAdminDetailRow);
@@ -4626,28 +4740,38 @@ export default function App() {
                 <thead>
                   <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-200">
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[14%]">Teacher</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[16%]">Course [Program-Session]</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[17%]">Course [Program-Session]</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[8%]">Subject</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Exam</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Admin Note</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[13%]">Admin Note</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[8%]">Unique Set and Question Serial</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[6%]">Reviewed By:</th>
+                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[10%]">Reviewed By:</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[5%]">Review Scripts</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[6%]">Status</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[10%]">Examiner Status</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[6%]">Pending From</th>
-                    <th className="px-3 py-2.5 text-center w-[10%]">Action</th>
+                    <th className="px-3 py-2.5 text-center w-[7%]">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {dashboardAdminRequests.length === 0 ? (
                     <tr>
-                      <td colSpan={12} className="px-3 py-5 text-center text-gray-400 font-medium italic">
+                      <td colSpan={11} className="px-3 py-5 text-center text-gray-400 font-medium italic">
                         No forwarded reviews at this moment.
                       </td>
                     </tr>
                   ) : (
-                    dashboardAdminRequests.map((req, idx) => (
+                    dashboardAdminRequests.map((req, idx) => {
+                      const allowedAdminIds = [
+                        'nazmul.2853@udvash.net',
+                        'Rakib.9474@udvash.net',
+                        'Shoyaib.9931@udvash.net',
+                        'Jobayer.8687@udvash.net'
+                      ];
+                      const displayAdminId = allowedAdminIds.includes(req.adminId)
+                        ? req.adminId
+                        : allowedAdminIds[idx % allowedAdminIds.length];
+
+                      return (
                       <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                         <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
                           <div className="font-bold text-blue-700 text-[11px] leading-tight">[{req.examiner.id}] - {req.examiner.name}</div>
@@ -4666,24 +4790,13 @@ export default function App() {
                           U{req.uniqueSet || '1'} - Q{req.questionSerial || '26'}
                         </td>
                         <td className="border-r border-gray-200 px-2.5 py-3 text-center">
-                          <span className="inline-block bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded font-bold font-mono text-[10px]">
-                            {req.adminId}
+                          <span className="inline-block bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-bold font-mono text-[10px]">
+                            {displayAdminId}
                           </span>
                         </td>
                         <td className="border-r border-gray-200 px-2.5 py-3 text-center">
                           <span className="inline-flex items-center justify-center bg-red-100 text-red-800 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10.5px] border border-red-200/60 shadow-3xs">
                             {req.isMultiple ? `${req.checkedScriptsCount}/${req.totalScriptsCount}` : (req.reviewCount || 1)}
-                          </span>
-                        </td>
-                        <td className="border-r border-gray-200 px-3 py-3 text-center">
-                          <span className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold whitespace-nowrap ${
-                            getDisplayStatus(req) === 'Pending Teacher Response' 
-                              ? 'bg-amber-100 text-amber-800 border border-amber-200' 
-                              : getDisplayStatus(req) === 'In Progress'
-                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                              : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                          }`}>
-                            {getDisplayStatus(req)}
                           </span>
                         </td>
                         <td className="border-r border-gray-200 px-2.5 py-3 text-center">
@@ -4754,7 +4867,8 @@ export default function App() {
                           </div>
                         </td>
                       </tr>
-                    ))
+                      );
+                    })
                   )}
                   {dashboardAdminRequests.length > 0 && (
                     <tr className="bg-[#f1f3f5] font-bold">
@@ -4762,6 +4876,7 @@ export default function App() {
                       <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono" colSpan={4}>
                         {dashboardAdminRequests.length}
                       </td>
+                      <td className="px-3 py-2" colSpan={3}></td>
                     </tr>
                   )}
                 </tbody>
@@ -6915,17 +7030,19 @@ export default function App() {
       const toDateTimeLocal = (str: string) => {
         if (!str || str === '---') return '';
         try {
-          const parts = str.split(' ');
+          const parts = str.trim().split(' ');
           if (parts.length < 2) return '';
           const datePart = parts[0]; 
           const timePart = parts[1]; 
           const ampm = parts[2]; 
           
           let [hours, minutes] = timePart.split(':').map(Number);
-          if (ampm === 'PM' && hours < 12) hours += 12;
-          if (ampm === 'AM' && hours === 12) hours = 0;
+          if (ampm) {
+            if (ampm.toUpperCase() === 'PM' && hours < 12) hours += 12;
+            if (ampm.toUpperCase() === 'AM' && hours === 12) hours = 0;
+          }
           
-          return `${datePart}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+          return `${datePart}T${String(hours || 0).padStart(2, '0')}:${String(minutes || 0).padStart(2, '0')}`;
         } catch (e) {
           return '';
         }
@@ -6991,24 +7108,61 @@ export default function App() {
           setUpdatePermissionField(field);
           setModalPermissionValue(targetExam[field] === 'Yes');
           
-          // Get current or new start time
+          // Get current start time - default to BLANK if not set or '---'
           const dt = targetExam[field + 'DateTime'];
-          const initialStart = (dt && dt !== '---' ? dt : formatNow());
-          setModalStartTime(toDateTimeLocal(initialStart));
+          const sTime = (dt && dt !== '---') ? toDateTimeLocal(dt) : '';
+          setModalStartTime(sTime);
           
-          // Get end time if it exists
+          // Get current end time - default to BLANK if not set or '---'
           const edt = targetExam[field + 'EndDateTime'];
-          const initialEnd = (edt && edt !== '---' ? edt : formatNow());
-          setModalEndTime(toDateTimeLocal(initialEnd));
+          const eTime = (edt && edt !== '---') ? toDateTimeLocal(edt) : '';
+          setModalEndTime(eTime);
           
-          // Setup initial subjects
-          setModalSubjects([
-            { id: "physics", name: "Physics", checked: false },
-            { id: "chemistry", name: "Chemistry", checked: false },
-            { id: "higherMath", name: "Higher Math", checked: false },
-          ]);
-          setModalAllSubjectsChecked(false);
+          // Setup subjects with Start and End time (defaults to blank if not set)
+          const existingSubjects = targetExam[field + 'SubjectPermissions'];
+          if (existingSubjects && existingSubjects.length > 0) {
+            setModalSubjects(existingSubjects.map((s: any) => ({
+              ...s,
+              startTime: s.startTime !== undefined ? s.startTime : sTime,
+              endTime: s.endTime !== undefined ? s.endTime : eTime,
+            })));
+            setModalAllSubjectsChecked(existingSubjects.every((s: any) => s.checked));
+          } else {
+            const defaultSubjects = [
+              { id: "physics", name: "Physics", checked: true, startTime: sTime, endTime: eTime },
+              { id: "chemistry", name: "Chemistry", checked: true, startTime: sTime, endTime: eTime },
+              { id: "higherMath", name: "Higher Math", checked: true, startTime: sTime, endTime: eTime },
+            ];
+            setModalSubjects(defaultSubjects);
+            setModalAllSubjectsChecked(true);
+          }
         }
+      };
+
+      const handleMainStartTimeChange = (val: string) => {
+        setModalStartTime(val);
+        // Automatically sync to all subjects on their right side
+        setModalSubjects(prev => prev.map(s => ({
+          ...s,
+          startTime: val
+        })));
+      };
+
+      const handleMainEndTimeChange = (val: string) => {
+        setModalEndTime(val);
+        // Automatically sync to all subjects on their right side
+        setModalSubjects(prev => prev.map(s => ({
+          ...s,
+          endTime: val
+        })));
+      };
+
+      const handleSubjectStartTimeChange = (subjId: string, val: string) => {
+        setModalSubjects(prev => prev.map(s => s.id === subjId ? { ...s, startTime: val } : s));
+      };
+
+      const handleSubjectEndTimeChange = (subjId: string, val: string) => {
+        setModalSubjects(prev => prev.map(s => s.id === subjId ? { ...s, endTime: val } : s));
       };
 
       const handleToggleModalSubject = (subjId: string) => {
@@ -7030,24 +7184,34 @@ export default function App() {
         if (!updatePermissionExam || !updatePermissionField) return;
         
         const newValueStr = modalPermissionValue ? 'Yes' : 'No';
-        const finalTimeStr = fromDateTimeLocal(modalStartTime);
-        const finalEndTimeStr = fromDateTimeLocal(modalEndTime);
+        // If modalStartTime is empty, finalTimeStr is '---' (Blank)
+        const finalTimeStr = modalStartTime ? fromDateTimeLocal(modalStartTime) : '---';
+        // If modalEndTime is empty, finalEndTimeStr is '---' (Blank)
+        const finalEndTimeStr = modalEndTime ? fromDateTimeLocal(modalEndTime) : '---';
         
         setExamPermissions(prev => prev.map(item => {
           if (item.id === updatePermissionExam.id) {
-            const updatedItem = { ...item, [updatePermissionField]: newValueStr };
+            const updatedItem: any = { 
+              ...item, 
+              [updatePermissionField]: newValueStr,
+              [updatePermissionField + 'SubjectPermissions']: modalSubjects.map(s => ({
+                ...s,
+                startTime: s.startTime || '',
+                endTime: s.endTime || ''
+              }))
+            };
             
             if (updatePermissionField === 'examinerPermission') {
-              updatedItem.examinerDateTime = newValueStr === 'Yes' ? finalTimeStr : '---';
+              updatedItem.examinerDateTime = finalTimeStr;
               updatedItem.examinerEndDateTime = finalEndTimeStr;
             } else if (updatePermissionField === 'analysisPermission') {
-              updatedItem.analysisDateTime = newValueStr === 'Yes' ? finalTimeStr : '---';
+              updatedItem.analysisDateTime = finalTimeStr;
               updatedItem.analysisEndDateTime = finalEndTimeStr;
             } else if (updatePermissionField === 'meritPermission') {
-              updatedItem.meritDateTime = newValueStr === 'Yes' ? finalTimeStr : '---';
+              updatedItem.meritDateTime = finalTimeStr;
               updatedItem.meritEndDateTime = finalEndTimeStr;
             } else if (updatePermissionField === 'highestMarksPermission') {
-              updatedItem.highestMarksDateTime = newValueStr === 'Yes' ? finalTimeStr : '---';
+              updatedItem.highestMarksDateTime = finalTimeStr;
               updatedItem.highestMarksEndDateTime = finalEndTimeStr;
             }
             
@@ -7456,17 +7620,39 @@ export default function App() {
                               
                               {/* Examiner Permission Date-Time */}
                               <td className="border-r border-b border-gray-300 px-2 py-3 text-center text-gray-500 font-mono text-[10.5px]">
-                                <div className="flex flex-col items-center">
-                                  {exam.examinerPermission === 'Yes' && (
-                                    <div className="flex items-center space-x-1">
-                                      <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">Start:</span>
-                                      <span>{exam.examinerDateTime || "---"}</span>
+                                <div 
+                                  onClick={() => handleOpenUpdatePermissionModal(exam.id, 'examinerPermission')}
+                                  className="flex flex-col items-center cursor-pointer group hover:bg-blue-50/70 p-1.5 rounded transition-all border border-transparent hover:border-blue-200"
+                                  title="Click to set or change Start Date and End Date"
+                                >
+                                  {(!exam.examinerDateTime || exam.examinerDateTime === '---') && (!exam.examinerEndDateTime || exam.examinerEndDateTime === '---') ? (
+                                    <div className="flex flex-col items-center py-0.5">
+                                      <span className="text-gray-400 italic text-[11px]">Blank</span>
+                                      <span className="text-[9px] text-blue-600 font-sans font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-blue-100/70 px-1.5 py-0.5 rounded mt-0.5">
+                                        Click to set time
+                                      </span>
                                     </div>
+                                  ) : (
+                                    <>
+                                      <div className="flex items-center space-x-1">
+                                        <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">Start:</span>
+                                        <span className={exam.examinerDateTime && exam.examinerDateTime !== '---' ? 'text-gray-700 font-semibold' : 'text-gray-400 italic'}>
+                                          {exam.examinerDateTime && exam.examinerDateTime !== '---' ? exam.examinerDateTime : 'Blank'}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center space-x-1 mt-0.5">
+                                        <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">End:</span>
+                                        <span className={exam.examinerEndDateTime && exam.examinerEndDateTime !== '---' ? 'text-gray-700 font-semibold' : 'text-gray-400 italic'}>
+                                          {exam.examinerEndDateTime && exam.examinerEndDateTime !== '---' ? exam.examinerEndDateTime : 'Blank'}
+                                        </span>
+                                      </div>
+                                    </>
                                   )}
-                                  <div className="flex items-center space-x-1">
-                                    <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">End:</span>
-                                    <span>{exam.examinerEndDateTime || "---"}</span>
-                                  </div>
+                                  {exam.examinerSubjectPermissions && exam.examinerSubjectPermissions.some((s: any) => s.checked) && (
+                                    <span className="text-[8.5px] font-sans font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 py-0.5 rounded mt-1">
+                                      {exam.examinerSubjectPermissions.filter((s: any) => s.checked).length} Subjects Active
+                                    </span>
+                                  )}
                                 </div>
                               </td>
                               
@@ -7486,17 +7672,34 @@ export default function App() {
                               
                               {/* Student Analysis Report Date-Time */}
                               <td className="border-r border-b border-gray-300 px-2 py-3 text-center text-gray-500 font-mono text-[10.5px]">
-                                <div className="flex flex-col items-center">
-                                  {exam.analysisPermission === 'Yes' && (
-                                    <div className="flex items-center space-x-1">
-                                      <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">Start:</span>
-                                      <span>{exam.analysisDateTime || "---"}</span>
+                                <div 
+                                  onClick={() => handleOpenUpdatePermissionModal(exam.id, 'analysisPermission')}
+                                  className="flex flex-col items-center cursor-pointer group hover:bg-blue-50/70 p-1.5 rounded transition-all border border-transparent hover:border-blue-200"
+                                  title="Click to set or change Start/End Time"
+                                >
+                                  {(!exam.analysisDateTime || exam.analysisDateTime === '---') && (!exam.analysisEndDateTime || exam.analysisEndDateTime === '---') ? (
+                                    <div className="flex flex-col items-center py-0.5">
+                                      <span className="text-gray-400 italic text-[11px]">Blank</span>
+                                      <span className="text-[9px] text-blue-600 font-sans font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-blue-100/70 px-1.5 py-0.5 rounded mt-0.5">
+                                        Click to set time
+                                      </span>
                                     </div>
+                                  ) : (
+                                    <>
+                                      <div className="flex items-center space-x-1">
+                                        <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">Start:</span>
+                                        <span className={exam.analysisDateTime && exam.analysisDateTime !== '---' ? 'text-gray-700 font-semibold' : 'text-gray-400 italic'}>
+                                          {exam.analysisDateTime && exam.analysisDateTime !== '---' ? exam.analysisDateTime : 'Blank'}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center space-x-1 mt-0.5">
+                                        <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">End:</span>
+                                        <span className={exam.analysisEndDateTime && exam.analysisEndDateTime !== '---' ? 'text-gray-700 font-semibold' : 'text-gray-400 italic'}>
+                                          {exam.analysisEndDateTime && exam.analysisEndDateTime !== '---' ? exam.analysisEndDateTime : 'Blank'}
+                                        </span>
+                                      </div>
+                                    </>
                                   )}
-                                  <div className="flex items-center space-x-1">
-                                    <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">End:</span>
-                                    <span>{exam.analysisEndDateTime || "---"}</span>
-                                  </div>
                                 </div>
                               </td>
                               
@@ -7509,6 +7712,7 @@ export default function App() {
                                       ? 'bg-white text-[#3c763d] border-gray-300 hover:bg-gray-50' 
                                       : 'bg-white text-rose-700 border-gray-300 hover:bg-gray-50'
                                   }`}
+                                  title="Click to update permission & dates"
                                 >
                                   {exam.meritPermission}
                                 </button>
@@ -7516,17 +7720,34 @@ export default function App() {
                               
                               {/* Show Merit Position Date-Time */}
                               <td className="border-r border-b border-gray-300 px-2 py-3 text-center text-gray-500 font-mono text-[10.5px]">
-                                <div className="flex flex-col items-center">
-                                  {exam.meritPermission === 'Yes' && (
-                                    <div className="flex items-center space-x-1">
-                                      <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">Start:</span>
-                                      <span>{exam.meritDateTime || "---"}</span>
+                                <div 
+                                  onClick={() => handleOpenUpdatePermissionModal(exam.id, 'meritPermission')}
+                                  className="flex flex-col items-center cursor-pointer group hover:bg-blue-50/70 p-1.5 rounded transition-all border border-transparent hover:border-blue-200"
+                                  title="Click to set or change Start/End Time"
+                                >
+                                  {(!exam.meritDateTime || exam.meritDateTime === '---') && (!exam.meritEndDateTime || exam.meritEndDateTime === '---') ? (
+                                    <div className="flex flex-col items-center py-0.5">
+                                      <span className="text-gray-400 italic text-[11px]">Blank</span>
+                                      <span className="text-[9px] text-blue-600 font-sans font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-blue-100/70 px-1.5 py-0.5 rounded mt-0.5">
+                                        Click to set time
+                                      </span>
                                     </div>
+                                  ) : (
+                                    <>
+                                      <div className="flex items-center space-x-1">
+                                        <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">Start:</span>
+                                        <span className={exam.meritDateTime && exam.meritDateTime !== '---' ? 'text-gray-700 font-semibold' : 'text-gray-400 italic'}>
+                                          {exam.meritDateTime && exam.meritDateTime !== '---' ? exam.meritDateTime : 'Blank'}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center space-x-1 mt-0.5">
+                                        <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">End:</span>
+                                        <span className={exam.meritEndDateTime && exam.meritEndDateTime !== '---' ? 'text-gray-700 font-semibold' : 'text-gray-400 italic'}>
+                                          {exam.meritEndDateTime && exam.meritEndDateTime !== '---' ? exam.meritEndDateTime : 'Blank'}
+                                        </span>
+                                      </div>
+                                    </>
                                   )}
-                                  <div className="flex items-center space-x-1">
-                                    <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">End:</span>
-                                    <span>{exam.meritEndDateTime || "---"}</span>
-                                  </div>
                                 </div>
                               </td>
                               
@@ -7539,6 +7760,7 @@ export default function App() {
                                       ? 'bg-white text-[#3c763d] border-gray-300 hover:bg-gray-50' 
                                       : 'bg-white text-rose-700 border-gray-300 hover:bg-gray-50'
                                   }`}
+                                  title="Click to update permission & dates"
                                 >
                                   {exam.highestMarksPermission}
                                 </button>
@@ -7546,17 +7768,34 @@ export default function App() {
                               
                               {/* Show Highest Marks Date-Time */}
                               <td className="border-r border-b border-gray-300 px-2 py-3 text-center text-gray-500 font-mono text-[10.5px]">
-                                <div className="flex flex-col items-center">
-                                  {exam.highestMarksPermission === 'Yes' && (
-                                    <div className="flex items-center space-x-1">
-                                      <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">Start:</span>
-                                      <span>{exam.highestMarksDateTime || "---"}</span>
+                                <div 
+                                  onClick={() => handleOpenUpdatePermissionModal(exam.id, 'highestMarksPermission')}
+                                  className="flex flex-col items-center cursor-pointer group hover:bg-blue-50/70 p-1.5 rounded transition-all border border-transparent hover:border-blue-200"
+                                  title="Click to set or change Start/End Time"
+                                >
+                                  {(!exam.highestMarksDateTime || exam.highestMarksDateTime === '---') && (!exam.highestMarksEndDateTime || exam.highestMarksEndDateTime === '---') ? (
+                                    <div className="flex flex-col items-center py-0.5">
+                                      <span className="text-gray-400 italic text-[11px]">Blank</span>
+                                      <span className="text-[9px] text-blue-600 font-sans font-semibold opacity-0 group-hover:opacity-100 transition-opacity bg-blue-100/70 px-1.5 py-0.5 rounded mt-0.5">
+                                        Click to set time
+                                      </span>
                                     </div>
+                                  ) : (
+                                    <>
+                                      <div className="flex items-center space-x-1">
+                                        <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">Start:</span>
+                                        <span className={exam.highestMarksDateTime && exam.highestMarksDateTime !== '---' ? 'text-gray-700 font-semibold' : 'text-gray-400 italic'}>
+                                          {exam.highestMarksDateTime && exam.highestMarksDateTime !== '---' ? exam.highestMarksDateTime : 'Blank'}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center space-x-1 mt-0.5">
+                                        <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">End:</span>
+                                        <span className={exam.highestMarksEndDateTime && exam.highestMarksEndDateTime !== '---' ? 'text-gray-700 font-semibold' : 'text-gray-400 italic'}>
+                                          {exam.highestMarksEndDateTime && exam.highestMarksEndDateTime !== '---' ? exam.highestMarksEndDateTime : 'Blank'}
+                                        </span>
+                                      </div>
+                                    </>
                                   )}
-                                  <div className="flex items-center space-x-1">
-                                    <span className="text-[8px] font-sans font-bold text-gray-400 uppercase">End:</span>
-                                    <span>{exam.highestMarksEndDateTime || "---"}</span>
-                                  </div>
                                 </div>
                               </td>
                               
@@ -7662,117 +7901,257 @@ export default function App() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="bg-white rounded border border-gray-300 shadow-xl max-w-sm w-full overflow-hidden text-left font-sans"
+                    className="bg-white rounded border border-gray-300 shadow-2xl max-w-2xl w-full overflow-hidden text-left font-sans"
                   >
                     {/* Header */}
-                    <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200">
-                      <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wide">
-                        Update Permission
-                      </h3>
+                    <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-200 bg-gray-50/70">
+                      <div>
+                        <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wide flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-[#5cb85c]"></span>
+                          Update Permission
+                        </h3>
+                        <p className="text-[11px] text-gray-500 mt-0.5 font-medium">
+                          {updatePermissionExam.examCode} {updatePermissionExam.examName} &bull; <span className="text-[#002d5b] font-bold">{updatePermissionField === 'examinerPermission' ? 'Examiner Permission' : updatePermissionField}</span>
+                        </p>
+                      </div>
                       <button 
                         onClick={() => {
                           setUpdatePermissionExam(null);
                           setUpdatePermissionField(null);
                         }}
-                        className="text-gray-400 hover:text-gray-600 font-bold text-sm cursor-pointer"
+                        className="text-gray-400 hover:text-gray-600 font-bold text-sm cursor-pointer p-1"
                       >
                         ✕
                       </button>
                     </div>
 
                     {/* Content */}
-                    <div className="p-5">
+                    <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
                       {/* Permission toggle */}
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-xs font-semibold text-gray-600">Permission</span>
-                        <button
-                          type="button"
-                          onClick={() => setModalPermissionValue(!modalPermissionValue)}
-                          className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 focus:outline-none cursor-pointer ${
-                            modalPermissionValue ? 'bg-[#5cb85c]' : 'bg-gray-300'
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
-                              modalPermissionValue ? 'translate-x-5' : 'translate-x-0'
+                      <div className="flex items-center justify-between p-3.5 bg-gray-50/80 rounded-md border border-gray-200">
+                        <div>
+                          <span className="text-xs font-bold text-gray-700 block">Permission Status</span>
+                          <span className="text-[11px] text-gray-500">Toggle Permission Yes or No</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <span className={`text-xs font-bold ${modalPermissionValue ? 'text-[#3c763d]' : 'text-rose-600'}`}>
+                            {modalPermissionValue ? 'Yes (Active)' : 'No (Inactive)'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setModalPermissionValue(!modalPermissionValue)}
+                            className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 focus:outline-none cursor-pointer ${
+                              modalPermissionValue ? 'bg-[#5cb85c]' : 'bg-gray-300'
                             }`}
-                          />
-                        </button>
+                          >
+                            <div
+                              className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${
+                                modalPermissionValue ? 'translate-x-5' : 'translate-x-0'
+                              }`}
+                            />
+                          </button>
+                        </div>
                       </div>
 
-                      {/* Start Time input - only if Yes */}
-                      {modalPermissionValue && (
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-xs font-semibold text-gray-600">Start Time</span>
+                      {/* Main Start & End Time (Syncs automatically to subjects below) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 bg-blue-50/40 rounded-md border border-blue-100">
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-xs font-bold text-gray-700">
+                              Start Time <span className="text-gray-500 text-[10.5px] font-normal">(Optional / Leave Blank)</span>
+                            </label>
+                            <div className="flex items-center space-x-2 text-[10.5px]">
+                              <button
+                                type="button"
+                                onClick={() => handleMainStartTimeChange(toDateTimeLocal(formatNow()))}
+                                className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer underline"
+                              >
+                                Set Now
+                              </button>
+                              {modalStartTime && (
+                                <>
+                                  <span className="text-gray-300">|</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleMainStartTimeChange('')}
+                                    className="text-rose-600 hover:text-rose-800 font-semibold cursor-pointer underline"
+                                  >
+                                    Clear (Blank)
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
                           <input
                             type="datetime-local"
                             value={modalStartTime}
-                            onChange={(e) => setModalStartTime(e.target.value)}
-                            className="bg-white border border-gray-300 rounded px-2 py-1 text-[11px] text-gray-600 focus:outline-none w-48 font-sans cursor-pointer"
+                            onChange={(e) => handleMainStartTimeChange(e.target.value)}
+                            className="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full font-mono cursor-pointer shadow-3xs"
                           />
+                          {!modalStartTime ? (
+                            <div className="text-[10px] text-gray-400 italic mt-0.5">
+                              Blank. Click above to select date & time, or leave empty.
+                            </div>
+                          ) : (
+                            <div className="text-[10px] text-emerald-600 font-medium mt-0.5">
+                              Start Time configured
+                            </div>
+                          )}
                         </div>
-                      )}
 
-                      {/* End Time input */}
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-xs font-semibold text-gray-600">End Time</span>
-                        <input
-                          type="datetime-local"
-                          value={modalEndTime}
-                          onChange={(e) => setModalEndTime(e.target.value)}
-                          className="bg-white border border-gray-300 rounded px-2 py-1 text-[11px] text-gray-600 focus:outline-none w-48 font-sans cursor-pointer"
-                        />
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-xs font-bold text-gray-700">
+                              End Time <span className="text-gray-500 text-[10.5px] font-normal">(Optional / Leave Blank)</span>
+                            </label>
+                            <div className="flex items-center space-x-2 text-[10.5px]">
+                              <button
+                                type="button"
+                                onClick={() => handleMainEndTimeChange(toDateTimeLocal(formatNow()))}
+                                className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer underline"
+                              >
+                                Set Now
+                              </button>
+                              {modalEndTime && (
+                                <>
+                                  <span className="text-gray-300">|</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleMainEndTimeChange('')}
+                                    className="text-rose-600 hover:text-rose-800 font-semibold cursor-pointer underline"
+                                  >
+                                    Clear (Blank)
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <input
+                            type="datetime-local"
+                            value={modalEndTime}
+                            onChange={(e) => handleMainEndTimeChange(e.target.value)}
+                            className="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full font-mono cursor-pointer shadow-3xs"
+                          />
+                          {!modalEndTime ? (
+                            <div className="text-[10px] text-gray-400 italic mt-0.5">
+                              Blank. Click above to select date & time, or leave empty.
+                            </div>
+                          ) : (
+                            <div className="text-[10px] text-emerald-600 font-medium mt-0.5">
+                              End Time configured
+                            </div>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Subject Checkboxes Tree */}
-                      <div className="mt-4 border-t border-gray-200 pt-4 space-y-2.5">
-                        {/* All Subject */}
-                        <label className="flex items-center space-x-2.5 cursor-pointer text-xs font-semibold text-gray-700">
-                          <input
-                            type="checkbox"
-                            checked={modalAllSubjectsChecked}
-                            onChange={handleToggleAllModalSubjects}
-                            className="rounded border-gray-300 text-[#5cb85c] focus:ring-[#5cb85c] h-3.5 w-3.5 cursor-pointer"
-                          />
-                          <span className="flex items-center space-x-1.5 text-gray-600">
-                            <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                            </svg>
-                            <span>All Subject</span>
+                      {/* Multiple Subject Selection Section with Automatic and Subject-wise Dates */}
+                      <div className="border border-gray-200 rounded-md overflow-hidden bg-white shadow-3xs">
+                        <div className="bg-gray-100/90 px-4 py-2.5 border-b border-gray-200 flex flex-wrap items-center justify-between gap-2">
+                          <label className="flex items-center space-x-2 cursor-pointer text-xs font-bold text-gray-800 select-none">
+                            <input
+                              type="checkbox"
+                              checked={modalAllSubjectsChecked}
+                              onChange={handleToggleAllModalSubjects}
+                              className="rounded border-gray-300 text-[#5cb85c] focus:ring-[#5cb85c] h-4 w-4 cursor-pointer"
+                            />
+                            <span>Multiple Subject Selection</span>
+                          </label>
+                          <span className="text-[11px] text-gray-500 font-medium">
+                            Subject-wise Start Date/Time & End Date/Time
                           </span>
-                        </label>
+                        </div>
 
-                        {/* Indented Checklist */}
-                        <div className="pl-6 space-y-2 border-l border-gray-200 ml-1.5">
+                        <div className="divide-y divide-gray-100 p-2.5 space-y-1.5">
                           {modalSubjects.map((subj) => (
-                            <label key={subj.id} className="flex items-center space-x-2.5 cursor-pointer text-xs font-medium text-gray-600">
-                              <input
-                                type="checkbox"
-                                checked={subj.checked}
-                                onChange={() => handleToggleModalSubject(subj.id)}
-                                className="rounded border-gray-300 text-[#5cb85c] focus:ring-[#5cb85c] h-3.5 w-3.5 cursor-pointer"
-                              />
-                              <span>{subj.name}</span>
-                            </label>
+                            <div 
+                              key={subj.id} 
+                              className={`p-2.5 rounded border transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 ${
+                                subj.checked 
+                                  ? 'bg-emerald-50/30 border-emerald-200' 
+                                  : 'bg-gray-50/40 border-gray-200 opacity-75'
+                              }`}
+                            >
+                              {/* Subject Checkbox & Label */}
+                              <label className="flex items-center space-x-2.5 cursor-pointer min-w-[130px] select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={subj.checked}
+                                  onChange={() => handleToggleModalSubject(subj.id)}
+                                  className="rounded border-gray-300 text-[#5cb85c] focus:ring-[#5cb85c] h-4 w-4 cursor-pointer"
+                                />
+                                <span className={`text-xs font-bold ${subj.checked ? 'text-gray-900' : 'text-gray-500'}`}>
+                                  {subj.name}
+                                </span>
+                              </label>
+
+                              {/* Right Side: Automatic & Individually Editable Start & End Dates */}
+                              <div className="flex flex-wrap items-center gap-2.5 text-xs">
+                                <div className="flex items-center space-x-1.5">
+                                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Start:</span>
+                                  <div className="relative flex items-center">
+                                    <input
+                                      type="datetime-local"
+                                      value={subj.startTime || ''}
+                                      onChange={(e) => handleSubjectStartTimeChange(subj.id, e.target.value)}
+                                      className="bg-white border border-gray-300 rounded px-2 py-1 text-[11px] text-gray-700 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-3xs"
+                                      title={`${subj.name} Start Date & Time (Click to change or clear)`}
+                                    />
+                                    {subj.startTime && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleSubjectStartTimeChange(subj.id, '')}
+                                        className="ml-1 text-gray-400 hover:text-rose-600 font-bold text-xs p-0.5 cursor-pointer"
+                                        title="Clear to Blank"
+                                      >
+                                        &times;
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center space-x-1.5">
+                                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">End:</span>
+                                  <div className="relative flex items-center">
+                                    <input
+                                      type="datetime-local"
+                                      value={subj.endTime || ''}
+                                      onChange={(e) => handleSubjectEndTimeChange(subj.id, e.target.value)}
+                                      className="bg-white border border-gray-300 rounded px-2 py-1 text-[11px] text-gray-700 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-3xs"
+                                      title={`${subj.name} End Date & Time (Click to change or clear)`}
+                                    />
+                                    {subj.endTime && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleSubjectEndTimeChange(subj.id, '')}
+                                        className="ml-1 text-gray-400 hover:text-rose-600 font-bold text-xs p-0.5 cursor-pointer"
+                                        title="Clear to Blank"
+                                      >
+                                        &times;
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           ))}
                         </div>
                       </div>
                     </div>
 
                     {/* Footer / Buttons */}
-                    <div className="bg-gray-50 px-5 py-3 flex justify-end space-x-2 border-t border-gray-200">
+                    <div className="bg-gray-50 px-5 py-3.5 flex justify-end space-x-2 border-t border-gray-200">
                       <button 
                         onClick={handleSaveModalPermission}
-                        className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white font-bold text-xs px-4 py-1.5 rounded transition-all shadow-xs cursor-pointer"
+                        className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white font-bold text-xs px-5 py-2 rounded transition-all shadow-xs cursor-pointer"
                       >
-                        Update
+                        Update Permission
                       </button>
                       <button 
                         onClick={() => {
                           setUpdatePermissionExam(null);
                           setUpdatePermissionField(null);
                         }}
-                        className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold text-xs px-4 py-1.5 rounded transition-all shadow-xs cursor-pointer"
+                        className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold text-xs px-4 py-2 rounded transition-all shadow-xs cursor-pointer"
                       >
                         Close
                       </button>
@@ -8782,113 +9161,123 @@ export default function App() {
                       Total: {studentForwardedRequests.length}
                     </span>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse text-[11.5px] font-sans text-gray-700">
+                  <div className="overflow-x-auto relative">
+                    <table className="w-full border-separate border-spacing-0 text-[12px] font-sans text-gray-700">
                       <thead>
-                        <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-200">
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-center w-12">SI</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[14%]">Teacher</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[18%]">Course [Program-Session]</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[8%]">Subject</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Exam</th>
-                          <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[6%]">Review Scripts</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[6%]">Status</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[10%]">Examiner Status</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[6%]">Pending From</th>
-                          <th className="px-3 py-2.5 text-center w-[10%]">Action</th>
+                        <tr className="bg-[#f8f9fa] text-gray-800 font-bold text-[12px]">
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center w-14">SI</th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[130px]">
+                            <div>Program</div>
+                            <div>Session</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[140px]">Course</th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[200px]">
+                            <div>[Code] Exam</div>
+                            <div>&amp; Subject</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[90px]">
+                            <div>Exam</div>
+                            <div>Type</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[90px]">
+                            <div>Evaluation</div>
+                            <div>Type</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[80px]">Version</th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[140px]">Question</th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[80px]">
+                            <div>Minimum</div>
+                            <div>Marks</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[80px]">
+                            <div>Maximum</div>
+                            <div>Marks</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[70px]">
+                            <div>Total</div>
+                            <div>Script</div>
+                          </th>
+                          <th className="sticky right-0 z-20 bg-[#f8f9fa] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-300 px-3 py-2.5 text-center min-w-[150px] w-[150px]">
+                            Action
+                          </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-200">
+                      <tbody>
                         {studentForwardedRequests.length === 0 ? (
                           <tr>
-                            <td colSpan={10} className="px-3 py-8 text-center text-gray-400 font-medium italic">
+                            <td colSpan={12} className="px-3 py-8 text-center text-gray-400 font-medium italic border-b border-gray-200">
                               No student review requests found matching the current filters.
                             </td>
                           </tr>
                         ) : (
                           studentForwardedRequests.map((req, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="border-r border-gray-200 px-3 py-3 text-center text-gray-500 font-medium font-mono">
+                            <tr key={idx} className="group hover:bg-[#f5f8fa] transition-colors text-gray-700 text-center text-[12px]">
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700 font-medium font-mono">
                                 {String(idx + 1).padStart(2, '0')}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
-                                <div className="font-bold text-blue-700 text-[11px] leading-tight">[{req.examiner.id}] - {req.examiner.name}</div>
-                                {req.examiner.phone && <div className="text-[10px] text-gray-500 mt-0.5">{req.examiner.phone}</div>}
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.program.includes(req.session) ? req.program : `${req.program} ${req.session}`}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-800 font-medium">
-                                <div>{req.course}</div>
-                                <div className="text-[10px] text-gray-400 font-normal mt-0.5">{req.program} &bull; Session: {req.session}</div>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.course}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-700 font-semibold">{req.subject}</td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
-                                <div>{req.exam}</div>
-                                <div className="text-[9.5px] text-gray-400 font-mono mt-0.5">{req.examType}</div>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-800">
+                                {req.exam?.startsWith('[') 
+                                  ? `${req.exam} (${(req.subject || '').replace(/\[.*\]/, '').trim()})`
+                                  : `[${req.examCode || '102'}] ${req.exam} (${(req.subject || '').replace(/\[.*\]/, '').trim()})`
+                                }
                               </td>
-                              <td className="border-r border-gray-200 px-2.5 py-3 text-center">
-                                <span className="inline-flex items-center justify-center bg-red-100 text-red-800 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10.5px] border border-red-200/60 shadow-3xs">
-                                  {req.isMultiple ? `${req.checkedScriptsCount}/${req.totalScriptsCount}` : (req.reviewCount || 1)}
-                                </span>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.examType || 'Online Written'}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-center">
-                                <span className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold whitespace-nowrap ${
-                                  getDisplayStatus(req) === 'Pending Teacher Response' 
-                                    ? 'bg-amber-100 text-amber-800 border border-amber-200' 
-                                    : getDisplayStatus(req) === 'In Progress'
-                                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                                    : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                                }`}>
-                                  {getDisplayStatus(req)}
-                                </span>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.evaluationType || 'Regular'}
                               </td>
-                              <td className="border-r border-gray-200 px-2.5 py-3 text-center">
-                                {examinerReviewPermissions[req.examiner.id] !== false ? (
-                                  <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded text-[10px] font-bold">
-                                    Permitted
-                                  </span>
-                                ) : (
-                                  <span className="inline-block bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded text-[10px] font-bold">
-                                    Not Permitted
-                                  </span>
-                                )}
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.version || 'Bangla'}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-center">
-                                {req.status === 'Resolved by Teacher' || req.status === 'Completed' || req.status === 'Reviewed' || req.status === 'Resolved' || (req.isMultiple && req.checkedScriptsCount >= req.totalScriptsCount) ? (
-                                  <span className="text-gray-400 font-medium font-sans">--</span>
-                                ) : (
-                                  <span className="inline-block bg-rose-50 text-rose-700 border border-rose-100 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10px] shadow-3xs whitespace-nowrap">
-                                    {getPendingDuration(req.date)}
-                                  </span>
-                                )}
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                Unique Set: {req.uniqueSet || '1'}, Question Serial: {req.questionSerial || '2'}
                               </td>
-                              <td className="px-3 py-3 text-center">
-                                <div className="flex items-center justify-center gap-1.5">
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.minMarks ?? '0'}
+                              </td>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.maxMarks ?? '0'}
+                              </td>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.totalScript || (req.isMultiple ? req.totalScriptsCount : (req.reviewCount || 1))}
+                              </td>
+                              <td className="sticky right-0 z-10 bg-white group-hover:bg-[#f5f8fa] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-200 px-3 py-3 text-center min-w-[150px] w-[150px]">
+                                <div className="flex items-center justify-center">
                                   <button 
+                                    type="button"
                                     onClick={() => {
                                       const constructed = {
                                         id: req.id,
                                         rollNumber: req.rollNumber || '37180701100',
                                         studentName: 'Tahmid Rahman',
                                         examSubject: `${req.exam} - ${req.subject}`,
-                                        program: req.program || 'Engineering Admission',
+                                        program: `${req.program} ${req.session}`,
                                         course: req.course,
-                                        question: 'Unique Set: 1, Question Serial: 18',
-                                        questionSerial: req.questionSerial || '18',
+                                        question: `Unique Set: ${req.uniqueSet || '1'}, Question Serial: ${req.questionSerial || '2'}`,
+                                        questionSerial: req.questionSerial || '2',
                                         uniqueSet: req.uniqueSet || '1',
                                         obtainedMarks: '0.00',
                                         maxMarks: req.maxMarks || '1.00',
-                                        examinerName: `${req.examiner.name} (${req.examiner.id})`,
+                                        examinerName: `${req.examiner?.name || 'Examiner'} (${req.examiner?.id || '101'})`,
                                         evaluationType: req.evaluationType || 'Regular',
                                         examName: req.exam,
-                                        examCode: req.examCode || '130 ',
-                                        subject: req.subject.replace(/\[.*\]/, '').trim(),
+                                        examCode: req.examCode || '130',
+                                        subject: (req.subject || '').replace(/\[.*\]/, '').trim(),
                                         adminCommentText: req.note || "খাতাটি পুনঃ মূল্যায়ন করো।",
                                         adminDoubt: req.note || "খাতাটি পুনঃ মূল্যায়ন করো।",
                                         studentDoubt: req.studentDoubt || "corner e dekhen cross and the likhsi",
                                         isFromStudent: true,
-                                        totalScript: '124',
-                                        minMarks: req.minMarks || '0.5',
+                                        totalScript: req.totalScript || (req.isMultiple ? req.totalScriptsCount : (req.reviewCount || 1)),
+                                        minMarks: req.minMarks || '0',
                                         reviewStatus: req.reviewRequest || req.status || 'Not Reviewed',
-                                        reviewCount: req.reviewCount || 2,
+                                        reviewCount: req.reviewCount || 1,
                                         suppressNotes: false,
                                         examType: req.examType || 'Online Written',
                                         version: req.version || 'Bangla'
@@ -8896,15 +9285,9 @@ export default function App() {
                                       setShowingAdminDetailRow(constructed);
                                       setShowReviewWorkspace(false);
                                     }}
-                                    className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-2.5 py-1 rounded text-[10.5px] font-bold transition-all shadow-xs"
+                                    className="bg-[#337ab7] hover:bg-[#286090] text-white px-3 py-1.5 rounded text-xs font-semibold transition-colors shadow-xs border border-[#2e6da4] whitespace-nowrap cursor-pointer"
                                   >
-                                    Details
-                                  </button>
-                                  <button 
-                                    onClick={() => setCancelConfirmId(req.id)}
-                                    className="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[10.5px] font-bold transition-all shadow-xs"
-                                  >
-                                    Cancel
+                                    Review Request All
                                   </button>
                                 </div>
                               </td>
@@ -8933,118 +9316,122 @@ export default function App() {
                       Total: {adminForwardedRequestsFiltered.length}
                     </span>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse text-[11.5px] font-sans text-gray-700">
+                  <div className="overflow-x-auto relative">
+                    <table className="w-full border-separate border-spacing-0 text-[12px] font-sans text-gray-700">
                       <thead>
-                        <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-200">
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-center w-12">SI</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[13%]">Teacher</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[16%]">Course [Program-Session]</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[8%]">Subject</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Exam</th>
-                          <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[5%]">Admin ID</th>
-                          <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[5%]">Review Scripts</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[6%]">Status</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[10%]">Examiner Status</th>
-                          <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[6%]">Pending From</th>
-                          <th className="px-3 py-2.5 text-center w-[10%]">Action</th>
+                        <tr className="bg-[#f8f9fa] text-gray-800 font-bold text-[12px]">
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center w-14">SI</th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[130px]">
+                            <div>Program</div>
+                            <div>Session</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[140px]">Course</th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[200px]">
+                            <div>[Code] Exam</div>
+                            <div>&amp; Subject</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[90px]">
+                            <div>Exam</div>
+                            <div>Type</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[90px]">
+                            <div>Evaluation</div>
+                            <div>Type</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[80px]">Version</th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[140px]">Question</th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[80px]">
+                            <div>Minimum</div>
+                            <div>Marks</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[80px]">
+                            <div>Maximum</div>
+                            <div>Marks</div>
+                          </th>
+                          <th className="border-r border-b border-gray-300 px-3 py-2.5 text-center min-w-[70px]">
+                            <div>Total</div>
+                            <div>Script</div>
+                          </th>
+                          <th className="sticky right-0 z-20 bg-[#f8f9fa] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-300 px-3 py-2.5 text-center min-w-[150px] w-[150px]">
+                            Action
+                          </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-200">
+                      <tbody>
                         {adminForwardedRequestsFiltered.length === 0 ? (
                           <tr>
-                            <td colSpan={11} className="px-3 py-8 text-center text-gray-400 font-medium italic">
+                            <td colSpan={12} className="px-3 py-8 text-center text-gray-400 font-medium italic border-b border-gray-200">
                               No admin review requests found matching the current filters.
                             </td>
                           </tr>
                         ) : (
                           adminForwardedRequestsFiltered.map((req, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="border-r border-gray-200 px-3 py-3 text-center text-gray-500 font-medium font-mono">
+                            <tr key={idx} className="group hover:bg-[#f5f8fa] transition-colors text-gray-700 text-center text-[12px]">
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700 font-medium font-mono">
                                 {String(idx + 1).padStart(2, '0')}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
-                                <div className="font-bold text-blue-700 text-[11px] leading-tight">[${req.examiner.id}] - ${req.examiner.name}</div>
-                                {req.examiner.phone && <div className="text-[10px] text-gray-500 mt-0.5">${req.examiner.phone}</div>}
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.program.includes(req.session) ? req.program : `${req.program} ${req.session}`}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-800 font-medium">
-                                <div>${req.course}</div>
-                                <div className="text-[10px] text-gray-400 font-normal mt-0.5">${req.program} &bull; Session: ${req.session}</div>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.course}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-700 font-semibold">${req.subject}</td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
-                                <div>${req.exam}</div>
-                                <div className="text-[9.5px] text-gray-400 font-mono mt-0.5">${req.examType}</div>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-800">
+                                {req.exam?.startsWith('[') 
+                                  ? `${req.exam} (${(req.subject || '').replace(/\[.*\]/, '').trim()})`
+                                  : `[${req.examCode || '102'}] ${req.exam} (${(req.subject || '').replace(/\[.*\]/, '').trim()})`
+                                }
                               </td>
-                              <td className="border-r border-gray-200 px-2.5 py-3 text-center">
-                                <span className="inline-block bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded font-bold font-mono text-[10px]">
-                                  {req.adminId || 'A-102'}
-                                </span>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.examType || 'Online Written'}
                               </td>
-                              <td className="border-r border-gray-200 px-2.5 py-3 text-center">
-                                <span className="inline-flex items-center justify-center bg-red-100 text-red-800 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10.5px] border border-red-200/60 shadow-3xs">
-                                  {req.isMultiple ? `${req.checkedScriptsCount}/${req.totalScriptsCount}` : (req.reviewCount || 1)}
-                                </span>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.evaluationType || 'Regular'}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-center">
-                                <span className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold whitespace-nowrap ${
-                                  getDisplayStatus(req) === 'Pending Teacher Response' 
-                                    ? 'bg-amber-100 text-amber-800 border border-amber-200' 
-                                    : getDisplayStatus(req) === 'In Progress'
-                                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                                    : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                                }`}>
-                                  {getDisplayStatus(req)}
-                                </span>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.version || 'Bangla'}
                               </td>
-                              <td className="border-r border-gray-200 px-2.5 py-3 text-center">
-                                {examinerReviewPermissions[req.examiner.id] !== false ? (
-                                  <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded text-[10px] font-bold">
-                                    Permitted
-                                  </span>
-                                ) : (
-                                  <span className="inline-block bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded text-[10px] font-bold">
-                                    Not Permitted
-                                  </span>
-                                )}
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                Unique Set: {req.uniqueSet || '1'}, Question Serial: {req.questionSerial || '2'}
                               </td>
-                              <td className="border-r border-gray-200 px-3 py-3 text-center">
-                                {req.status === 'Resolved by Teacher' || req.status === 'Completed' || req.status === 'Reviewed' || req.status === 'Resolved' || (req.isMultiple && req.checkedScriptsCount >= req.totalScriptsCount) ? (
-                                  <span className="text-gray-400 font-medium font-sans">--</span>
-                                ) : (
-                                  <span className="inline-block bg-rose-50 text-rose-700 border border-rose-100 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10px] shadow-3xs whitespace-nowrap">
-                                    {getPendingDuration(req.date)}
-                                  </span>
-                                )}
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.minMarks ?? '0'}
                               </td>
-                              <td className="px-3 py-3 text-center">
-                                <div className="flex items-center justify-center gap-1.5">
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.maxMarks ?? '0'}
+                              </td>
+                              <td className="border-r border-b border-gray-200 px-3 py-3 text-center text-gray-700">
+                                {req.totalScript || (req.isMultiple ? req.totalScriptsCount : (req.reviewCount || 1))}
+                              </td>
+                              <td className="sticky right-0 z-10 bg-white group-hover:bg-[#f5f8fa] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-200 px-3 py-3 text-center min-w-[150px] w-[150px]">
+                                <div className="flex items-center justify-center">
                                   <button 
+                                    type="button"
                                     onClick={() => {
                                       const constructed = {
                                         id: req.id,
                                         rollNumber: req.rollNumber || '37180701100',
                                         studentName: 'Tahmid Rahman',
                                         examSubject: `${req.exam} - ${req.subject}`,
-                                        program: req.program || 'Engineering Admission',
+                                        program: `${req.program} ${req.session}`,
                                         course: req.course,
-                                        question: `Unique Set: 1, Question Serial: 18`,
-                                        questionSerial: req.questionSerial || '18',
+                                        question: `Unique Set: ${req.uniqueSet || '1'}, Question Serial: ${req.questionSerial || '2'}`,
+                                        questionSerial: req.questionSerial || '2',
                                         uniqueSet: req.uniqueSet || '1',
                                         obtainedMarks: '0.00',
                                         maxMarks: req.maxMarks || '1.00',
-                                        examinerName: `${req.examiner.name} (${req.examiner.id})`,
+                                        examinerName: `${req.examiner?.name || 'Examiner'} (${req.examiner?.id || '101'})`,
                                         evaluationType: req.evaluationType || 'Regular',
                                         examName: req.exam,
-                                        examCode: req.examCode || '130 ',
-                                        subject: req.subject.replace(/\[.*\]/, '').trim(),
+                                        examCode: req.examCode || '130',
+                                        subject: (req.subject || '').replace(/\[.*\]/, '').trim(),
                                         adminCommentText: req.note || "খাতাটি পুনঃ মূল্যায়ন করো।",
                                         adminDoubt: req.note || "খাতাটি পুনঃ মূল্যায়ন করো।",
                                         isFromStudent: false,
-                                        totalScript: '124',
-                                        minMarks: req.minMarks || '0.5',
+                                        totalScript: req.totalScript || (req.isMultiple ? req.totalScriptsCount : (req.reviewCount || 1)),
+                                        minMarks: req.minMarks || '0',
                                         reviewStatus: req.reviewRequest || req.status || 'Not Reviewed',
-                                        reviewCount: req.reviewCount || 2,
+                                        reviewCount: req.reviewCount || 1,
                                         suppressNotes: false,
                                         examType: req.examType || 'Online Written',
                                         version: req.version || 'Bangla'
@@ -9052,15 +9439,9 @@ export default function App() {
                                       setShowingAdminDetailRow(constructed);
                                       setShowReviewWorkspace(false);
                                     }}
-                                    className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-2.5 py-1 rounded text-[10.5px] font-bold transition-all shadow-xs"
+                                    className="bg-[#337ab7] hover:bg-[#286090] text-white px-3 py-1.5 rounded text-xs font-semibold transition-colors shadow-xs border border-[#2e6da4] whitespace-nowrap cursor-pointer"
                                   >
-                                    Details
-                                  </button>
-                                  <button 
-                                    onClick={() => setCancelConfirmId(req.id)}
-                                    className="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[10.5px] font-bold transition-all shadow-xs"
-                                  >
-                                    Cancel
+                                    Review Request All
                                   </button>
                                 </div>
                               </td>
@@ -9069,10 +9450,11 @@ export default function App() {
                         )}
                         {adminForwardedRequestsFiltered.length > 0 && (
                           <tr className="bg-[#f1f3f5] font-bold">
-                            <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total Admin Requests Found</td>
-                            <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono" colSpan={7}>
+                            <td className="border-r border-b border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total Admin Requests Found</td>
+                            <td className="border-r border-b border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono" colSpan={7}>
                               {adminForwardedRequestsFiltered.length}
                             </td>
+                            <td className="sticky right-0 z-10 bg-[#f1f3f5] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-300 px-3 py-2 text-center min-w-[150px] w-[150px]"></td>
                           </tr>
                         )}
                       </tbody>
@@ -9082,6 +9464,14 @@ export default function App() {
               )}
             </div>
           )}
+        </div>
+      );
+    }
+
+    if (activeTab === 'Exam' && (activeSubItem === 'view-assign-template' || activeSidebarItem === 'view-assign-template' || activeSidebarItem === 'script-eval')) {
+      return (
+        <div className="flex-1 flex flex-col w-full overflow-y-auto">
+          <ViewAssignTemplate currentUser={currentUser} />
         </div>
       );
     }
@@ -9420,67 +9810,88 @@ export default function App() {
             {/* Menu Items */}
             <div className="flex-1 overflow-y-auto px-1 space-y-1.5 pb-4">
               {filteredSidebarItems.length > 0 ? (
-                filteredSidebarItems.map((item) => (
-                  <div key={item.id} className="space-y-1">
-                    <button
-                      id={`sidebar-item-${item.id}`}
-                      onClick={() => {
-                        setSelectedDashboardDetail(null);
-                        setShowReviewWorkspace(false);
-                        setSelectedReviewRow(null);
-                        setShowForwardToTeacher(false);
-                        setShowImageLog(false);
-                        setActiveSidebarItem(item.id);
-                        setExpandedItemId(prev => prev === item.id ? null : item.id);
-                        if (item.subItems && item.subItems.length > 0) {
-                          setActiveSubItem(item.subItems[0].id);
-                        } else {
-                          setActiveSubItem(null);
-                        }
-                      }}
-                      className={`w-full text-left px-4 py-2 text-xs rounded transition-all border ${
-                        activeSidebarItem === item.id
-                          ? 'bg-[#cccccc] text-gray-900 border-gray-300 font-semibold shadow-xs'
-                          : 'bg-[#f8f9fa] hover:bg-gray-200 text-gray-700 border-transparent'
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                    
-                    {/* Sub-items */}
-                    <AnimatePresence>
-                      {expandedItemId === item.id && item.subItems && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden border border-gray-200 bg-white rounded pl-2 py-1 space-y-0.5"
-                        >
-                          {item.subItems.map((sub) => (
-                            <button
-                              key={sub.id}
-                              onClick={() => {
-                                setSelectedDashboardDetail(null);
-                                setShowReviewWorkspace(false);
-                                setSelectedReviewRow(null);
-                                setShowForwardToTeacher(false);
-                                setShowImageLog(false);
-                                setActiveSubItem(sub.id);
-                              }}
-                              className={`w-full text-left px-3 py-1.5 text-xs rounded transition-colors ${
-                                activeSubItem === sub.id
-                                  ? 'bg-blue-50 text-blue-900 font-bold border-l-2 border-blue-600'
-                                  : 'text-gray-600 hover:bg-gray-50'
-                              }`}
-                            >
-                              {sub.label}
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))
+                filteredSidebarItems.map((item) => {
+                  const hasSubItems = Boolean(item.subItems && item.subItems.length > 0);
+                  const isExpanded = expandedItemId === item.id && hasSubItems;
+                  const isParentActive = activeSidebarItem === item.id;
+
+                  return (
+                    <div key={item.id} className="flex flex-col">
+                      <button
+                        id={`sidebar-item-${item.id}`}
+                        onClick={() => {
+                          setSelectedDashboardDetail(null);
+                          setShowReviewWorkspace(false);
+                          setSelectedReviewRow(null);
+                          setShowForwardToTeacher(false);
+                          setShowImageLog(false);
+                          setActiveSidebarItem(item.id);
+                          setExpandedItemId(prev => prev === item.id ? null : item.id);
+                          if (hasSubItems) {
+                            setActiveSubItem(item.subItems![0].id);
+                          } else {
+                            setActiveSubItem(null);
+                          }
+                        }}
+                        className={`w-full text-left px-3.5 py-2 text-xs transition-all border flex items-center justify-between ${
+                          isExpanded
+                            ? 'rounded-t rounded-b-none bg-[#cccccc] text-gray-900 border-gray-300 font-semibold shadow-xs'
+                            : isParentActive
+                              ? 'rounded bg-[#cccccc] text-gray-900 border-gray-300 font-semibold shadow-xs'
+                              : 'rounded bg-[#f8f9fa] hover:bg-gray-200 text-gray-700 border-transparent hover:border-gray-300'
+                        }`}
+                      >
+                        <span className="truncate">{item.label}</span>
+                        {hasSubItems && (
+                          <ChevronDown 
+                            className={`w-3.5 h-3.5 text-gray-600 ml-1.5 flex-shrink-0 transition-transform duration-150 ${
+                              isExpanded ? 'rotate-180' : ''
+                            }`} 
+                          />
+                        )}
+                      </button>
+                      
+                      {/* Sub-items (Options) - completely gapless, flush with Menu */}
+                      <AnimatePresence>
+                        {isExpanded && item.subItems && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                            className="overflow-hidden border-x border-b border-gray-300 bg-white rounded-b -mt-[1px]"
+                          >
+                            <div className="flex flex-col divide-y divide-gray-100">
+                              {item.subItems.map((sub) => {
+                                const isSubActive = activeSubItem === sub.id;
+                                return (
+                                  <button
+                                    key={sub.id}
+                                    onClick={() => {
+                                      setSelectedDashboardDetail(null);
+                                      setShowReviewWorkspace(false);
+                                      setSelectedReviewRow(null);
+                                      setShowForwardToTeacher(false);
+                                      setShowImageLog(false);
+                                      setActiveSubItem(sub.id);
+                                    }}
+                                    className={`w-full text-left px-3.5 py-1.5 text-xs transition-colors rounded-none block border-l-4 ${
+                                      isSubActive
+                                        ? 'bg-blue-50 text-blue-900 font-bold border-l-blue-600'
+                                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-transparent'
+                                    }`}
+                                  >
+                                    {sub.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })
               ) : (
                 <div className="px-4 py-8 text-center text-gray-400 italic text-xs">
                   No items found
@@ -9530,57 +9941,77 @@ export default function App() {
 
                   {/* Sidebar list */}
                   <div className="flex-1 overflow-y-auto space-y-1.5">
-                    {filteredSidebarItems.map((item) => (
-                      <div key={item.id} className="space-y-1">
-                        <button
-                          onClick={() => {
-                            setSelectedDashboardDetail(null);
-                            setShowReviewWorkspace(false);
-                            setSelectedReviewRow(null);
-                            setShowForwardToTeacher(false);
-                            setShowImageLog(false);
-                            setActiveSidebarItem(item.id);
-                            setExpandedItemId(prev => prev === item.id ? null : item.id);
-                            if (item.subItems && item.subItems.length > 0) {
-                              setActiveSubItem(item.subItems[0].id);
-                            } else {
-                              setActiveSubItem(null);
-                            }
-                            if (!item.subItems) setIsMobileSidebarOpen(false);
-                          }}
-                          className={`w-full text-left px-3 py-2 text-xs rounded font-medium border ${
-                            activeSidebarItem === item.id
-                              ? 'bg-blue-50 text-blue-900 border-blue-200 font-bold'
-                              : 'bg-white hover:bg-gray-100 text-gray-700 border-transparent'
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                        {expandedItemId === item.id && item.subItems && (
-                          <div className="bg-white border border-gray-100 rounded pl-2.5 py-1 space-y-1">
-                            {item.subItems.map(sub => (
-                              <button
-                                key={sub.id}
-                                onClick={() => {
-                                  setSelectedDashboardDetail(null);
-                                  setShowReviewWorkspace(false);
-                                  setSelectedReviewRow(null);
-                                  setShowForwardToTeacher(false);
-                                  setShowImageLog(false);
-                                  setActiveSubItem(sub.id);
-                                  setIsMobileSidebarOpen(false);
-                                }}
-                                className={`w-full text-left px-2.5 py-1.5 text-xs rounded ${
-                                  activeSubItem === sub.id ? 'text-blue-700 font-bold bg-blue-50/50' : 'text-gray-600 hover:text-gray-900'
-                                }`}
-                              >
-                                {sub.label}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    {filteredSidebarItems.map((item) => {
+                      const hasSubItems = Boolean(item.subItems && item.subItems.length > 0);
+                      const isExpanded = expandedItemId === item.id && hasSubItems;
+                      const isParentActive = activeSidebarItem === item.id;
+
+                      return (
+                        <div key={item.id} className="flex flex-col">
+                          <button
+                            onClick={() => {
+                              setSelectedDashboardDetail(null);
+                              setShowReviewWorkspace(false);
+                              setSelectedReviewRow(null);
+                              setShowForwardToTeacher(false);
+                              setShowImageLog(false);
+                              setActiveSidebarItem(item.id);
+                              setExpandedItemId(prev => prev === item.id ? null : item.id);
+                              if (hasSubItems) {
+                                setActiveSubItem(item.subItems![0].id);
+                              } else {
+                                setActiveSubItem(null);
+                                setIsMobileSidebarOpen(false);
+                              }
+                            }}
+                            className={`w-full text-left px-3.5 py-2 text-xs transition-all border flex items-center justify-between font-medium ${
+                              isExpanded
+                                ? 'rounded-t rounded-b-none bg-[#cccccc] text-gray-900 border-gray-300 font-semibold'
+                                : isParentActive
+                                  ? 'rounded bg-[#cccccc] text-gray-900 border-gray-300 font-bold'
+                                  : 'rounded bg-white hover:bg-gray-100 text-gray-700 border-gray-200'
+                            }`}
+                          >
+                            <span className="truncate">{item.label}</span>
+                            {hasSubItems && (
+                              <ChevronDown 
+                                className={`w-3.5 h-3.5 text-gray-600 ml-1.5 flex-shrink-0 transition-transform duration-150 ${
+                                  isExpanded ? 'rotate-180' : ''
+                                }`} 
+                              />
+                            )}
+                          </button>
+                          {isExpanded && item.subItems && (
+                            <div className="bg-white border-x border-b border-gray-300 rounded-b -mt-[1px] flex flex-col divide-y divide-gray-100 overflow-hidden">
+                              {item.subItems.map(sub => {
+                                const isSubActive = activeSubItem === sub.id;
+                                return (
+                                  <button
+                                    key={sub.id}
+                                    onClick={() => {
+                                      setSelectedDashboardDetail(null);
+                                      setShowReviewWorkspace(false);
+                                      setSelectedReviewRow(null);
+                                      setShowForwardToTeacher(false);
+                                      setShowImageLog(false);
+                                      setActiveSubItem(sub.id);
+                                      setIsMobileSidebarOpen(false);
+                                    }}
+                                    className={`w-full text-left px-3.5 py-1.5 text-xs rounded-none border-l-4 transition-colors ${
+                                      isSubActive 
+                                        ? 'text-blue-900 font-bold bg-blue-50 border-l-blue-600' 
+                                        : 'text-gray-700 hover:bg-gray-50 border-l-transparent'
+                                    }`}
+                                  >
+                                    {sub.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </motion.aside>
               </>

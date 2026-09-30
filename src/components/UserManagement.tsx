@@ -59,7 +59,13 @@ const NAVIGATION_TREE: Record<string, { label: string; items: PermissionNode[] }
           { id: 'admin-review', label: 'Admin Review' },
           { id: 'exam-perm', label: 'Exam Permission' },
           { id: 'admin-review-req', label: 'Review Request' },
-          { id: 'teacher-user-perm', label: 'Assign Teacher User Permission' },
+        ]
+      },
+      {
+        id: 'script-eval',
+        label: 'Script Evaluation',
+        subItems: [
+          { id: 'view-assign-template', label: 'View Assign Template' },
         ]
       },
       {

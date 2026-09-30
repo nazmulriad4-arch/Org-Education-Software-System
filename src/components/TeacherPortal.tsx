@@ -51,6 +51,309 @@ interface TeacherPortalProps {
   currentUser?: any;
 }
 
+const initialEvaluationPaymentData = [
+  {
+    date: '18 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Khilgaon Udvash',
+    exam: '[121] Daily Exam For NDC English-03-04',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'English',
+    examType: 'SAQ',
+    subject: 'English',
+    quantity: 7,
+    amount: 2.80,
+    base: 0.00,
+    extra: 0.00,
+    total: 3.00,
+    approvalStatus: 'Pending',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '18 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Malibagh Udvash',
+    exam: '[121] Daily Exam For NDC English-03-04',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'English',
+    examType: 'SAQ',
+    subject: 'English',
+    quantity: 16,
+    amount: 6.40,
+    base: 0.00,
+    extra: 0.00,
+    total: 7.00,
+    approvalStatus: 'Pending',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '18 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Savar Udvash',
+    exam: '[121] Daily Exam For NDC English-03-04',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'English',
+    examType: 'SAQ',
+    subject: 'English',
+    quantity: 11,
+    amount: 4.40,
+    base: 0.00,
+    extra: 0.00,
+    total: 5.00,
+    approvalStatus: 'Approved',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '18 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Cumilla Udvash',
+    exam: '[121] Daily Exam For NDC English-03-04',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'English',
+    examType: 'SAQ',
+    subject: 'English',
+    quantity: 12,
+    amount: 4.80,
+    base: 0.00,
+    extra: 0.00,
+    total: 5.00,
+    approvalStatus: 'Pending',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '17 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Mirpur Udvash',
+    exam: '[122] Daily Exam For NDC Physics-01-02',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'Bangla',
+    examType: 'SAQ',
+    subject: 'Physics',
+    quantity: 14,
+    amount: 5.60,
+    base: 0.00,
+    extra: 0.00,
+    total: 6.00,
+    approvalStatus: 'Approved',
+    status: 'Paid',
+    payDate: '19 Jul, 2026'
+  },
+  {
+    date: '17 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Uttara Udvash',
+    exam: '[122] Daily Exam For NDC Physics-01-02',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'Bangla',
+    examType: 'SAQ',
+    subject: 'Physics',
+    quantity: 9,
+    amount: 3.60,
+    base: 0.00,
+    extra: 0.00,
+    total: 4.00,
+    approvalStatus: 'Pending',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '16 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Farmgate Udvash',
+    exam: '[123] Weekly Exam For NDC Chemistry-01',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'English',
+    examType: 'SAQ',
+    subject: 'Chemistry',
+    quantity: 20,
+    amount: 8.00,
+    base: 0.00,
+    extra: 0.00,
+    total: 8.00,
+    approvalStatus: 'Approved',
+    status: 'Paid',
+    payDate: '18 Jul, 2026'
+  },
+  {
+    date: '16 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Motijheel Udvash',
+    exam: '[123] Weekly Exam For NDC Chemistry-01',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'Bangla',
+    examType: 'SAQ',
+    subject: 'Chemistry',
+    quantity: 15,
+    amount: 6.00,
+    base: 0.00,
+    extra: 0.00,
+    total: 6.00,
+    approvalStatus: 'Approved',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '15 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Chawkbazar Udvash',
+    exam: '[124] Daily Exam For NDC Math-01',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'Bangla',
+    examType: 'SAQ',
+    subject: 'Math',
+    quantity: 18,
+    amount: 7.20,
+    base: 0.00,
+    extra: 0.00,
+    total: 7.50,
+    approvalStatus: 'Approved',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '15 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Sylhet Udvash',
+    exam: '[124] Daily Exam For NDC Math-01',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'English',
+    examType: 'SAQ',
+    subject: 'Math',
+    quantity: 10,
+    amount: 4.00,
+    base: 0.00,
+    extra: 0.00,
+    total: 4.00,
+    approvalStatus: 'Pending',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '14 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Rajshahi Udvash',
+    exam: '[125] Daily Exam For NDC Biology-01',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'Bangla',
+    examType: 'SAQ',
+    subject: 'Biology',
+    quantity: 13,
+    amount: 5.20,
+    base: 0.00,
+    extra: 0.00,
+    total: 5.50,
+    approvalStatus: 'Approved',
+    status: 'Paid',
+    payDate: '16 Jul, 2026'
+  },
+  {
+    date: '14 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Khulna Udvash',
+    exam: '[125] Daily Exam For NDC Biology-01',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'Bangla',
+    examType: 'SAQ',
+    subject: 'Biology',
+    quantity: 8,
+    amount: 3.20,
+    base: 0.00,
+    extra: 0.00,
+    total: 3.50,
+    approvalStatus: 'Pending',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '13 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Barishal Udvash',
+    exam: '[126] Model Test For NDC Bangla-01',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'Bangla',
+    examType: 'SAQ',
+    subject: 'Bangla',
+    quantity: 22,
+    amount: 8.80,
+    base: 0.00,
+    extra: 0.00,
+    total: 9.00,
+    approvalStatus: 'Approved',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '13 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Bogura Udvash',
+    exam: '[126] Model Test For NDC Bangla-01',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'Bangla',
+    examType: 'SAQ',
+    subject: 'Bangla',
+    quantity: 17,
+    amount: 6.80,
+    base: 0.00,
+    extra: 0.00,
+    total: 7.00,
+    approvalStatus: 'Approved',
+    status: 'Due',
+    payDate: '-'
+  },
+  {
+    date: '12 Jul, 2026',
+    session: 'CAP 2026',
+    course: 'NDC & SJC All Service',
+    branch: 'Mymensingh Udvash',
+    exam: '[127] Special SAQ Practice Exam',
+    qType: 'Normal',
+    evalType: 'Regular',
+    version: 'English',
+    examType: 'SAQ',
+    subject: 'General Science',
+    quantity: 25,
+    amount: 10.00,
+    base: 0.00,
+    extra: 0.00,
+    total: 10.00,
+    approvalStatus: 'Approved',
+    status: 'Paid',
+    payDate: '15 Jul, 2026'
+  }
+];
+
 export default function TeacherPortal({ 
   onBackToAdmin,
   adminForwardedRequests = [],
@@ -117,9 +420,10 @@ export default function TeacherPortal({
   const [evalPaymentStatus, setEvalPaymentStatus] = useState('All Status');
   const [evalPaymentStartDate, setEvalPaymentStartDate] = useState('2026-07-12');
   const [evalPaymentEndDate, setEvalPaymentEndDate] = useState('2026-07-19');
+  const [evalDisplayPerPage, setEvalDisplayPerPage] = useState('10');
   const [isEvalFilterExpanded, setIsEvalFilterExpanded] = useState(true);
   const [isEvalSearching, setIsEvalSearching] = useState(false);
-  const [evalSearchResults, setEvalSearchResults] = useState<any[]>([]);
+  const [evalSearchResults, setEvalSearchResults] = useState<any[]>(initialEvaluationPaymentData);
 
   // Canvas Drawing State for Script Review
   const [activeDrawingTool, setActiveDrawingTool] = useState("pencil");
@@ -1216,7 +1520,7 @@ export default function TeacherPortal({
                     <tr className="bg-gray-50 text-gray-700">
                       <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Payment Type</th>
                       <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Approved Amount</th>
-                      <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Pending Amount</th>
+                      <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Approval Pending Amount</th>
                       <th className="border border-gray-200 px-4 py-3 text-center font-bold w-1/4">Total Due</th>
                     </tr>
                   </thead>
@@ -1402,6 +1706,18 @@ export default function TeacherPortal({
                             className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50/50"
                           />
                         </div>
+                        {/* Display Per Page Filter Option (No red box, clean standard row with red text) */}
+                        <div className="grid grid-cols-3 items-center gap-4">
+                          <label className="text-xs font-bold text-red-600 text-right">Display Per Page</label>
+                          <input 
+                            type="number"
+                            min="1"
+                            value={evalDisplayPerPage}
+                            onChange={(e) => setEvalDisplayPerPage(e.target.value)}
+                            placeholder="e.g. 10"
+                            className="col-span-2 border border-gray-300 rounded px-3 py-1.5 text-xs text-red-600 font-bold focus:outline-none focus:ring-1 focus:ring-red-500"
+                          />
+                        </div>
                       </div>
 
                       {/* Right Column */}
@@ -1456,92 +1772,10 @@ export default function TeacherPortal({
                       <button 
                         onClick={() => {
                           setIsEvalSearching(true);
-                          // Mock search delay and results
                           setTimeout(() => {
-                            setEvalSearchResults([
-                              {
-                                date: '18 Jul, 2026',
-                                session: 'CAP 2026',
-                                course: 'NDC & SJC All Service',
-                                branch: 'Khilgaon Udvash',
-                                exam: '[121] Daily Exam For NDC English-03-04',
-                                qType: 'Normal',
-                                evalType: 'Regular',
-                                version: 'English',
-                                examType: 'SAQ',
-                                subject: 'English',
-                                quantity: 7,
-                                amount: 2.80,
-                                base: 0.00,
-                                extra: 0.00,
-                                total: 3.00,
-                                approvalStatus: 'Pending',
-                                status: 'Due',
-                                payDate: '-'
-                              },
-                              {
-                                date: '18 Jul, 2026',
-                                session: 'CAP 2026',
-                                course: 'NDC & SJC All Service',
-                                branch: 'Malibagh Udvash',
-                                exam: '[121] Daily Exam For NDC English-03-04',
-                                qType: 'Normal',
-                                evalType: 'Regular',
-                                version: 'English',
-                                examType: 'SAQ',
-                                subject: 'English',
-                                quantity: 16,
-                                amount: 6.40,
-                                base: 0.00,
-                                extra: 0.00,
-                                total: 7.00,
-                                approvalStatus: 'Pending',
-                                status: 'Due',
-                                payDate: '-'
-                              },
-                              {
-                                date: '18 Jul, 2026',
-                                session: 'CAP 2026',
-                                course: 'NDC & SJC All Service',
-                                branch: 'Savar Udvash',
-                                exam: '[121] Daily Exam For NDC English-03-04',
-                                qType: 'Normal',
-                                evalType: 'Regular',
-                                version: 'English',
-                                examType: 'SAQ',
-                                subject: 'English',
-                                quantity: 11,
-                                amount: 4.40,
-                                base: 0.00,
-                                extra: 0.00,
-                                total: 5.00,
-                                approvalStatus: 'Approved',
-                                status: 'Due',
-                                payDate: '-'
-                              },
-                              {
-                                date: '18 Jul, 2026',
-                                session: 'CAP 2026',
-                                course: 'NDC & SJC All Service',
-                                branch: 'Cumilla Udvash',
-                                exam: '[121] Daily Exam For NDC English-03-04',
-                                qType: 'Normal',
-                                evalType: 'Regular',
-                                version: 'English',
-                                examType: 'SAQ',
-                                subject: 'English',
-                                quantity: 12,
-                                amount: 4.80,
-                                base: 0.00,
-                                extra: 0.00,
-                                total: 5.00,
-                                approvalStatus: 'Pending',
-                                status: 'Due',
-                                payDate: '-'
-                              }
-                            ]);
+                            setEvalSearchResults(initialEvaluationPaymentData);
                             setIsEvalSearching(false);
-                          }, 600);
+                          }, 400);
                         }}
                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-2 rounded text-xs transition-colors shadow-sm"
                       >
@@ -1553,64 +1787,88 @@ export default function TeacherPortal({
               </div>
 
               {/* Results Table Section (Matches Screenshot 1 & 2) */}
-              {evalSearchResults.length > 0 && (
-                <div className="bg-white rounded border border-gray-200 overflow-hidden shadow-xs">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-[11px] font-sans border-collapse">
-                      <thead>
-                        <tr className="bg-white text-gray-700 border-b border-gray-200">
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Date</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Program Session</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Course</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Branch</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">[Code] Exam</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Script Question Type</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Type</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Script Version</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Exam Type</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Subject</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Total Quantity</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Amount</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Base Amount</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Extra Amount</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Total Amount</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Approval Status</th>
-                          <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Payment Status</th>
-                          <th className="px-3 py-4 font-bold text-center">Payment Date</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {evalSearchResults.map((row, idx) => (
-                          <tr key={idx} className="hover:bg-gray-50/50">
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.date}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.session}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.course}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.branch}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.exam}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.qType}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.evalType}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.version}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.examType}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.subject}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.quantity}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.amount.toFixed(2)}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.base.toFixed(2)}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.extra.toFixed(2)}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-bold">{row.total.toFixed(2)}</td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100">
-                              <span className={`font-bold ${row.approvalStatus === 'Approved' ? 'text-green-600' : 'text-orange-500'}`}>{row.approvalStatus}</span>
-                            </td>
-                            <td className="px-3 py-4 text-center border-r border-gray-100">
-                              <span className={`font-bold ${row.status === 'Paid' ? 'text-green-600' : 'text-gray-600'}`}>{row.status}</span>
-                            </td>
-                            <td className="px-3 py-4 text-center text-gray-600">{row.payDate}</td>
+              {(() => {
+                const perPageNum = parseInt(evalDisplayPerPage, 10);
+                const displayedEvalResults = (!isNaN(perPageNum) && perPageNum > 0)
+                  ? evalSearchResults.slice(0, perPageNum)
+                  : evalSearchResults;
+
+                return evalSearchResults.length > 0 ? (
+                  <div className="bg-white rounded border border-gray-200 overflow-hidden shadow-xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[11px] font-sans border-collapse">
+                        <thead>
+                          <tr className="bg-white text-gray-700 border-b border-gray-200">
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Date</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Program Session</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Course</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Branch</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">[Code] Exam</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Script Question Type</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Type</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Script Version</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Exam Type</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Subject</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Total Quantity</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Evaluation Amount</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Base Amount</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Extra Amount</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Total Amount</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Approval Status</th>
+                            <th className="px-3 py-4 font-bold border-r border-gray-100 text-center">Payment Status</th>
+                            <th className="px-3 py-4 font-bold text-center">Payment Date</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {displayedEvalResults.map((row, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50/50">
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.date}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.session}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.course}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.branch}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.exam}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.qType}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.evalType}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.version}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.examType}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600">{row.subject}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.quantity}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.amount.toFixed(2)}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.base.toFixed(2)}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-medium">{row.extra.toFixed(2)}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100 text-gray-600 font-bold">{row.total.toFixed(2)}</td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100">
+                                <span className={`font-bold ${row.approvalStatus === 'Approved' ? 'text-green-600' : 'text-orange-500'}`}>{row.approvalStatus}</span>
+                              </td>
+                              <td className="px-3 py-4 text-center border-r border-gray-100">
+                                <span className={`font-bold ${row.status === 'Paid' ? 'text-green-600' : 'text-gray-600'}`}>{row.status}</span>
+                              </td>
+                              <td className="px-3 py-4 text-center text-gray-600">{row.payDate}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Table Footer with Display Per Page input */}
+                    <div className="bg-gray-50 border-t border-gray-200 px-4 py-3 flex items-center justify-between text-xs text-gray-600">
+                      <div>
+                        Showing <strong>{displayedEvalResults.length}</strong> of <strong>{evalSearchResults.length}</strong> rows
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-600 font-bold">Display Per Page:</span>
+                        <input 
+                          type="number" 
+                          min="1" 
+                          value={evalDisplayPerPage} 
+                          onChange={(e) => setEvalDisplayPerPage(e.target.value)} 
+                          className="w-16 border border-gray-300 rounded px-2 py-0.5 text-center font-bold text-red-600 bg-white focus:outline-none focus:ring-1 focus:ring-red-500"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : null;
+              })()}
             </motion.div>
           )}
 
@@ -1674,272 +1932,48 @@ export default function TeacherPortal({
             </motion.div>
           )}
 
-          {/* 10. CLASS PERFORMANCE */}
+          {/* 10. CLASS PERFORMANCE - Kept blank as requested */}
           {activeTab === 'class-performance' && (
             <motion.div 
               key="class-performance"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="space-y-6 text-left"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-xs text-center">
-                  <span className="text-[11px] font-bold text-gray-400 block uppercase font-sans">Teacher Rating</span>
-                  <div className="text-3xl font-black text-[#ff9800] mt-2 flex items-center justify-center gap-1 font-mono">
-                    4.92
-                    <Star className="w-6 h-6 fill-[#ff9800] text-[#ff9800]" />
-                  </div>
-                  <span className="text-[10px] text-gray-500 font-sans block mt-1.5">Based on 342 student evaluations</span>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-xs text-center">
-                  <span className="text-[11px] font-bold text-gray-400 block uppercase font-sans">Total Lectures Taken</span>
-                  <div className="text-3xl font-black text-[#002d5b] mt-2 font-mono">
-                    ৮৪ টি
-                  </div>
-                  <span className="text-[10px] text-gray-500 font-sans block mt-1.5">Across 4 separate subjects</span>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-xs text-center">
-                  <span className="text-[11px] font-bold text-gray-400 block uppercase font-sans">Class Active Rate</span>
-                  <div className="text-3xl font-black text-emerald-600 mt-2 font-mono">
-                    96.5%
-                  </div>
-                  <span className="text-[10px] text-gray-500 font-sans block mt-1.5">Student positive feedback score</span>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-xs text-center">
-                  <span className="text-[11px] font-bold text-gray-400 block uppercase font-sans">Student Doubts Solved</span>
-                  <div className="text-3xl font-black text-purple-700 mt-2 font-mono">
-                    ১৮৬ টি
-                  </div>
-                  <span className="text-[10px] text-gray-500 font-sans block mt-1.5">Fast-track response rate: 94%</span>
-                </div>
-              </div>
-
-              {/* Student comments */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-sm font-bold text-[#002d5b] border-b border-gray-100 pb-3 mb-4 font-sans">Recent Student Testimonials & Feedback</h3>
-                <div className="space-y-4">
-                  <div className="p-4 bg-[#faf9fc] rounded-lg border border-gray-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-[#002d5b] font-sans">Engineering Chemistry Learner</span>
-                      <div className="flex items-center gap-0.5 text-amber-500">
-                        <Star className="w-3 h-3 fill-amber-400" />
-                        <Star className="w-3 h-3 fill-amber-400" />
-                        <Star className="w-3 h-3 fill-amber-400" />
-                        <Star className="w-3 h-3 fill-amber-400" />
-                        <Star className="w-3 h-3 fill-amber-400" />
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 font-sans">"ভাইয়ার জটিল সমীকরণগুলোকে সহজ উদাহরণ দিয়ে বুঝিয়ে দেওয়ার স্টাইলটা চমৎকার! বিশেষ করে তড়িৎ রসায়নের Z এর মানের অংকগুলো এখন একদম ক্লিয়ার।"</p>
-                  </div>
-
-                  <div className="p-4 bg-[#faf9fc] rounded-lg border border-gray-100">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-bold text-[#002d5b] font-sans">Weekly test examinee (Physics)</span>
-                      <div className="flex items-center gap-0.5 text-amber-500">
-                        <Star className="w-3 h-3 fill-amber-400" />
-                        <Star className="w-3 h-3 fill-amber-400" />
-                        <Star className="w-3 h-3 fill-amber-400" />
-                        <Star className="w-3 h-3 fill-amber-400" />
-                        <Star className="w-3 h-3 fill-amber-400" />
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 font-sans">"আমার খাতায় ভুল চিহ্নিত করার সাথে সুন্দরভাবে সঠিক রেফারেন্সটা লিখে দিয়েছেন। অনেক উপকৃত হয়েছি!"</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="min-h-[400px]"
+            />
           )}
 
-          {/* 11. QUESTION & ANSWER - PENDING QUESTION */}
+          {/* 11. QUESTION & ANSWER - PENDING QUESTION - Kept blank as requested */}
           {activeTab === 'pending-question' && (
             <motion.div 
               key="pending-question"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="space-y-6 text-left"
-            >
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="border-b border-gray-100 pb-3 mb-4">
-                  <h2 className="text-base font-extrabold text-[#002d5b] font-sans">Student Pending Doubts & Questions</h2>
-                  <p className="text-xs text-gray-500 font-medium font-sans">প্রশ্নগুলোর সহজ ও সঠিক সমাধান প্রদান করে ছাত্রদের সাহায্য করুন।</p>
-                </div>
-
-                {pendingQuestions.filter(q => !q.isAnswered).length === 0 ? (
-                  <div className="text-center py-8 text-gray-400 font-medium font-sans">
-                    সব প্রশ্নের উত্তর দেওয়া হয়েছে! অসাধারণ!
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {pendingQuestions.filter(q => !q.isAnswered).map(q => (
-                      <div key={q.id} className="border border-purple-100 rounded-lg p-5 bg-[#faf8ff] hover:shadow-2xs transition-shadow">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="bg-purple-100 text-purple-950 font-mono font-bold text-[10.5px] px-2 py-0.5 rounded">
-                            {q.id} &bull; {q.subject}
-                          </span>
-                          <span className="text-[10.5px] text-gray-400 font-mono">{q.submittedDate}</span>
-                        </div>
-                        <p className="text-[13px] text-gray-800 font-sans font-medium bg-white p-4 rounded border border-gray-200 leading-relaxed mb-4 shadow-3xs">
-                          {q.questionText}
-                        </p>
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-gray-500">Student: <strong>{q.studentName}</strong></span>
-                          <button 
-                            onClick={() => {
-                              setAnsweringQuestion(q);
-                              setAnswerInput('');
-                            }}
-                            className="bg-[#7e22ce] hover:bg-[#6b1cb2] text-white font-bold px-4 py-2 rounded text-xs tracking-wide shadow-xs transition-colors cursor-pointer"
-                          >
-                            Answer Question
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="min-h-[400px]"
+            />
           )}
 
-          {/* 12. QUESTION & ANSWER - EDIT ANSWER */}
+          {/* 12. QUESTION & ANSWER - EDIT ANSWER - Kept blank as requested */}
           {activeTab === 'edit-answer' && (
             <motion.div 
               key="edit-answer"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="space-y-6 text-left"
-            >
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="border-b border-gray-100 pb-3 mb-4">
-                  <h2 className="text-base font-extrabold text-[#002d5b] font-sans">Edit / Review Submitted Answers</h2>
-                  <p className="text-xs text-gray-500 font-medium font-sans">আপনার ইতিমধ্যে প্রদানকৃত উত্তরগুলোতে কোনো সংযোজন-বিয়োজন বা পরিমার্জন থাকলে এডিট করুন।</p>
-                </div>
-
-                {pendingQuestions.filter(q => q.isAnswered).length === 0 ? (
-                  <div className="text-center py-8 text-gray-400 font-medium font-sans">
-                    এখনো কোনো উত্তর প্রদান করা হয়নি।
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {pendingQuestions.filter(q => q.isAnswered).map(q => (
-                      <div key={q.id} className="border border-gray-200 rounded-lg p-5 bg-white shadow-2xs">
-                        <div className="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
-                          <span className="bg-gray-100 text-gray-800 font-mono font-bold text-[10.5px] px-2 py-0.5 rounded">
-                            {q.id} &bull; {q.subject}
-                          </span>
-                          <span className="text-[11px] text-green-600 font-bold flex items-center gap-1">
-                            <CheckCircle className="w-3.5 h-3.5" /> Answered
-                          </span>
-                        </div>
-                        
-                        <div className="space-y-3 mb-4">
-                          <div className="text-xs">
-                            <span className="font-bold text-gray-400 block mb-1 uppercase tracking-wide">Question</span>
-                            <p className="text-gray-700 bg-gray-50/50 p-3 rounded italic">{q.questionText}</p>
-                          </div>
-                          
-                          <div className="text-xs">
-                            <span className="font-bold text-purple-400 block mb-1 uppercase tracking-wide">Your Solution</span>
-                            <p className="text-gray-800 bg-purple-50/20 p-3 rounded border border-purple-50 font-sans leading-relaxed">{q.answerText}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-end">
-                          <button 
-                            onClick={() => {
-                              setAnsweringQuestion(q);
-                              setAnswerInput(q.answerText);
-                            }}
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-1.5 rounded text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-gray-200"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                            Edit Response
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="min-h-[400px]"
+            />
           )}
 
-          {/* 13. COMMUNITY TAB */}
+          {/* 13. COMMUNITY TAB - Kept blank as requested */}
           {activeTab === 'community' && (
             <motion.div 
               key="community"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="space-y-6 text-left"
-            >
-              {/* Write Post Box */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-                <h2 className="text-base font-extrabold text-[#7e22ce] mb-3 font-sans">Teacher Community Discussion Board</h2>
-                <form onSubmit={handleCreatePost} className="space-y-3">
-                  <textarea 
-                    value={newPostText}
-                    onChange={(e) => setNewPostText(e.target.value)}
-                    placeholder="উদ্ভাস-উন্মেষ শিক্ষক ফোরামে কিছু শেয়ার করুন... (যেমন: পরীক্ষা সংক্রান্ত নোটিস, সলভ সংক্রান্ত ডাউট ইত্যাদি)"
-                    className="w-full min-h-[80px] border border-gray-200 rounded-md p-3 text-xs font-sans text-gray-800 bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y"
-                  />
-                  <div className="flex justify-end">
-                    <button 
-                      type="submit"
-                      disabled={!newPostText.trim()}
-                      className="bg-[#7e22ce] hover:bg-[#6b1cb2] disabled:opacity-40 text-white font-bold text-xs px-6 py-2 rounded shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <Send className="w-3.5 h-3.5" /> Post Announcement
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {/* Feed List */}
-              <div className="space-y-4">
-                {communityPosts.map(post => (
-                  <div key={post.id} className="bg-white rounded-lg border border-gray-200 p-6 shadow-xs hover:shadow-xs transition-shadow">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2.5">
-                        <div className="w-8 h-8 rounded-full bg-purple-50 text-[#7e22ce] flex items-center justify-center font-bold text-sm border border-purple-100">
-                          {post.author[0]}
-                        </div>
-                        <div>
-                          <strong className="text-xs text-gray-800 block leading-tight">{post.author}</strong>
-                          <span className="text-[10px] text-gray-500 font-medium font-sans block">{post.role}</span>
-                        </div>
-                      </div>
-                      <span className="text-[10px] text-gray-400 font-mono">{post.date}</span>
-                    </div>
-
-                    <p className="text-xs text-gray-700 font-sans leading-relaxed whitespace-pre-wrap mb-4">
-                      {post.content}
-                    </p>
-
-                    <div className="flex items-center space-x-6 text-xs text-gray-500 border-t border-gray-100 pt-3">
-                      <button 
-                        onClick={() => handleLikePost(post.id)}
-                        className={`flex items-center space-x-1.5 font-sans font-bold cursor-pointer transition-colors ${
-                          post.hasLiked ? 'text-purple-600' : 'hover:text-gray-800'
-                        }`}
-                      >
-                        <ThumbsUp className={`w-3.5 h-3.5 ${post.hasLiked ? 'fill-purple-100' : ''}`} />
-                        <span>{post.likes} Likes</span>
-                      </button>
-                      <span className="font-sans font-bold">
-                        {post.comments} Comments
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="min-h-[400px]"
+            />
           )}
 
         </AnimatePresence>
