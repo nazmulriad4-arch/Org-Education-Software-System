@@ -56,6 +56,7 @@ import TeacherPortal from './components/TeacherPortal';
 import UserManagementPanel from './components/UserManagement';
 import PasswordChange from './components/PasswordChange';
 import ViewAssignTemplate from './components/ViewAssignTemplate';
+import { DateTimePicker } from './components/DateTimePicker';
 import { dbGetItems, dbSaveItem, dbDeleteItem } from './services/firebase';
 
 // --- Types ---
@@ -1820,8 +1821,8 @@ export default function App() {
     questionSerial: 'All',
     examType: 'All Exam Type',
     examiner: '',
-    startDate: '2026-07-04',
-    endDate: '2026-07-04',
+    startDate: '2026-07-04 12:00 AM',
+    endDate: '2026-07-04 11:59 PM',
     noOfRows: '100',
     orderBy: 'All'
   });
@@ -1849,7 +1850,7 @@ export default function App() {
       avgEvaluationTime: "00:18",
       reportType: "Summary",
       organization: "UDVASH",
-      dateTime: "2026-07-04",
+      dateTime: "2026-07-04 10:15 AM",
       uniqueSet: "Set A",
       questionSerial: "Q1",
       examinerName: "Md Jahangir Alam",
@@ -1857,59 +1858,59 @@ export default function App() {
     },
     {
       id: "EVR-002",
-      program: "CAP 2026",
+      program: "VAP 'KA'",
       session: "2026",
-      course: "NDC & SJC All Service",
-      examCode: "107",
-      examName: "Daily Exam For NDC Chemistry-05-06",
+      course: "Varsity 'KA' Offline Exam 2025",
+      examCode: "126",
+      examName: "VAP KA Daily MCQ and Written Exam HM-06",
       examType: "Templated Written",
       totalParticipant: 1,
       mcqSubmitted: 1,
       writtenSubmitted: 1,
-      writtenEvaluated: 0,
+      writtenEvaluated: 1,
       blankScript: 0,
-      writtenPending: 5,
+      writtenPending: 4,
       reviewRequest: 0,
       reviewPending: 0,
-      totalEvaluationTime: "-",
-      maxEvaluationTime: "-",
-      minEvaluationTime: "-",
-      avgEvaluationTime: "-",
+      totalEvaluationTime: "00:45",
+      maxEvaluationTime: "00:45",
+      minEvaluationTime: "00:45",
+      avgEvaluationTime: "00:45",
       reportType: "Summary",
       organization: "UDVASH",
-      dateTime: "2026-07-04",
+      dateTime: "2026-07-04 11:20 AM",
       uniqueSet: "Set B",
       questionSerial: "Q2",
       examinerName: "Al Jubair Hasan",
-      status: "Pending"
+      status: "Evaluated"
     },
     {
       id: "EVR-003",
-      program: "CAP 2026",
+      program: "VAP 'KA'",
       session: "2026",
-      course: "NDC & SJC All Service",
-      examCode: "103",
-      examName: "Daily Exam For NDC Physics-05-06",
+      course: "Varsity 'KA' Offline Exam 2025",
+      examCode: "106",
+      examName: "VAP KA Daily MCQ and Written Exam P-06",
       examType: "Templated Written",
       totalParticipant: 30,
       mcqSubmitted: 30,
       writtenSubmitted: 30,
-      writtenEvaluated: 0,
-      blankScript: 18,
-      writtenPending: 131,
+      writtenEvaluated: 28,
+      blankScript: 2,
+      writtenPending: 103,
       reviewRequest: 0,
       reviewPending: 0,
-      totalEvaluationTime: "-",
-      maxEvaluationTime: "-",
-      minEvaluationTime: "-",
-      avgEvaluationTime: "-",
+      totalEvaluationTime: "08:15",
+      maxEvaluationTime: "01:20",
+      minEvaluationTime: "00:08",
+      avgEvaluationTime: "00:18",
       reportType: "Summary",
       organization: "UNMESH",
-      dateTime: "2026-07-04",
+      dateTime: "2026-07-04 02:45 PM",
       uniqueSet: "Set A",
       questionSerial: "Q3",
       examinerName: "Md Al Amin",
-      status: "Pending"
+      status: "Evaluated"
     },
     {
       id: "EVR-004",
@@ -1922,22 +1923,22 @@ export default function App() {
       totalParticipant: 43,
       mcqSubmitted: 43,
       writtenSubmitted: 43,
-      writtenEvaluated: 0,
+      writtenEvaluated: 43,
       blankScript: 0,
-      writtenPending: 215,
+      writtenPending: 172,
       reviewRequest: 0,
       reviewPending: 0,
-      totalEvaluationTime: "-",
-      maxEvaluationTime: "-",
-      minEvaluationTime: "-",
-      avgEvaluationTime: "-",
+      totalEvaluationTime: "11:20",
+      maxEvaluationTime: "02:10",
+      minEvaluationTime: "00:10",
+      avgEvaluationTime: "00:16",
       reportType: "Summary",
       organization: "UDVASH",
-      dateTime: "2026-07-04",
+      dateTime: "2026-07-04 04:30 PM",
       uniqueSet: "Set A",
       questionSerial: "Q4",
       examinerName: "M. Nazmul Alam",
-      status: "Pending"
+      status: "Evaluated"
     },
     {
       id: "EVR-005",
@@ -1961,7 +1962,7 @@ export default function App() {
       avgEvaluationTime: "00:20",
       reportType: "Subject Wise Summary",
       organization: "UDVASH",
-      dateTime: "2026-07-04",
+      dateTime: "2026-07-04 01:10 PM",
       uniqueSet: "Set A",
       questionSerial: "Q1-Q5",
       examinerName: "Md Jahangir Alam",
@@ -1989,7 +1990,7 @@ export default function App() {
       avgEvaluationTime: "00:05",
       reportType: "Teacher Wise Summary",
       organization: "UNMESH",
-      dateTime: "2026-07-04",
+      dateTime: "2026-07-04 05:25 PM",
       uniqueSet: "Set A",
       questionSerial: "Q1-Q10",
       examinerName: "Al Jubair Hasan",
@@ -2017,7 +2018,7 @@ export default function App() {
       avgEvaluationTime: "00:35",
       reportType: "Teacher Subject Question Wise Summary",
       organization: "UDVASH",
-      dateTime: "2026-07-03",
+      dateTime: "2026-07-03 03:30 PM",
       uniqueSet: "Set A",
       questionSerial: "Q5",
       examinerName: "Md Al Amin",
@@ -2045,7 +2046,7 @@ export default function App() {
       avgEvaluationTime: "00:35",
       reportType: "Teacher Subject Wise Summary",
       organization: "UDVASH",
-      dateTime: "2026-07-03",
+      dateTime: "2026-07-03 04:45 PM",
       uniqueSet: "Set A",
       questionSerial: "Q5",
       examinerName: "Md Al Amin",
@@ -2081,8 +2082,8 @@ export default function App() {
     examType: 'All Exam Type',
     version: 'All Version',
     questionSerial: 'All Question Serial',
-    startDate: '2026-07-02',
-    endDate: '2026-07-04',
+    startDate: '2026-07-02 12:00 AM',
+    endDate: '2026-07-04 11:59 PM',
     examiner: '',
     uniqueSet: 'All Unique Set',
     minMarks: '',
@@ -2368,7 +2369,7 @@ export default function App() {
 
         // 6. Evaluation Reports
         const dbEvalReports = await dbGetItems('evaluation_reports');
-        const hasOldSchema = dbEvalReports.length > 0 && !('totalParticipant' in dbEvalReports[0]);
+        const hasOldSchema = dbEvalReports.length > 0 && (!('totalParticipant' in dbEvalReports[0]) || dbEvalReports.some(e => e.totalEvaluationTime === '-'));
         if (dbEvalReports.length === 0 || hasOldSchema) {
           if (hasOldSchema) {
             for (const item of dbEvalReports) {
@@ -2380,7 +2381,16 @@ export default function App() {
             await dbSaveItem('evaluation_reports', evr.id, evr);
           }
         } else {
-          setEvaluationReports(dbEvalReports);
+          const updated = dbEvalReports.map(item => {
+            if (item.id === 'EVR-002' && item.examCode !== '126') {
+              return { ...item, examCode: '126', examName: 'VAP KA Daily MCQ and Written Exam HM-06', course: "Varsity 'KA' Offline Exam 2025", program: "VAP 'KA'" };
+            }
+            if (item.id === 'EVR-003' && item.examCode !== '106') {
+              return { ...item, examCode: '106', examName: 'VAP KA Daily MCQ and Written Exam P-06', course: "Varsity 'KA' Offline Exam 2025", program: "VAP 'KA'" };
+            }
+            return item;
+          });
+          setEvaluationReports(updated);
         }
 
         setIsDbLoaded(true);
@@ -4636,13 +4646,12 @@ export default function App() {
               <table className="w-full border-collapse text-[11.5px] font-sans">
                 <thead>
                   <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-200">
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[20%]">Teacher</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[24%]">Course [Program-Session]</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[14%]">Subject</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[18%]">Exam</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[22%]">Teacher</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[26%]">Course [Program-Session]</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[16%]">Subject</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[20%]">Exam</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[8%]">Review Requests</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[10%]">Pending From</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[11%]">Examiner Status</th>
+                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[8%]">Pending From</th>
                     <th className="px-3 py-2.5 text-center w-[5%]">Action</th>
                   </tr>
                 </thead>
@@ -4658,17 +4667,6 @@ export default function App() {
                       <td className="border-r border-gray-200 px-3 py-3 text-gray-700">{req.exam}</td>
                       <td className="border-r border-gray-200 px-2.5 py-3 text-center font-bold text-gray-800 font-mono">{req.requests}</td>
                       <td className="border-r border-gray-200 px-2.5 py-3 text-center text-gray-600 font-mono">{req.pending}</td>
-                      <td className="border-r border-gray-200 px-2.5 py-3 text-center">
-                        {examinerReviewPermissions[req.examiner.id] !== false ? (
-                          <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded text-[10px] font-bold">
-                            Permitted
-                          </span>
-                        ) : (
-                          <span className="inline-block bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded text-[10px] font-bold">
-                            Not Permitted
-                          </span>
-                        )}
-                      </td>
                       <td className="px-3 py-3 text-center">
                         <button 
                           onClick={() => {
@@ -4709,7 +4707,7 @@ export default function App() {
                   <tr className="bg-[#f1f3f5] font-bold">
                     <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total</td>
                     <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono">{reviewRequests.length}</td>
-                    <td className="px-3 py-2" colSpan={3}></td>
+                    <td className="px-3 py-2" colSpan={2}></td>
                   </tr>
                 </tbody>
               </table>
@@ -4744,18 +4742,17 @@ export default function App() {
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[8%]">Subject</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Exam</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[13%]">Admin Note</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[8%]">Unique Set and Question Serial</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[10%]">Reviewed By:</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[5%]">Review Scripts</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[10%]">Examiner Status</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[6%]">Pending From</th>
+                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[9%]">Unique Set and Question Serial</th>
+                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[12%]">Reviewed By:</th>
+                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[6%]">Review Scripts</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[8%]">Pending From</th>
                     <th className="px-3 py-2.5 text-center w-[7%]">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {dashboardAdminRequests.length === 0 ? (
                     <tr>
-                      <td colSpan={11} className="px-3 py-5 text-center text-gray-400 font-medium italic">
+                      <td colSpan={10} className="px-3 py-5 text-center text-gray-400 font-medium italic">
                         No forwarded reviews at this moment.
                       </td>
                     </tr>
@@ -4798,17 +4795,6 @@ export default function App() {
                           <span className="inline-flex items-center justify-center bg-red-100 text-red-800 px-2.5 py-0.5 rounded font-extrabold font-mono text-[10.5px] border border-red-200/60 shadow-3xs">
                             {req.isMultiple ? `${req.checkedScriptsCount}/${req.totalScriptsCount}` : (req.reviewCount || 1)}
                           </span>
-                        </td>
-                        <td className="border-r border-gray-200 px-2.5 py-3 text-center">
-                          {examinerReviewPermissions[req.examiner.id] !== false ? (
-                            <span className="inline-block bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded text-[10px] font-bold">
-                              Permitted
-                            </span>
-                          ) : (
-                            <span className="inline-block bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-0.5 rounded text-[10px] font-bold">
-                              Not Permitted
-                            </span>
-                          )}
                         </td>
                         <td className="border-r border-gray-200 px-3 py-3 text-center">
                           {req.status === 'Resolved by Teacher' || req.status === 'Completed' || req.status === 'Reviewed' || req.status === 'Resolved' || (req.isMultiple && req.checkedScriptsCount >= req.totalScriptsCount) ? (
@@ -4876,7 +4862,7 @@ export default function App() {
                       <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono" colSpan={4}>
                         {dashboardAdminRequests.length}
                       </td>
-                      <td className="px-3 py-2" colSpan={3}></td>
+                      <td className="px-3 py-2" colSpan={2}></td>
                     </tr>
                   )}
                 </tbody>
@@ -5881,9 +5867,17 @@ export default function App() {
                               className="w-full bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none pr-8 cursor-pointer font-sans"
                             >
                               <option>Select Session</option>
+                              <option>2028</option>
+                              <option>2027</option>
                               <option>2026</option>
                               <option>2025</option>
                               <option>2024</option>
+                              <option>2023</option>
+                              <option>2022</option>
+                              <option>2021</option>
+                              <option>2020</option>
+                              <option>2019</option>
+                              <option>2018</option>
                             </select>
                             <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                           </div>
@@ -5920,8 +5914,8 @@ export default function App() {
                               className="w-full bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none pr-8 cursor-pointer font-sans"
                             >
                               <option>All</option>
-                              <option>Yes</option>
-                              <option>No</option>
+                              <option>Has Permission</option>
+                              <option>No Permission</option>
                             </select>
                             <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                           </div>
@@ -5956,9 +5950,25 @@ export default function App() {
                               className="w-full bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none pr-8 cursor-pointer font-sans"
                             >
                               <option>Select Program</option>
-                              <option>Varsity 'KA' Admission Program</option>
                               <option>Engineering Admission Program</option>
+                              <option>Varsity 'KA' Admission Program</option>
+                              <option>Varsity 'KHA' Admission Program</option>
+                              <option>College Admission Program</option>
+                              <option>SSC Model Test</option>
                               <option>HSC Model Test</option>
+                              <option>HSC Bangla-English Full Program</option>
+                              <option>Class 12 Academic Program</option>
+                              <option>Class 11 Academic Program</option>
+                              <option>Class 10 Academic Program</option>
+                              <option>Class 10 Bangla-English Program</option>
+                              <option>Class 9 Academic Program</option>
+                              <option>Class 9 Bangla-English Program</option>
+                              <option>HSC Bangla-English Special Program</option>
+                              <option>Class 8 Bangla-English Full Course (Online)</option>
+                              <option>HSC Science Foundation Program</option>
+                              <option>HSC 1st Year Basic Course (Top 100 Topics)</option>
+                              <option>HSC ICT Program</option>
+                              <option>Class 9-10 Bangla-English Full Course</option>
                             </select>
                             <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                           </div>
@@ -5995,6 +6005,7 @@ export default function App() {
                               <option>All</option>
                               <option>Bangla</option>
                               <option>English</option>
+                              <option>Not Set Yet</option>
                             </select>
                             <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                           </div>
@@ -6013,6 +6024,8 @@ export default function App() {
                               <option>Teacher Level</option>
                               <option>Regular</option>
                               <option>Expert</option>
+                              <option>Both</option>
+                              <option>None</option>
                             </select>
                             <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                           </div>
@@ -6262,8 +6275,65 @@ export default function App() {
             const queryEx = evalReportFilters.examiner.toLowerCase();
             if (!item.examinerName.toLowerCase().includes(queryEx)) return false;
           }
-          if (evalReportFilters.startDate && item.dateTime < evalReportFilters.startDate) return false;
-          if (evalReportFilters.endDate && item.dateTime > evalReportFilters.endDate) return false;
+          // Date & Time Filtering
+          const parseFilterDateTime = (val: string, fallbackTime: string) => {
+            if (!val) return null;
+            const clean = val.trim();
+            if (clean.includes('T')) {
+              const d = new Date(clean);
+              return isNaN(d.getTime()) ? null : d.getTime();
+            }
+            if (clean.includes(' ')) {
+              const parts = clean.split(' ');
+              const datePart = parts[0];
+              const timePart = parts[1] || '12:00';
+              const ampm = parts[2];
+              let [h, m] = timePart.split(':').map(Number);
+              if (ampm) {
+                if (ampm.toUpperCase() === 'PM' && h < 12) h += 12;
+                if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+              }
+              const d = new Date(`${datePart}T${String(h || 0).padStart(2, '0')}:${String(m || 0).padStart(2, '0')}:00`);
+              return isNaN(d.getTime()) ? null : d.getTime();
+            }
+            const d = new Date(`${clean}T${fallbackTime}`);
+            return isNaN(d.getTime()) ? null : d.getTime();
+          };
+
+          const parseItemDateTime = (dtStr: string) => {
+            if (!dtStr) return null;
+            const clean = dtStr.trim();
+            if (clean.includes('T')) {
+              const d = new Date(clean);
+              return isNaN(d.getTime()) ? null : d.getTime();
+            }
+            if (clean.includes(' ')) {
+              const parts = clean.split(' ');
+              const datePart = parts[0];
+              const timePart = parts[1] || '12:00';
+              const ampm = parts[2];
+              let [h, m] = timePart.split(':').map(Number);
+              if (ampm) {
+                if (ampm.toUpperCase() === 'PM' && h < 12) h += 12;
+                if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+              }
+              const d = new Date(`${datePart}T${String(h || 0).padStart(2, '0')}:${String(m || 0).padStart(2, '0')}:00`);
+              return isNaN(d.getTime()) ? null : d.getTime();
+            }
+            const d = new Date(`${clean}T12:00:00`);
+            return isNaN(d.getTime()) ? null : d.getTime();
+          };
+
+          if (evalReportFilters.startDate) {
+            const startLimit = parseFilterDateTime(evalReportFilters.startDate, '00:00:00');
+            const itemTime = parseItemDateTime(item.dateTime);
+            if (startLimit !== null && itemTime !== null && itemTime < startLimit) return false;
+          }
+          if (evalReportFilters.endDate) {
+            const endLimit = parseFilterDateTime(evalReportFilters.endDate, '23:59:59');
+            const itemTime = parseItemDateTime(item.dateTime);
+            if (endLimit !== null && itemTime !== null && itemTime > endLimit) return false;
+          }
           return true;
         });
 
@@ -6279,64 +6349,6 @@ export default function App() {
 
       const filteredReports = getFilteredReports();
 
-      const handleAddReport = (e: React.FormEvent) => {
-        e.preventDefault();
-        const id = `EVR-${Math.floor(100 + Math.random() * 900)}`;
-        const newRecord = {
-          id,
-          organization: newReportForm.organization,
-          program: newReportForm.program,
-          session: newReportForm.session,
-          course: newReportForm.course,
-          examCode: newReportForm.examCode || '101',
-          examName: newReportForm.examName || 'New Evaluation Exam',
-          examType: newReportForm.examType,
-          uniqueSet: newReportForm.uniqueSet,
-          questionSerial: newReportForm.questionSerial || 'Q1',
-          studentRoll: newReportForm.studentRoll || '100001',
-          studentName: newReportForm.studentName || 'Student Name',
-          examinerName: newReportForm.examinerName || 'M. Nazmul Alam',
-          marksObtained: newReportForm.marksObtained || '8.0',
-          maxMarks: newReportForm.maxMarks || '10',
-          dateTime: '2026-07-04',
-          status: 'Evaluated',
-          reportType: newReportForm.reportType,
-          totalParticipant: 10,
-          mcqSubmitted: 5,
-          writtenSubmitted: 5,
-          writtenEvaluated: 5,
-          blankScript: 0,
-          writtenPending: 0,
-          reviewRequest: 0,
-          reviewPending: 0,
-          totalEvaluationTime: "01:30",
-          maxEvaluationTime: "00:15",
-          minEvaluationTime: "00:01",
-          avgEvaluationTime: "00:05"
-        };
-
-        setEvaluationReports(prev => [...prev, newRecord]);
-        setIsAddingReport(false);
-        setNewReportForm({
-          organization: 'UDVASH',
-          program: 'HSC-2026',
-          session: '2026',
-          course: "HSC'26 Model Test Online Service",
-          examCode: '',
-          examName: '',
-          examType: 'Mcq',
-          uniqueSet: 'Set A',
-          questionSerial: '',
-          studentRoll: '',
-          studentName: '',
-          examinerName: '',
-          marksObtained: '',
-          maxMarks: '10',
-          reportType: 'Summary'
-        });
-        alert("Evaluation Report successfully saved to Firebase!");
-      };
-
       const handleDeleteReport = (id: string) => {
         if (window.confirm("Are you sure you want to delete this evaluation report from Firebase?")) {
           setEvaluationReports(prev => prev.filter(r => r.id !== id));
@@ -6349,26 +6361,45 @@ export default function App() {
           return;
         }
         
-        const headers = ["SL", "Report Type", "Organization", "Program", "Session", "Course", "Exam Code", "Exam Name", "Exam Type", "Unique Set", "Question Serial", "Student Roll", "Student Name", "Examiner", "Marks Obtained", "Max Marks", "Date", "Status"];
+        const headers = [
+          "Sl",
+          "Program Session",
+          "Course",
+          "[Code] Exam",
+          "Exam Type",
+          "Total Participant",
+          "MCQ Submitted",
+          "Written Submitted",
+          "Written Evaluated",
+          "Blank Script",
+          "Written Pending",
+          "Review Request",
+          "Review Pending",
+          "Review Accepted (%)",
+          "Total Eva. Time",
+          "Max Eva. Time",
+          "Min Eva. Time",
+          "Avg. Eva. Time"
+        ];
         const rows = filteredReports.map((r, index) => [
           index + 1,
-          r.reportType,
-          r.organization,
-          r.program,
-          r.session,
+          `${r.program} ${r.session}`,
           r.course,
-          r.examCode,
-          r.examName,
+          `[${r.examCode}] ${r.examName}`,
           r.examType,
-          r.uniqueSet,
-          r.questionSerial,
-          r.studentRoll,
-          r.studentName,
-          r.examinerName,
-          r.marksObtained,
-          r.maxMarks,
-          r.dateTime,
-          r.status
+          r.totalParticipant ?? 0,
+          r.mcqSubmitted ?? 0,
+          r.writtenSubmitted ?? 0,
+          r.writtenEvaluated ?? 0,
+          r.blankScript ?? 0,
+          r.writtenPending ?? 0,
+          r.reviewRequest ?? 0,
+          r.reviewPending ?? 0,
+          r.writtenEvaluated && r.writtenEvaluated > 0 ? `${(((r.reviewRequest || 0) / r.writtenEvaluated) * 100).toFixed(1)}%` : '-',
+          r.totalEvaluationTime || '-',
+          r.maxEvaluationTime || '-',
+          r.minEvaluationTime || '-',
+          r.avgEvaluationTime || '-'
         ]);
 
         const csvContent = "data:text/csv;charset=utf-8," 
@@ -6385,230 +6416,8 @@ export default function App() {
 
       return (
         <div className="flex-1 p-6 overflow-y-auto space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-gray-800 tracking-tight">Evaluation Report Manager</h1>
-              <p className="text-xs text-gray-500 font-medium">Manage and generate evaluation reports, fully synchronized with Firebase.</p>
-            </div>
-            <button
-              onClick={() => setIsAddingReport(true)}
-              className="bg-[#002d5b] hover:bg-[#001f40] text-white text-xs font-bold px-4 py-2 rounded shadow flex items-center space-x-1.5 transition-all cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Evaluation Record</span>
-            </button>
-          </div>
-
-          {/* Add Report Modal */}
-          {isAddingReport && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <motion.div 
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="bg-white rounded-lg shadow-xl max-w-xl w-full overflow-hidden"
-              >
-                <div className="bg-[#002d5b] text-white px-5 py-3.5 flex items-center justify-between">
-                  <h3 className="font-bold text-sm tracking-wide">Add New Evaluation Record to Firebase</h3>
-                  <button onClick={() => setIsAddingReport(false)} className="text-white/80 hover:text-white">
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <form onSubmit={handleAddReport} className="p-5 grid grid-cols-2 gap-4 max-h-[75vh] overflow-y-auto">
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Organization</label>
-                    <select 
-                      value={newReportForm.organization} 
-                      onChange={e => setNewReportForm({...newReportForm, organization: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="UDVASH">UDVASH</option>
-                      <option value="UNMESH">UNMESH</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Program</label>
-                    <select 
-                      value={newReportForm.program} 
-                      onChange={e => setNewReportForm({...newReportForm, program: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="HSC-2026">HSC-2026</option>
-                      <option value="VAP 'KA'">VAP 'KA'</option>
-                      <option value="Engineering Admission Program">Engineering Admission Program</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Session</label>
-                    <select 
-                      value={newReportForm.session} 
-                      onChange={e => setNewReportForm({...newReportForm, session: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="2026">2026</option>
-                      <option value="2025">2025</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Course</label>
-                    <select 
-                      value={newReportForm.course} 
-                      onChange={e => setNewReportForm({...newReportForm, course: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="HSC'26 Model Test Online Service">HSC'26 Model Test Online Service</option>
-                      <option value="Varsity 'KA' Offline Exam 2025">Varsity 'KA' Offline Exam 2025</option>
-                      <option value="NDC & SJC All Service">NDC & SJC All Service</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Exam Code</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. 101" 
-                      value={newReportForm.examCode} 
-                      onChange={e => setNewReportForm({...newReportForm, examCode: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Exam Name</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Higher Math 1st Paper" 
-                      value={newReportForm.examName} 
-                      onChange={e => setNewReportForm({...newReportForm, examName: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Exam Type</label>
-                    <select 
-                      value={newReportForm.examType} 
-                      onChange={e => setNewReportForm({...newReportForm, examType: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="Mcq">MCQ</option>
-                      <option value="Templated Written">Templated Written</option>
-                      <option value="Regular Written">Regular Written</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Unique Set</label>
-                    <select 
-                      value={newReportForm.uniqueSet} 
-                      onChange={e => setNewReportForm({...newReportForm, uniqueSet: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="Set A">Set A</option>
-                      <option value="Set B">Set B</option>
-                      <option value="Set C">Set C</option>
-                      <option value="Set D">Set D</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Question Serial</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Q1-Q10" 
-                      value={newReportForm.questionSerial} 
-                      onChange={e => setNewReportForm({...newReportForm, questionSerial: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Student Name</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Tahmid Rahman" 
-                      value={newReportForm.studentName} 
-                      onChange={e => setNewReportForm({...newReportForm, studentName: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Student Roll</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. 104825" 
-                      value={newReportForm.studentRoll} 
-                      onChange={e => setNewReportForm({...newReportForm, studentRoll: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Examiner Name</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Md Jahangir Alam" 
-                      value={newReportForm.examinerName} 
-                      onChange={e => setNewReportForm({...newReportForm, examinerName: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Obtained Marks</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. 8.5" 
-                      value={newReportForm.marksObtained} 
-                      onChange={e => setNewReportForm({...newReportForm, marksObtained: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Max Marks</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. 10" 
-                      value={newReportForm.maxMarks} 
-                      onChange={e => setNewReportForm({...newReportForm, maxMarks: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-[11px] font-bold text-gray-600 uppercase mb-1">Report Type</label>
-                    <select 
-                      value={newReportForm.reportType} 
-                      onChange={e => setNewReportForm({...newReportForm, reportType: e.target.value})}
-                      className="w-full border border-gray-300 rounded p-1.5 text-xs focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="Summary">Summary</option>
-                      <option value="Subject Wise Summary">Subject Wise Summary</option>
-                      <option value="Teacher Wise Summary">Teacher Wise Summary</option>
-                      <option value="Teacher Subject Question Wise Summary">Teacher Subject Question Wise Summary</option>
-                      <option value="Teacher Subject Wise Summary">Teacher Subject Wise Summary</option>
-                    </select>
-                  </div>
-                  <div className="col-span-2 flex justify-end space-x-2.5 pt-4 border-t border-gray-100 mt-2">
-                    <button 
-                      type="button" 
-                      onClick={() => setIsAddingReport(false)}
-                      className="border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-bold px-4 py-2 rounded cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="bg-[#002d5b] hover:bg-[#001f40] text-white text-xs font-bold px-4 py-2 rounded cursor-pointer"
-                    >
-                      Save to Firebase
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </div>
-          )}
-
           {/* Collapsible Filter Card */}
-          <div className="bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm">
+          <div className={`bg-white rounded-md border border-gray-200 shadow-sm ${isEvalReportCollapsed ? 'overflow-hidden' : 'overflow-visible'}`}>
             {/* Header with Minimize Toggle */}
             <div className="bg-[#002d5b] text-white px-4 py-2.5 flex items-center justify-between rounded-t border-b border-gray-200">
               <span className="font-bold text-sm tracking-wide">Evaluation New</span>
@@ -6629,7 +6438,7 @@ export default function App() {
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="overflow-hidden bg-white border-t border-gray-100"
+                  className={`bg-white border-t border-gray-100 ${isEvalReportCollapsed ? 'overflow-hidden' : 'overflow-visible'}`}
                 >
                   <div className="p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-4">
@@ -6708,11 +6517,10 @@ export default function App() {
                         <div className="grid grid-cols-12 items-center gap-2">
                           <label className="col-span-4 text-right pr-4 font-bold text-gray-700 text-[13px]">Start Date</label>
                           <div className="col-span-8">
-                            <input
-                              type="date"
+                            <DateTimePicker
                               value={evalReportFilters.startDate}
-                              onChange={e => setEvalReportFilters({...evalReportFilters, startDate: e.target.value})}
-                              className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 bg-gray-50 shadow-sm focus:outline-none focus:border-blue-500"
+                              onChange={val => setEvalReportFilters({ ...evalReportFilters, startDate: val })}
+                              placeholder="YYYY-MM-DD hh:mm A"
                             />
                           </div>
                         </div>
@@ -6721,11 +6529,10 @@ export default function App() {
                         <div className="grid grid-cols-12 items-center gap-2">
                           <label className="col-span-4 text-right pr-4 font-bold text-gray-700 text-[13px]">End Date</label>
                           <div className="col-span-8">
-                            <input
-                              type="date"
+                            <DateTimePicker
                               value={evalReportFilters.endDate}
-                              onChange={e => setEvalReportFilters({...evalReportFilters, endDate: e.target.value})}
-                              className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 bg-gray-50 shadow-sm focus:outline-none focus:border-blue-500"
+                              onChange={val => setEvalReportFilters({ ...evalReportFilters, endDate: val })}
+                              placeholder="YYYY-MM-DD hh:mm A"
                             />
                           </div>
                         </div>
@@ -6908,76 +6715,77 @@ export default function App() {
               </div>
 
               <div className="overflow-x-auto">
+                <div className="h-1 bg-[#002d5b] w-full"></div>
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-[#002d5b] text-white border-b border-gray-300 text-[11px] font-bold uppercase tracking-wider">
-                      <th className="p-3 border border-gray-200/20 text-center">SL</th>
-                      <th className="p-3 border border-gray-200/20">Exam Code</th>
-                      <th className="p-3 border border-gray-200/20 min-w-[200px]">Exam Name</th>
-                      <th className="p-3 border border-gray-200/20">Exam Type</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Total Part.</th>
-                      <th className="p-3 border border-gray-200/20 text-center">MCQ Sub.</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Written Sub.</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Written Eval.</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Blank Script</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Written Pend.</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Review Request</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Review Pend.</th>
-                      <th className="p-3 border border-gray-200/20 text-center text-teal-300 min-w-[130px]">Review Accepted (%)</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Total Eva. Time</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Max Eva. Time</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Min Eva. Time</th>
-                      <th className="p-3 border border-gray-200/20 text-center">Avg. Eva. Time</th>
+                    <tr className="bg-white text-gray-800 border-b border-gray-300 text-[12px] font-bold">
+                      <th className="p-3 border border-gray-300 text-center">Sl</th>
+                      <th className="p-3 border border-gray-300 text-center min-w-[130px]">Program Session</th>
+                      <th className="p-3 border border-gray-300 text-center min-w-[160px]">Course</th>
+                      <th className="p-3 border border-gray-300 text-center min-w-[220px]">[Code] Exam</th>
+                      <th className="p-3 border border-gray-300 text-center min-w-[110px]">Exam Type</th>
+                      <th className="p-3 border border-gray-300 text-center">Total Participant</th>
+                      <th className="p-3 border border-gray-300 text-center">MCQ Submitted</th>
+                      <th className="p-3 border border-gray-300 text-center">Written Submitted</th>
+                      <th className="p-3 border border-gray-300 text-center">Written Evaluated</th>
+                      <th className="p-3 border border-gray-300 text-center">Blank Script</th>
+                      <th className="p-3 border border-gray-300 text-center">Written Pending</th>
+                      <th className="p-3 border border-gray-300 text-center">Review Request</th>
+                      <th className="p-3 border border-gray-300 text-center">Review Pending</th>
+                      <th className="p-3 border border-gray-300 text-center text-teal-800 bg-teal-50 min-w-[130px]">Review Accepted (%)</th>
+                      <th className="p-3 border border-gray-300 text-center">Total Eva. Time</th>
+                      <th className="p-3 border border-gray-300 text-center">Max Eva. Time</th>
+                      <th className="p-3 border border-gray-300 text-center">Min Eva. Time</th>
+                      <th className="p-3 border border-gray-300 text-center">Avg. Eva. Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200 bg-white">
                     {filteredReports.length === 0 ? (
                       <tr>
-                        <td colSpan={17} className="p-8 text-center text-gray-400 font-medium italic">
-                          No evaluation reports found matching your selected filters. Try adding a new evaluation record above!
+                        <td colSpan={18} className="p-8 text-center text-gray-400 font-medium italic">
+                          No evaluation reports found matching your selected filters. Try adjusting your search filters above!
                         </td>
                       </tr>
                     ) : (
                       filteredReports.map((r, i) => (
-                        <tr key={r.id} className="hover:bg-gray-50/70 transition-colors text-gray-700">
-                          <td className="p-3 border border-gray-100 font-medium text-gray-500 text-center">{i + 1}</td>
-                          <td className="p-3 border border-gray-100 font-bold text-gray-900">{r.examCode}</td>
-                          <td className="p-3 border border-gray-100">
-                            <div className="font-semibold text-blue-900">{r.examName}</div>
-                            <div className="text-[10px] text-gray-400 font-medium mt-0.5 flex items-center gap-1.5 flex-wrap">
-                              <span>Org: <strong className="text-gray-600">{r.organization}</strong></span>
-                              <span>•</span>
-                              <span>Report Type: <strong className="text-indigo-600">{r.reportType}</strong></span>
-                              <span>•</span>
-                              <span>Set: <strong className="text-blue-600">{r.uniqueSet || 'N/A'}</strong></span>
-                              <span>•</span>
-                              <span>Q Serial: <strong className="text-purple-600">{r.questionSerial || 'N/A'}</strong></span>
+                        <tr key={r.id} className="hover:bg-blue-50/40 transition-colors text-gray-700">
+                          <td className="p-3 border border-gray-200 font-medium text-gray-500 text-center">{i + 1}</td>
+                          <td className="p-3 border border-gray-200 text-center whitespace-nowrap">
+                            <div className="font-semibold text-gray-800 text-[11.5px]">{r.program}</div>
+                            <div className="text-[10.5px] text-gray-500 font-mono">{r.session}</div>
+                          </td>
+                          <td className="p-3 border border-gray-200 font-medium text-gray-800 text-center text-[11.5px]">
+                            {r.course}
+                          </td>
+                          <td className="p-3 border border-gray-200">
+                            <div className="font-semibold text-[#002d5b] text-[11.5px]">
+                              [{r.examCode}] {r.examName}
                             </div>
                           </td>
-                          <td className="p-3 border border-gray-100 whitespace-nowrap">
-                            <span className="bg-gray-100 text-gray-800 font-medium px-2 py-0.5 rounded text-[10px] border border-gray-200">
+                          <td className="p-3 border border-gray-200 text-center whitespace-nowrap">
+                            <span className="bg-gray-100 text-gray-800 font-medium px-2 py-0.5 rounded text-[10.5px] border border-gray-200">
                               {r.examType}
                             </span>
                           </td>
-                          <td className="p-3 border border-gray-100 font-semibold text-center text-gray-800">{r.totalParticipant ?? 0}</td>
-                          <td className="p-3 border border-gray-100 font-semibold text-center text-gray-800">{r.mcqSubmitted ?? 0}</td>
-                          <td className="p-3 border border-gray-100 font-semibold text-center text-gray-800">{r.writtenSubmitted ?? 0}</td>
-                          <td className="p-3 border border-gray-100 font-semibold text-center text-emerald-600">{r.writtenEvaluated ?? 0}</td>
-                          <td className="p-3 border border-gray-100 font-semibold text-center text-gray-500">{r.blankScript ?? 0}</td>
-                          <td className="p-3 border border-gray-100 font-semibold text-center text-amber-600">{r.writtenPending ?? 0}</td>
-                          <td className="p-3 border border-gray-100 font-semibold text-center text-blue-600">{r.reviewRequest ?? 0}</td>
-                          <td className="p-3 border border-gray-100 font-semibold text-center text-red-500">{r.reviewPending ?? 0}</td>
-                          <td className="p-3 border border-gray-100 font-bold text-center text-teal-600 bg-teal-50/30">
+                          <td className="p-3 border border-gray-200 font-semibold text-center text-gray-800">{r.totalParticipant ?? 0}</td>
+                          <td className="p-3 border border-gray-200 font-semibold text-center text-gray-800">{r.mcqSubmitted ?? 0}</td>
+                          <td className="p-3 border border-gray-200 font-semibold text-center text-gray-800">{r.writtenSubmitted ?? 0}</td>
+                          <td className="p-3 border border-gray-200 font-semibold text-center text-emerald-600">{r.writtenEvaluated ?? 0}</td>
+                          <td className="p-3 border border-gray-200 font-semibold text-center text-gray-500">{r.blankScript ?? 0}</td>
+                          <td className="p-3 border border-gray-200 font-semibold text-center text-amber-600">{r.writtenPending ?? 0}</td>
+                          <td className="p-3 border border-gray-200 font-semibold text-center text-blue-600">{r.reviewRequest ?? 0}</td>
+                          <td className="p-3 border border-gray-200 font-semibold text-center text-red-500">{r.reviewPending ?? 0}</td>
+                          <td className="p-3 border border-gray-200 font-bold text-center text-teal-700 bg-teal-50/50">
                             {r.writtenEvaluated && r.writtenEvaluated > 0 ? (
                               <span>{(((r.reviewRequest || 0) / r.writtenEvaluated) * 100).toFixed(1)}%</span>
                             ) : (
                               <span className="text-gray-400 font-normal">-</span>
                             )}
                           </td>
-                          <td className="p-3 border border-gray-100 font-mono text-center text-gray-600">{r.totalEvaluationTime || '-'}</td>
-                          <td className="p-3 border border-gray-100 font-mono text-center text-gray-600">{r.maxEvaluationTime || '-'}</td>
-                          <td className="p-3 border border-gray-100 font-mono text-center text-gray-600">{r.minEvaluationTime || '-'}</td>
-                          <td className="p-3 border border-gray-100 font-mono text-center text-gray-700 font-bold">{r.avgEvaluationTime || '-'}</td>
+                          <td className="p-3 border border-gray-200 font-mono text-center text-gray-600">{r.totalEvaluationTime || '-'}</td>
+                          <td className="p-3 border border-gray-200 font-mono text-center text-gray-600">{r.maxEvaluationTime || '-'}</td>
+                          <td className="p-3 border border-gray-200 font-mono text-center text-gray-600">{r.minEvaluationTime || '-'}</td>
+                          <td className="p-3 border border-gray-200 font-mono text-center text-gray-700 font-bold">{r.avgEvaluationTime || '-'}</td>
                         </tr>
                       ))
                     )}
@@ -7109,13 +6917,14 @@ export default function App() {
           setModalPermissionValue(targetExam[field] === 'Yes');
           
           // Get current start time - default to BLANK if not set or '---'
+          // Get current start time - default to BLANK if not set or '---'
           const dt = targetExam[field + 'DateTime'];
-          const sTime = (dt && dt !== '---') ? toDateTimeLocal(dt) : '';
+          const sTime = (dt && dt !== '---') ? dt : '';
           setModalStartTime(sTime);
           
           // Get current end time - default to BLANK if not set or '---'
           const edt = targetExam[field + 'EndDateTime'];
-          const eTime = (edt && edt !== '---') ? toDateTimeLocal(edt) : '';
+          const eTime = (edt && edt !== '---') ? edt : '';
           setModalEndTime(eTime);
           
           // Setup subjects with Start and End time (defaults to blank if not set)
@@ -7184,10 +6993,21 @@ export default function App() {
         if (!updatePermissionExam || !updatePermissionField) return;
         
         const newValueStr = modalPermissionValue ? 'Yes' : 'No';
-        // If modalStartTime is empty, finalTimeStr is '---' (Blank)
-        const finalTimeStr = modalStartTime ? fromDateTimeLocal(modalStartTime) : '---';
-        // If modalEndTime is empty, finalEndTimeStr is '---' (Blank)
-        const finalEndTimeStr = modalEndTime ? fromDateTimeLocal(modalEndTime) : '---';
+
+        if (modalPermissionValue) {
+          if (!modalStartTime || !modalStartTime.trim() || !modalEndTime || !modalEndTime.trim()) {
+            alert("দয়া করে Start Date এবং End Date উভয়ই প্রদান করুন! (Date Input বাধ্যতামূলক)");
+            return;
+          }
+        } else {
+          if (!modalEndTime || !modalEndTime.trim()) {
+            alert("দয়া করে End Date প্রদান করুন! (Date Input বাধ্যতামূলক)");
+            return;
+          }
+        }
+
+        const finalTimeStr = modalPermissionValue && modalStartTime && modalStartTime.trim() ? modalStartTime.trim() : '---';
+        const finalEndTimeStr = modalEndTime && modalEndTime.trim() ? modalEndTime.trim() : '---';
         
         setExamPermissions(prev => prev.map(item => {
           if (item.id === updatePermissionExam.id) {
@@ -7931,7 +7751,6 @@ export default function App() {
                       <div className="flex items-center justify-between p-3.5 bg-gray-50/80 rounded-md border border-gray-200">
                         <div>
                           <span className="text-xs font-bold text-gray-700 block">Permission Status</span>
-                          <span className="text-[11px] text-gray-500">Toggle Permission Yes or No</span>
                         </div>
                         <div className="flex items-center space-x-3">
                           <span className={`text-xs font-bold ${modalPermissionValue ? 'text-[#3c763d]' : 'text-rose-600'}`}>
@@ -7953,61 +7772,53 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Main Start & End Time (Syncs automatically to subjects below) */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 bg-blue-50/40 rounded-md border border-blue-100">
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <label className="text-xs font-bold text-gray-700">
-                              Start Time <span className="text-gray-500 text-[10.5px] font-normal">(Optional / Leave Blank)</span>
-                            </label>
-                            <div className="flex items-center space-x-2 text-[10.5px]">
-                              <button
-                                type="button"
-                                onClick={() => handleMainStartTimeChange(toDateTimeLocal(formatNow()))}
-                                className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer underline"
-                              >
-                                Set Now
-                              </button>
-                              {modalStartTime && (
-                                <>
-                                  <span className="text-gray-300">|</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleMainStartTimeChange('')}
-                                    className="text-rose-600 hover:text-rose-800 font-semibold cursor-pointer underline"
-                                  >
-                                    Clear (Blank)
-                                  </button>
-                                </>
-                              )}
+                      {/* Main Start & End Date (Syncs automatically to subjects below) */}
+                      <div className={`grid grid-cols-1 ${modalPermissionValue ? 'sm:grid-cols-2' : 'sm:grid-cols-1'} gap-4 p-3.5 bg-blue-50/40 rounded-md border border-blue-100`}>
+                        {modalPermissionValue && (
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-xs font-bold text-gray-700">
+                                Start Date <span className="text-rose-500">*</span>
+                              </label>
+                              <div className="flex items-center space-x-2 text-[10.5px]">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMainStartTimeChange(formatNow())}
+                                  className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer underline"
+                                >
+                                  Set Now
+                                </button>
+                                {modalStartTime && (
+                                  <>
+                                    <span className="text-gray-300">|</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleMainStartTimeChange('')}
+                                      className="text-rose-600 hover:text-rose-800 font-semibold cursor-pointer underline"
+                                    >
+                                      Clear
+                                    </button>
+                                  </>
+                                )}
+                              </div>
                             </div>
+                            <DateTimePicker
+                              value={modalStartTime}
+                              onChange={(val) => handleMainStartTimeChange(val)}
+                              placeholder="YYYY-MM-DD hh:mm A"
+                            />
                           </div>
-                          <input
-                            type="datetime-local"
-                            value={modalStartTime}
-                            onChange={(e) => handleMainStartTimeChange(e.target.value)}
-                            className="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full font-mono cursor-pointer shadow-3xs"
-                          />
-                          {!modalStartTime ? (
-                            <div className="text-[10px] text-gray-400 italic mt-0.5">
-                              Blank. Click above to select date & time, or leave empty.
-                            </div>
-                          ) : (
-                            <div className="text-[10px] text-emerald-600 font-medium mt-0.5">
-                              Start Time configured
-                            </div>
-                          )}
-                        </div>
+                        )}
 
                         <div>
                           <div className="flex items-center justify-between mb-1">
                             <label className="text-xs font-bold text-gray-700">
-                              End Time <span className="text-gray-500 text-[10.5px] font-normal">(Optional / Leave Blank)</span>
+                              End Date
                             </label>
                             <div className="flex items-center space-x-2 text-[10.5px]">
                               <button
                                 type="button"
-                                onClick={() => handleMainEndTimeChange(toDateTimeLocal(formatNow()))}
+                                onClick={() => handleMainEndTimeChange(formatNow())}
                                 className="text-blue-600 hover:text-blue-800 font-semibold cursor-pointer underline"
                               >
                                 Set Now
@@ -8020,32 +7831,22 @@ export default function App() {
                                     onClick={() => handleMainEndTimeChange('')}
                                     className="text-rose-600 hover:text-rose-800 font-semibold cursor-pointer underline"
                                   >
-                                    Clear (Blank)
+                                    Clear
                                   </button>
                                 </>
                               )}
                             </div>
                           </div>
-                          <input
-                            type="datetime-local"
+                          <DateTimePicker
                             value={modalEndTime}
-                            onChange={(e) => handleMainEndTimeChange(e.target.value)}
-                            className="bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full font-mono cursor-pointer shadow-3xs"
+                            onChange={(val) => handleMainEndTimeChange(val)}
+                            placeholder="YYYY-MM-DD hh:mm A"
                           />
-                          {!modalEndTime ? (
-                            <div className="text-[10px] text-gray-400 italic mt-0.5">
-                              Blank. Click above to select date & time, or leave empty.
-                            </div>
-                          ) : (
-                            <div className="text-[10px] text-emerald-600 font-medium mt-0.5">
-                              End Time configured
-                            </div>
-                          )}
                         </div>
                       </div>
 
                       {/* Multiple Subject Selection Section with Automatic and Subject-wise Dates */}
-                      <div className="border border-gray-200 rounded-md overflow-hidden bg-white shadow-3xs">
+                      <div className="border border-gray-200 rounded-md bg-white shadow-3xs">
                         <div className="bg-gray-100/90 px-4 py-2.5 border-b border-gray-200 flex flex-wrap items-center justify-between gap-2">
                           <label className="flex items-center space-x-2 cursor-pointer text-xs font-bold text-gray-800 select-none">
                             <input
@@ -8056,9 +7857,6 @@ export default function App() {
                             />
                             <span>Multiple Subject Selection</span>
                           </label>
-                          <span className="text-[11px] text-gray-500 font-medium">
-                            Subject-wise Start Date/Time & End Date/Time
-                          </span>
                         </div>
 
                         <div className="divide-y divide-gray-100 p-2.5 space-y-1.5">
@@ -8088,48 +7886,46 @@ export default function App() {
                               <div className="flex flex-wrap items-center gap-2.5 text-xs">
                                 <div className="flex items-center space-x-1.5">
                                   <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Start:</span>
-                                  <div className="relative flex items-center">
-                                    <input
-                                      type="datetime-local"
+                                  <div className="w-[170px]">
+                                    <DateTimePicker
                                       value={subj.startTime || ''}
-                                      onChange={(e) => handleSubjectStartTimeChange(subj.id, e.target.value)}
-                                      className="bg-white border border-gray-300 rounded px-2 py-1 text-[11px] text-gray-700 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-3xs"
-                                      title={`${subj.name} Start Date & Time (Click to change or clear)`}
+                                      onChange={(val) => handleSubjectStartTimeChange(subj.id, val)}
+                                      placeholder="YYYY-MM-DD hh:mm A"
+                                      className="bg-white border border-gray-300 rounded px-2 py-1 text-[11px] text-gray-700 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-3xs w-full"
                                     />
-                                    {subj.startTime && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleSubjectStartTimeChange(subj.id, '')}
-                                        className="ml-1 text-gray-400 hover:text-rose-600 font-bold text-xs p-0.5 cursor-pointer"
-                                        title="Clear to Blank"
-                                      >
-                                        &times;
-                                      </button>
-                                    )}
                                   </div>
+                                  {subj.startTime && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleSubjectStartTimeChange(subj.id, '')}
+                                      className="text-gray-400 hover:text-rose-600 font-bold text-xs p-0.5 cursor-pointer"
+                                      title="Clear"
+                                    >
+                                      &times;
+                                    </button>
+                                  )}
                                 </div>
 
                                 <div className="flex items-center space-x-1.5">
                                   <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">End:</span>
-                                  <div className="relative flex items-center">
-                                    <input
-                                      type="datetime-local"
+                                  <div className="w-[170px]">
+                                    <DateTimePicker
                                       value={subj.endTime || ''}
-                                      onChange={(e) => handleSubjectEndTimeChange(subj.id, e.target.value)}
-                                      className="bg-white border border-gray-300 rounded px-2 py-1 text-[11px] text-gray-700 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-3xs"
-                                      title={`${subj.name} End Date & Time (Click to change or clear)`}
+                                      onChange={(val) => handleSubjectEndTimeChange(subj.id, val)}
+                                      placeholder="YYYY-MM-DD hh:mm A"
+                                      className="bg-white border border-gray-300 rounded px-2 py-1 text-[11px] text-gray-700 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-3xs w-full"
                                     />
-                                    {subj.endTime && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleSubjectEndTimeChange(subj.id, '')}
-                                        className="ml-1 text-gray-400 hover:text-rose-600 font-bold text-xs p-0.5 cursor-pointer"
-                                        title="Clear to Blank"
-                                      >
-                                        &times;
-                                      </button>
-                                    )}
                                   </div>
+                                  {subj.endTime && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleSubjectEndTimeChange(subj.id, '')}
+                                      className="text-gray-400 hover:text-rose-600 font-bold text-xs p-0.5 cursor-pointer"
+                                      title="Clear"
+                                    >
+                                      &times;
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -8231,10 +8027,10 @@ export default function App() {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-6xl bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden"
+            className="w-full max-w-6xl bg-white rounded-md border border-gray-200 shadow-sm overflow-visible"
           >
             {/* Header */}
-            <div className="bg-[#002d5b] text-white px-4 py-2.5 flex items-center justify-between">
+            <div className="bg-[#002d5b] text-white px-4 py-2.5 flex items-center justify-between rounded-t-md">
               <h2 className="text-sm font-medium tracking-wide font-sans">Admin Review</h2>
               <button className="text-white hover:opacity-80">
                 <Minus className="w-4 h-4 cursor-pointer" />
@@ -8313,11 +8109,10 @@ export default function App() {
                   <div className="flex items-center">
                     <label className="w-40 text-[13px] font-bold text-[#333] text-right mr-4 leading-tight font-sans">Start Date</label>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <DateTimePicker
                         value={reviewFilters.startDate}
-                        onChange={(e) => setReviewFilters(prev => ({ ...prev, startDate: e.target.value }))}
-                        className="w-full border border-gray-300 rounded px-3 py-1.5 text-[13px] text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[#f5f5f5] font-sans" 
+                        onChange={(val) => setReviewFilters(prev => ({ ...prev, startDate: val }))}
+                        placeholder="YYYY-MM-DD hh:mm A"
                       />
                     </div>
                   </div>
@@ -8482,11 +8277,10 @@ export default function App() {
                   <div className="flex items-center">
                     <label className="w-40 text-[13px] font-bold text-[#333] text-right mr-4 leading-tight font-sans">End Date</label>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <DateTimePicker
                         value={reviewFilters.endDate}
-                        onChange={(e) => setReviewFilters(prev => ({ ...prev, endDate: e.target.value }))}
-                        className="w-full border border-gray-300 rounded px-3 py-1.5 text-[13px] text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[#f5f5f5] font-sans" 
+                        onChange={(val) => setReviewFilters(prev => ({ ...prev, endDate: val }))}
+                        placeholder="YYYY-MM-DD hh:mm A"
                       />
                     </div>
                   </div>
@@ -8795,6 +8589,16 @@ export default function App() {
       const studentForwardedRequests = filteredForwardedRequests.filter(req => isStudentRequest(req));
       const adminForwardedRequestsFiltered = filteredForwardedRequests.filter(req => !isStudentRequest(req));
 
+      const getReqScriptCount = (req: any): number => {
+        const val = req.totalScript ?? (req.isMultiple ? req.totalScriptsCount : (req.reviewCount || 1));
+        const num = Number(val);
+        return isNaN(num) || num <= 0 ? 1 : num;
+      };
+
+      const totalStudentScripts = studentForwardedRequests.reduce((sum, req) => sum + getReqScriptCount(req), 0);
+      const totalAdminScripts = adminForwardedRequestsFiltered.reduce((sum, req) => sum + getReqScriptCount(req), 0);
+      const totalReviewRequestScripts = totalStudentScripts + totalAdminScripts;
+
       const handleResetFilters = () => {
         setAdminReviewReqFilters({
           organization: 'All Organization',
@@ -8805,8 +8609,8 @@ export default function App() {
           examType: 'All Exam Type',
           version: 'All Version',
           questionSerial: 'All Question Serial',
-          startDate: '2026-07-02',
-          endDate: '2026-07-04',
+          startDate: '2026-07-02 12:00 AM',
+          endDate: '2026-07-04 11:59 PM',
           examiner: '',
           uniqueSet: 'All Unique Set',
           minMarks: '',
@@ -8830,10 +8634,10 @@ export default function App() {
           <motion.div 
             initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-6xl bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden text-left"
+            className="w-full max-w-6xl bg-white rounded-md border border-gray-200 shadow-sm overflow-visible text-left"
           >
             {/* Header */}
-            <div className="bg-[#002d5b] text-white px-4 py-2.5 flex items-center justify-between">
+            <div className="bg-[#002d5b] text-white px-4 py-2.5 flex items-center justify-between rounded-t-md">
               <h2 className="text-sm font-medium tracking-wide font-sans">Review Request</h2>
               <button className="text-white hover:opacity-80">
                 <Minus className="w-4 h-4 cursor-pointer" />
@@ -8910,11 +8714,10 @@ export default function App() {
                   <div className="flex items-center">
                     <label className="w-40 text-[13px] font-bold text-[#333] text-right mr-4 leading-tight font-sans">Start Date</label>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <DateTimePicker
                         value={adminReviewReqFilters.startDate}
-                        onChange={(e) => setAdminReviewReqFilters(prev => ({ ...prev, startDate: e.target.value }))}
-                        className="w-full border border-gray-300 rounded px-3 py-1.5 text-[13px] text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[#f5f5f5] font-sans" 
+                        onChange={(val) => setAdminReviewReqFilters(prev => ({ ...prev, startDate: val }))}
+                        placeholder="YYYY-MM-DD hh:mm A"
                       />
                     </div>
                   </div>
@@ -9076,11 +8879,10 @@ export default function App() {
                   <div className="flex items-center">
                     <label className="w-40 text-[13px] font-bold text-[#333] text-right mr-4 leading-tight font-sans">End Date</label>
                     <div className="flex-1">
-                      <input 
-                        type="text" 
+                      <DateTimePicker
                         value={adminReviewReqFilters.endDate}
-                        onChange={(e) => setAdminReviewReqFilters(prev => ({ ...prev, endDate: e.target.value }))}
-                        className="w-full border border-gray-300 rounded px-3 py-1.5 text-[13px] text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-[#f5f5f5] font-sans" 
+                        onChange={(val) => setAdminReviewReqFilters(prev => ({ ...prev, endDate: val }))}
+                        placeholder="YYYY-MM-DD hh:mm A"
                       />
                     </div>
                   </div>
@@ -9145,6 +8947,26 @@ export default function App() {
           {/* Results Table Section */}
           {adminReviewReqSearchTriggered && (
             <div className="w-full max-w-6xl space-y-6">
+              {/* Overall Total Review Request Found Banner */}
+              <div className="bg-white rounded-md border border-gray-200 px-4 py-3 shadow-xs flex flex-wrap items-center justify-between gap-3 text-left">
+                <div className="flex items-center space-x-2.5">
+                  <span className="text-gray-700 text-xs font-bold uppercase tracking-wider font-sans">
+                    Total Review Request Found:
+                  </span>
+                  <span className="bg-blue-50 text-[#002d5b] text-base font-black font-mono px-3 py-0.5 rounded border border-blue-200 shadow-2xs">
+                    {totalReviewRequestScripts}
+                  </span>
+                  <span className="text-xs text-gray-500 font-sans">
+                    টি খাতায় রিভিউ রিকোয়েস্ট এসেছে
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 font-sans flex items-center space-x-3">
+                  <span>Student: <strong className="text-blue-700 font-mono font-bold">{totalStudentScripts}</strong> scripts</span>
+                  <span>•</span>
+                  <span>Admin: <strong className="text-purple-700 font-mono font-bold">{totalAdminScripts}</strong> scripts</span>
+                </div>
+              </div>
+
               {/* Student Review Requests Part */}
               {(adminReviewReqFilters.reviewRequestFrom === 'All' || adminReviewReqFilters.reviewRequestFrom === 'Student') && (
                 <motion.div 
@@ -9157,8 +8979,8 @@ export default function App() {
                       <span className="w-1.5 h-4 bg-[#4395d1] rounded-sm mr-2.5 inline-block"></span>
                       Student Review Request
                     </h3>
-                    <span className="bg-blue-100 text-blue-800 text-[10.5px] font-extrabold font-mono px-2 py-0.5 rounded">
-                      Total: {studentForwardedRequests.length}
+                    <span className="bg-blue-100 text-blue-800 text-[10.5px] font-extrabold font-mono px-2.5 py-0.5 rounded">
+                      Total Review Request Found: {totalStudentScripts} ({totalStudentScripts} টি খাতা)
                     </span>
                   </div>
                   <div className="overflow-x-auto relative">
@@ -9294,6 +9116,15 @@ export default function App() {
                             </tr>
                           ))
                         )}
+                        {studentForwardedRequests.length > 0 && (
+                          <tr className="bg-[#f1f3f5] font-bold">
+                            <td className="border-r border-b border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total Review Request Found</td>
+                            <td className="border-r border-b border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono" colSpan={7}>
+                              {totalStudentScripts}
+                            </td>
+                            <td className="sticky right-0 z-10 bg-[#f1f3f5] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-300 px-3 py-2 text-center min-w-[150px] w-[150px]"></td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -9312,8 +9143,8 @@ export default function App() {
                       <span className="w-1.5 h-4 bg-purple-600 rounded-sm mr-2.5 inline-block"></span>
                       Admin Review Request
                     </h3>
-                    <span className="bg-purple-100 text-purple-800 text-[10.5px] font-extrabold font-mono px-2 py-0.5 rounded">
-                      Total: {adminForwardedRequestsFiltered.length}
+                    <span className="bg-purple-100 text-purple-800 text-[10.5px] font-extrabold font-mono px-2.5 py-0.5 rounded">
+                      Total Review Request Found: {totalAdminScripts} ({totalAdminScripts} টি খাতা)
                     </span>
                   </div>
                   <div className="overflow-x-auto relative">
@@ -9450,9 +9281,9 @@ export default function App() {
                         )}
                         {adminForwardedRequestsFiltered.length > 0 && (
                           <tr className="bg-[#f1f3f5] font-bold">
-                            <td className="border-r border-b border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total Admin Requests Found</td>
+                            <td className="border-r border-b border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total Review Request Found</td>
                             <td className="border-r border-b border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono" colSpan={7}>
-                              {adminForwardedRequestsFiltered.length}
+                              {totalAdminScripts}
                             </td>
                             <td className="sticky right-0 z-10 bg-[#f1f3f5] shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.12)] border-l border-b border-gray-300 px-3 py-2 text-center min-w-[150px] w-[150px]"></td>
                           </tr>

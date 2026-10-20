@@ -744,41 +744,7 @@ export default function ViewAssignTemplate({ currentUser }: ViewAssignTemplatePr
         </div>
       )}
 
-      {/* Main Header / Breadcrumb Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 mb-3 border-b border-gray-200 gap-2">
-        <div>
-          <div className="flex items-center space-x-2 text-xs text-gray-500">
-            <span>Exam</span>
-            <span>/</span>
-            <span>Script Evaluation</span>
-            <span>/</span>
-            <span className="text-gray-800 font-semibold">View Assign Template</span>
-          </div>
-          <h1 className="text-base sm:text-lg font-bold text-[#002d5b] mt-0.5">
-            Script Evaluation — Assign Payment Template
-          </h1>
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setManageTemplatesOpen(true)}
-            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-semibold text-xs px-3 py-1.5 rounded shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer"
-          >
-            <Layers className="w-3.5 h-3.5 text-blue-600" />
-            <span>Manage Templates ({paymentTemplates.length})</span>
-          </button>
-
-          {hasSubmitted && filteredExams.length > 0 && (
-            <button
-              onClick={handleExportExcel}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-3 py-1.5 rounded shadow-xs flex items-center space-x-1.5 transition-colors cursor-pointer"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>Export Excel</span>
-            </button>
-          )}
-        </div>
-      </div>
 
       {/* ========================================================================= */}
       {/* FILTER BOX: With Multi-Select Checkmark Options (As per user's image)      */}
@@ -933,6 +899,13 @@ export default function ViewAssignTemplate({ currentUser }: ViewAssignTemplatePr
             </div>
             <div className="flex items-center space-x-2">
               <button
+                onClick={handleExportExcel}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-2.5 py-1 rounded shadow-xs flex items-center space-x-1 cursor-pointer"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Export Excel</span>
+              </button>
+              <button
                 onClick={handlePrint}
                 className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-medium px-2.5 py-1 rounded shadow-xs flex items-center space-x-1 cursor-pointer"
               >
@@ -952,14 +925,13 @@ export default function ViewAssignTemplate({ currentUser }: ViewAssignTemplatePr
                   <th className="py-2.5 px-4 text-center border-r border-gray-300 min-w-[200px]">Program</th>
                   <th className="py-2.5 px-4 text-center border-r border-gray-300 min-w-[200px]">Course</th>
                   <th className="py-2.5 px-4 text-center border-r border-gray-300 min-w-[260px]">Exam</th>
-                  <th className="py-2.5 px-4 text-center border-r border-gray-300 w-36">Status</th>
-                  <th className="py-2.5 px-4 text-center w-32">Action</th>
+                  <th className="py-2.5 px-4 text-center w-36">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-300 bg-white">
                 {filteredExams.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-gray-500">
+                    <td colSpan={6} className="py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center justify-center space-y-2">
                         <AlertCircle className="w-8 h-8 text-amber-500" />
                         <p className="text-sm font-semibold text-gray-700">No exams match the selected filter criteria.</p>
@@ -1007,21 +979,8 @@ export default function ViewAssignTemplate({ currentUser }: ViewAssignTemplatePr
                       </td>
 
                       {/* Status */}
-                      <td className="py-3 px-4 text-center font-normal border-r border-gray-300 text-gray-800">
+                      <td className="py-3 px-4 text-center font-normal text-gray-800">
                         {exam.status}
-                      </td>
-
-                      {/* Action (Only Log option) */}
-                      <td className="py-3 px-4 text-center">
-                        <div className="flex items-center justify-center">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenLogModal(exam)}
-                            className="bg-[#337ab7] hover:bg-[#286090] text-white font-medium text-xs px-4 py-1 rounded transition-colors cursor-pointer border border-[#2e6da4] shadow-xs"
-                          >
-                            Log
-                          </button>
-                        </div>
                       </td>
                     </tr>
                   ))
