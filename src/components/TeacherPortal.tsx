@@ -354,6 +354,42 @@ const initialEvaluationPaymentData = [
   }
 ];
 
+const initialScriptEvaluationReviewData = [
+  {
+    id: 1,
+    program: "Varsity 'KA' Admission Program-2026",
+    course: "Varsity 'KA' Offline Exam 2026",
+    exam: "[146] VAP KA Weekly MCQ and Written Exam W-06 (Phy)",
+    version: "Bangla",
+    question: "Unique Set: 3, Question Serial: 4",
+    total: 3,
+    set: "3",
+    qSerial: "4"
+  },
+  {
+    id: 2,
+    program: "Varsity 'KA' Admission Program-2026",
+    course: "Varsity 'KA' Offline Exam 2026",
+    exam: "[146] VAP KA Weekly MCQ and Written Exam W-06 (HMath)",
+    version: "Bangla",
+    question: "Unique Set: 1, Question Serial: 9",
+    total: 1,
+    set: "1",
+    qSerial: "9"
+  },
+  {
+    id: 3,
+    program: "Varsity 'KA' Admission Program-2026",
+    course: "Varsity 'KA' Offline Exam 2026",
+    exam: "[146] VAP KA Weekly MCQ and Written Exam W-06 (HMath)",
+    version: "Bangla",
+    question: "Unique Set: 4, Question Serial: 10",
+    total: 1,
+    set: "4",
+    qSerial: "10"
+  }
+];
+
 export default function TeacherPortal({ 
   onBackToAdmin,
   adminForwardedRequests = [],
@@ -424,6 +460,50 @@ export default function TeacherPortal({
   const [isEvalFilterExpanded, setIsEvalFilterExpanded] = useState(true);
   const [isEvalSearching, setIsEvalSearching] = useState(false);
   const [evalSearchResults, setEvalSearchResults] = useState<any[]>(initialEvaluationPaymentData);
+
+  // Script Evaluation Review States (Matches Image 1 & Image 2)
+  const [reviewOrganization, setReviewOrganization] = useState('All Organization');
+  const [reviewProgram, setReviewProgram] = useState('All Program');
+  const [reviewSession, setReviewSession] = useState('All Session');
+  const [reviewCourse, setReviewCourse] = useState('All Course');
+  const [reviewExam, setReviewExam] = useState('');
+  const [reviewVersion, setReviewVersion] = useState('All Version');
+  const [reviewDateFrom, setReviewDateFrom] = useState('2026-10-19 12:00 AM');
+  const [reviewDateTo, setReviewDateTo] = useState('2026-10-21 05:38 PM');
+  const [reviewUniqueSet, setReviewUniqueSet] = useState('All');
+  const [reviewQuestionSerial, setReviewQuestionSerial] = useState('All');
+  const [reviewMarksMin, setReviewMarksMin] = useState('');
+  const [reviewMarksMax, setReviewMarksMax] = useState('');
+  const [reviewDisplayPerPage, setReviewDisplayPerPage] = useState('100');
+  const [isReviewFilterExpanded, setIsReviewFilterExpanded] = useState(true);
+  const [isReviewSearched, setIsReviewSearched] = useState(false);
+  const [reviewSearchResults, setReviewSearchResults] = useState<any[]>(initialScriptEvaluationReviewData);
+
+  const handleScriptEvaluationReviewSearch = () => {
+    setIsReviewFilterExpanded(false);
+    setIsReviewSearched(true);
+    let filtered = [...initialScriptEvaluationReviewData];
+    if (reviewProgram !== 'All Program') {
+      filtered = filtered.filter(item => item.program === reviewProgram);
+    }
+    if (reviewCourse !== 'All Course') {
+      filtered = filtered.filter(item => item.course === reviewCourse);
+    }
+    if (reviewVersion !== 'All Version') {
+      filtered = filtered.filter(item => item.version === reviewVersion);
+    }
+    if (reviewUniqueSet !== 'All') {
+      filtered = filtered.filter(item => item.set === reviewUniqueSet);
+    }
+    if (reviewQuestionSerial !== 'All') {
+      filtered = filtered.filter(item => item.qSerial === reviewQuestionSerial);
+    }
+    if (reviewExam.trim()) {
+      const q = reviewExam.toLowerCase().trim();
+      filtered = filtered.filter(item => item.exam.toLowerCase().includes(q));
+    }
+    setReviewSearchResults(filtered);
+  };
 
   // Canvas Drawing State for Script Review
   const [activeDrawingTool, setActiveDrawingTool] = useState("pencil");
@@ -774,6 +854,9 @@ export default function TeacherPortal({
     setIsScriptEvalOpen(false);
     setIsMyPaymentOpen(false);
     setIsQAOpen(false);
+    if (tab === 'review') {
+      setIsReviewFilterExpanded(true);
+    }
   };
 
   // Submit Grade
@@ -1442,7 +1525,7 @@ export default function TeacherPortal({
             </motion.div>
           )}
 
-          {/* 3. SCRIPT EVALUATION - REVIEW REQUESTS */}
+          {/* 3. SCRIPT EVALUATION - REVIEW */}
           {activeTab === 'review' && (
             <motion.div 
               key="review"
@@ -1451,56 +1534,324 @@ export default function TeacherPortal({
               exit={{ opacity: 0, y: -15 }}
               className="space-y-6 text-left"
             >
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="border-b border-gray-100 pb-4 mb-4">
-                  <h2 className="text-base font-extrabold text-[#950000] font-sans">Script Re-Evaluation Reviews (ছাত্র রি-চেক অনুরোধ)</h2>
-                  <p className="text-xs text-gray-500 font-medium mt-0.5 font-sans">ছাত্রদের মার্কিং সংক্রান্ত আপিলগুলোর সঠিক পর্যালোচনা করে মতামত দিন।</p>
+              {/* 1. FILTER CARD (Image 1: Script Evaluation Review) */}
+              <div className="bg-white rounded border border-gray-200 shadow-xs overflow-hidden">
+                <div 
+                  onClick={() => setIsReviewFilterExpanded(!isReviewFilterExpanded)}
+                  className="bg-white border-b border-gray-200 px-6 py-3.5 flex items-center justify-between cursor-pointer select-none"
+                >
+                  <h2 className="text-[15px] font-bold text-gray-800 font-sans tracking-tight">
+                    Script Evaluation Review
+                  </h2>
+                  <button 
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsReviewFilterExpanded(!isReviewFilterExpanded);
+                    }}
+                    className="text-gray-700 hover:text-gray-900 flex items-center justify-center w-6 h-6 rounded cursor-pointer"
+                    aria-label={isReviewFilterExpanded ? "Collapse" : "Expand"}
+                  >
+                    {isReviewFilterExpanded ? (
+                      <Minus className="w-4 h-4 stroke-[2.5]" />
+                    ) : (
+                      <Plus className="w-4 h-4 stroke-[2.5]" />
+                    )}
+                  </button>
                 </div>
 
-                {reviews.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400 font-medium font-sans">
-                    কোন পেন্ডিং রিভিউ অনুরোধ নেই।
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {reviews.map(item => (
-                      <div key={item.id} className="border border-purple-100 rounded-lg p-5 bg-[#fcf9ff] hover:shadow-xs transition-shadow">
-                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                          <div className="space-y-1.5">
-                            <div className="flex items-center space-x-2">
-                              <span className="bg-purple-100 text-purple-900 text-[10.5px] font-mono font-extrabold px-2 py-0.5 rounded">
-                                {item.id}
-                              </span>
-                              <h3 className="text-sm font-bold text-gray-800 font-sans">{item.studentName} (Roll: {item.roll})</h3>
-                            </div>
-                            <p className="text-xs text-gray-600 font-sans">
-                              <strong>Subject:</strong> {item.subject} &bull; <strong>Exam:</strong> {item.examName}
-                            </p>
-                            <p className="text-xs text-gray-500 font-sans italic bg-white p-3 rounded border border-gray-100 mt-2">
-                              " {item.reason} "
-                            </p>
-                            <div className="flex items-center space-x-4 text-xs font-sans text-gray-500 mt-2">
-                              <span><strong>Original Marks:</strong> <span className="text-rose-600 font-bold">{item.originalMarks}</span></span>
-                              <span><strong>Claimed Marks:</strong> <span className="text-green-600 font-bold">{item.claimedMarks}</span></span>
-                              <span className="text-[10px] text-gray-400 font-mono">Date: {item.date}</span>
-                            </div>
-                          </div>
-                          <button 
-                            onClick={() => {
-                              setReviewingItem(item);
-                              setReviewObtainedMarks(String(item.originalMarks));
-                              setReviewRemarks('');
-                            }}
-                            className="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded text-[11.5px] font-bold font-sans tracking-wide shadow-xs shrink-0 self-end md:self-start transition-colors cursor-pointer"
+                {isReviewFilterExpanded && (
+                  <div className="p-6 md:p-8 font-sans">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-14 gap-y-4">
+                      {/* Left Column */}
+                      <div className="space-y-4">
+                        {/* Organization */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Organization</label>
+                          <select 
+                            value={reviewOrganization}
+                            onChange={(e) => setReviewOrganization(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                           >
-                            Re-Evaluate Now
-                          </button>
+                            <option>All Organization</option>
+                            <option>UDVASH</option>
+                            <option>UNMESH</option>
+                            <option>UTKORSHO</option>
+                          </select>
+                        </div>
+
+                        {/* Session */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Session</label>
+                          <select 
+                            value={reviewSession}
+                            onChange={(e) => setReviewSession(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Session</option>
+                            <option>2026</option>
+                            <option>2025</option>
+                            <option>2024</option>
+                          </select>
+                        </div>
+
+                        {/* Exam */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Exam</label>
+                          <input 
+                            type="text"
+                            placeholder="[Code] Exam Name"
+                            value={reviewExam}
+                            onChange={(e) => setReviewExam(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        {/* Date From */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Date From</label>
+                          <input 
+                            type="text"
+                            value={reviewDateFrom}
+                            onChange={(e) => setReviewDateFrom(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-800 bg-[#e9ecef] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        {/* Unique Set */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Unique Set</label>
+                          <select 
+                            value={reviewUniqueSet}
+                            onChange={(e) => setReviewUniqueSet(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All</option>
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>Set A</option>
+                            <option>Set B</option>
+                            <option>Set C</option>
+                            <option>Set D</option>
+                          </select>
+                        </div>
+
+                        {/* Marks */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Marks</label>
+                          <div className="flex-1 flex items-center gap-3">
+                            <input 
+                              type="text"
+                              placeholder="Min"
+                              value={reviewMarksMin}
+                              onChange={(e) => setReviewMarksMin(e.target.value)}
+                              className="w-1/2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <input 
+                              type="text"
+                              placeholder="Max"
+                              value={reviewMarksMax}
+                              onChange={(e) => setReviewMarksMax(e.target.value)}
+                              className="w-1/2 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                          </div>
                         </div>
                       </div>
-                    ))}
+
+                      {/* Right Column */}
+                      <div className="space-y-4">
+                        {/* Program */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Program</label>
+                          <select 
+                            value={reviewProgram}
+                            onChange={(e) => setReviewProgram(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Program</option>
+                            <option>Varsity 'KA' Admission Program-2026</option>
+                            <option>Engineering Admission Program-2026</option>
+                            <option>Medical Admission Program-2026</option>
+                            <option>CAP 2026</option>
+                          </select>
+                        </div>
+
+                        {/* Course */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Course</label>
+                          <select 
+                            value={reviewCourse}
+                            onChange={(e) => setReviewCourse(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Course</option>
+                            <option>Varsity 'KA' Offline Exam 2026</option>
+                            <option>Engineering Offline Exam 2026</option>
+                            <option>NDC & SJC All Service</option>
+                          </select>
+                        </div>
+
+                        {/* Version */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Version</label>
+                          <select 
+                            value={reviewVersion}
+                            onChange={(e) => setReviewVersion(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All Version</option>
+                            <option>Bangla</option>
+                            <option>English</option>
+                          </select>
+                        </div>
+
+                        {/* Date To */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Date To</label>
+                          <input 
+                            type="text"
+                            value={reviewDateTo}
+                            onChange={(e) => setReviewDateTo(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-800 bg-[#e9ecef] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        {/* Question Serial */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Question Serial</label>
+                          <select 
+                            value={reviewQuestionSerial}
+                            onChange={(e) => setReviewQuestionSerial(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option>All</option>
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                          </select>
+                        </div>
+
+                        {/* Display Per Page */}
+                        <div className="flex items-center justify-between gap-4">
+                          <label className="font-bold text-gray-900 text-sm w-36 shrink-0">Display Per Page</label>
+                          <input 
+                            type="text"
+                            value={reviewDisplayPerPage}
+                            onChange={(e) => setReviewDisplayPerPage(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded px-3 py-1.5 text-xs text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Centered Search Button */}
+                    <div className="flex justify-center mt-7">
+                      <button 
+                        onClick={handleScriptEvaluationReviewSearch}
+                        className="bg-[#007bff] hover:bg-[#0069d9] text-white px-9 py-2 rounded text-sm font-semibold transition-colors shadow-xs cursor-pointer"
+                      >
+                        Search
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
+
+              {/* 2. RESULTS TABLE (Image 2: Manage Script Evaluation Review) */}
+              {isReviewSearched && (
+                <div className="bg-white rounded border border-gray-200 shadow-xs overflow-hidden">
+                  <div className="bg-[#f8f9fa] border-b border-gray-200 px-5 py-3.5">
+                    <h2 className="text-[14px] font-bold text-gray-800 font-sans tracking-wide">
+                      Manage Script Evaluation Review
+                    </h2>
+                  </div>
+
+                  <div className="p-5 overflow-x-auto font-sans">
+                    {/* Show Entries Control */}
+                    <div className="flex items-center justify-between mb-4 text-xs text-gray-700">
+                      <div className="flex items-center gap-1.5">
+                        <span>Show</span>
+                        <select 
+                          value={reviewDisplayPerPage}
+                          onChange={(e) => setReviewDisplayPerPage(e.target.value)}
+                          className="border border-gray-300 rounded px-2 py-1 text-xs bg-white text-gray-700"
+                        >
+                          <option value="10">10</option>
+                          <option value="25">25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </select>
+                        <span>entries</span>
+                      </div>
+                    </div>
+
+                    {/* Table */}
+                    <table className="w-full border-collapse border border-gray-300 text-xs text-gray-700 font-sans">
+                      <thead>
+                        <tr className="bg-white text-gray-800 font-bold border-b border-gray-300">
+                          <th className="border border-gray-300 px-3 py-3 w-[5%] text-center font-bold">Sl.</th>
+                          <th className="border border-gray-300 px-4 py-3 w-[15%] text-left font-bold">Program</th>
+                          <th className="border border-gray-300 px-4 py-3 w-[12%] text-left font-bold">Course</th>
+                          <th className="border border-gray-300 px-4 py-3 w-[25%] text-left font-bold">[Code] Exam (Subject)</th>
+                          <th className="border border-gray-300 px-3 py-3 w-[8%] text-center font-bold">Version</th>
+                          <th className="border border-gray-300 px-4 py-3 w-[19%] text-left font-bold">Question</th>
+                          <th className="border border-gray-300 px-3 py-3 w-[8%] text-center font-bold">Total</th>
+                          <th className="border border-gray-300 px-3 py-3 w-[8%] text-center font-bold">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {reviewSearchResults.length === 0 ? (
+                          <tr>
+                            <td colSpan={8} className="border border-gray-300 px-4 py-8 text-center text-gray-400 font-medium">
+                              No scripts found matching the search criteria.
+                            </td>
+                          </tr>
+                        ) : (
+                          reviewSearchResults.map((row, idx) => (
+                            <tr key={row.id} className="hover:bg-gray-50/50 transition-colors">
+                              <td className="border border-gray-300 px-3 py-3.5 text-center font-medium text-gray-700">{idx + 1}</td>
+                              <td className="border border-gray-300 px-4 py-3.5 text-left font-medium text-gray-800">{row.program}</td>
+                              <td className="border border-gray-300 px-4 py-3.5 text-left font-medium text-gray-800">{row.course}</td>
+                              <td className="border border-gray-300 px-4 py-3.5 text-left font-medium text-gray-800">{row.exam}</td>
+                              <td className="border border-gray-300 px-3 py-3.5 text-center text-gray-700">{row.version}</td>
+                              <td className="border border-gray-300 px-4 py-3.5 text-left text-gray-700">{row.question}</td>
+                              <td className="border border-gray-300 px-3 py-3.5 text-center font-bold text-gray-800 font-mono">{row.total}</td>
+                              <td className="border border-gray-300 px-3 py-3.5 text-center">
+                                <button 
+                                  disabled
+                                  title="Review All is currently inactive"
+                                  className="bg-[#007bff] opacity-50 cursor-not-allowed text-white px-4 py-1.5 rounded font-sans text-xs font-bold shadow-xs select-none"
+                                >
+                                  Review All
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                        {reviewSearchResults.length > 0 && (
+                          <tr className="bg-white font-bold text-gray-800 border-t-2 border-gray-300">
+                            <td className="border border-gray-300 px-3 py-3" colSpan={5}></td>
+                            <td className="border border-gray-300 px-4 py-3 text-center font-bold text-[13px]">Total</td>
+                            <td className="border border-gray-300 px-3 py-3 text-center font-bold font-mono text-[13px]">
+                              {reviewSearchResults.reduce((sum, r) => sum + r.total, 0)}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-3"></td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 

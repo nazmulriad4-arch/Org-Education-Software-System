@@ -88,21 +88,25 @@ interface PendingBreakdownItem {
 }
 
 const getPendingBreakdown = (course: string, subject: string, total: number): PendingBreakdownItem[] => {
-  let prefix = "EX";
+  let examCode = "127";
+  let examName = "Daily Live Exam For NDC Physics-05-06";
   const subLower = subject.toLowerCase();
-  if (subLower.includes("chemistry")) prefix = "CH";
-  else if (subLower.includes("physics")) prefix = "PH";
-  else if (subLower.includes("mathematics") || subLower.includes("math")) prefix = "HM";
-  else if (subLower.includes("biology")) prefix = "BI";
-  else if (subLower.includes("english")) prefix = "EN";
-  else if (subLower.includes("bangla")) prefix = "BN";
+  const isVarsity = course.toLowerCase().includes("varsity") || course.toLowerCase().includes("vap");
 
-  let suffix = "-OW";
-  if (subject.includes("[TW]")) suffix = "-TW";
-  else if (subject.includes("[OW]")) suffix = "-OW";
-
-  const codePrefix = `${prefix}${suffix}`;
-  const cleanSubject = subject.replace(/\[\w+\]/, "").trim();
+  if (isVarsity) {
+    if (subLower.includes("physics")) { examCode = "106"; examName = "VAP KA Daily MCQ and Written Exam P-06"; }
+    else if (subLower.includes("mathematics") || subLower.includes("math")) { examCode = "126"; examName = "VAP KA Daily MCQ and Written Exam HM-06"; }
+    else if (subLower.includes("chemistry")) { examCode = "112"; examName = "VAP KA Daily MCQ and Written Exam CH-06"; }
+    else if (subLower.includes("biology")) { examCode = "115"; examName = "VAP KA Daily MCQ and Written Exam BIO-06"; }
+    else { examCode = "126"; examName = "VAP KA Daily MCQ and Written Exam"; }
+  } else {
+    if (subLower.includes("chemistry")) { examCode = "105"; examName = "Daily Live Exam For NDC Chemistry-05-06"; }
+    else if (subLower.includes("physics")) { examCode = "127"; examName = "Daily Live Exam For NDC Physics-05-06"; }
+    else if (subLower.includes("mathematics") || subLower.includes("math")) { examCode = "111"; examName = "Daily Exam For NDC Higher Math-05-06"; }
+    else if (subLower.includes("biology")) { examCode = "107"; examName = "Daily Live Exam For NDC Biology-05-06"; }
+    else if (subLower.includes("english")) { examCode = "102"; examName = "Daily Live Exam For NDC English-05-06"; }
+    else if (subLower.includes("bangla")) { examCode = "101"; examName = "Daily Live Exam For NDC Bangla-05-06"; }
+  }
 
   const parts: number[] = [];
   if (total > 0) {
@@ -111,18 +115,17 @@ const getPendingBreakdown = (course: string, subject: string, total: number): Pe
     } else if (total === 2) {
       parts.push(1, 1);
     } else {
-      const part1 = Math.floor(total * 0.45);
-      const part2 = Math.floor(total * 0.35);
-      const part3 = total - part1 - part2;
-      parts.push(part1, part2, part3);
+      const part1 = Math.floor(total * 0.5);
+      const part2 = total - part1;
+      parts.push(part1, part2);
     }
   }
 
   return parts.map((count, index) => {
-    const letters = ["A", "B", "C", "D"];
+    const codeNum = parseInt(examCode) + index;
     return {
-      code: `${codePrefix}-10${index + 1}`,
-      setName: `${cleanSubject} Unique Set ${letters[index]}`,
+      code: `[${codeNum}]`,
+      setName: examName,
       count
     };
   });
@@ -4490,7 +4493,7 @@ export default function App() {
                             {/* Popup Tooltip */}
                             {hoveredPending && hoveredPending.course === group.course && hoveredPending.subject === subj.name && subj.pending > 0 && (
                               <div 
-                                className={`absolute z-50 w-80 bg-white border border-gray-200 rounded-lg shadow-xl text-left pointer-events-none transition-all duration-200 ${
+                                className={`absolute z-50 w-[420px] max-w-[92vw] bg-white border border-gray-200 rounded-lg shadow-xl text-left pointer-events-none transition-all duration-200 ${
                                   // Position below if near the top, otherwise above to avoid clipping
                                   gIdx === 0 && sIdx < 4 ? 'top-full mt-2 left-1/2 -translate-x-1/2' : 'bottom-full mb-2 left-1/2 -translate-x-1/2'
                                 }`}
@@ -4510,20 +4513,20 @@ export default function App() {
                                   <div className="border-b border-gray-100 my-2.5"></div>
                                   
                                   <div className="text-[9px] font-extrabold text-gray-400 tracking-wider mb-2 uppercase">
-                                    EXAM CODE & SETS
+                                    EXAM CODE & EXAM NAME
                                   </div>
                                   
                                   <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-0.5">
                                     {getPendingBreakdown(group.course, subj.name, subj.pending).map((item, idx) => (
                                       <div 
                                         key={idx} 
-                                        className="flex items-center justify-between border border-gray-100 rounded-lg p-2.5 bg-[#fcfdfe] shadow-2xs"
+                                        className="flex items-center justify-between border border-gray-100 rounded-lg p-2.5 bg-[#fcfdfe] shadow-2xs gap-2.5"
                                       >
-                                        <div>
-                                          <span className="text-[11px] font-bold text-[#337ab7] block">{item.code}</span>
-                                          <span className="text-[9.5px] text-gray-500 font-medium block">{item.setName}</span>
+                                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                          <span className="text-[11.5px] font-bold text-[#337ab7] shrink-0 font-mono">{item.code}</span>
+                                          <span className="text-[11px] text-gray-800 font-medium truncate" title={item.setName}>{item.setName}</span>
                                         </div>
-                                        <div className="text-[11px] font-bold text-gray-700 bg-gray-50 border border-gray-200 rounded px-2.5 py-1 font-mono">
+                                        <div className="text-[11px] font-bold text-gray-700 bg-gray-50 border border-gray-200 rounded px-2.5 py-1 font-mono shrink-0">
                                           {item.count.toLocaleString()}
                                         </div>
                                       </div>
@@ -4706,7 +4709,9 @@ export default function App() {
                   ))}
                   <tr className="bg-[#f1f3f5] font-bold">
                     <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total</td>
-                    <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono">{reviewRequests.length}</td>
+                    <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono">
+                      {reviewRequests.reduce((sum, r) => sum + (r.requests || 1), 0)}
+                    </td>
                     <td className="px-3 py-2" colSpan={2}></td>
                   </tr>
                 </tbody>
@@ -4741,8 +4746,8 @@ export default function App() {
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[17%]">Course [Program-Session]</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[8%]">Subject</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Exam</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[13%]">Admin Note</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[9%]">Unique Set and Question Serial</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[13%]">Admin Note</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[12%]">Reviewed By:</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[6%]">Review Scripts</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[8%]">Pending From</th>
@@ -4777,14 +4782,14 @@ export default function App() {
                         <td className="border-r border-gray-200 px-3 py-3 text-gray-800 font-medium">{req.course}</td>
                         <td className="border-r border-gray-200 px-3 py-3 text-gray-700">{req.subject}</td>
                         <td className="border-r border-gray-200 px-3 py-3 text-gray-700">{req.exam}</td>
+                        <td className="border-r border-gray-200 px-2.5 py-3 text-center text-purple-700 font-bold font-mono text-[11px]">
+                          U{req.uniqueSet || '1'} - Q{req.questionSerial || '26'}
+                        </td>
                         <td className="border-r border-gray-200 px-3 py-3 text-purple-950 text-[11px] font-sans leading-relaxed">
                           <div className="bg-purple-50/70 border border-purple-100 rounded p-2 italic">
                             "{req.note}"
                           </div>
                           <div className="text-[9px] text-gray-400 mt-1.5 font-mono">{req.date}</div>
-                        </td>
-                        <td className="border-r border-gray-200 px-2.5 py-3 text-center text-purple-700 font-bold font-mono text-[11px]">
-                          U{req.uniqueSet || '1'} - Q{req.questionSerial || '26'}
                         </td>
                         <td className="border-r border-gray-200 px-2.5 py-3 text-center">
                           <span className="inline-block bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-bold font-mono text-[10px]">
@@ -4858,9 +4863,9 @@ export default function App() {
                   )}
                   {dashboardAdminRequests.length > 0 && (
                     <tr className="bg-[#f1f3f5] font-bold">
-                      <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total Forwarded</td>
-                      <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono" colSpan={4}>
-                        {dashboardAdminRequests.length}
+                      <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={7}>Total</td>
+                      <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono">
+                        {dashboardAdminRequests.reduce((sum, req) => sum + (req.isMultiple ? (req.totalScriptsCount || 1) : (req.reviewCount || 1)), 0)}
                       </td>
                       <td className="px-3 py-2" colSpan={2}></td>
                     </tr>
@@ -8956,9 +8961,6 @@ export default function App() {
                   <span className="bg-blue-50 text-[#002d5b] text-base font-black font-mono px-3 py-0.5 rounded border border-blue-200 shadow-2xs">
                     {totalReviewRequestScripts}
                   </span>
-                  <span className="text-xs text-gray-500 font-sans">
-                    টি খাতায় রিভিউ রিকোয়েস্ট এসেছে
-                  </span>
                 </div>
                 <div className="text-xs text-gray-500 font-sans flex items-center space-x-3">
                   <span>Student: <strong className="text-blue-700 font-mono font-bold">{totalStudentScripts}</strong> scripts</span>
@@ -8980,7 +8982,7 @@ export default function App() {
                       Student Review Request
                     </h3>
                     <span className="bg-blue-100 text-blue-800 text-[10.5px] font-extrabold font-mono px-2.5 py-0.5 rounded">
-                      Total Review Request Found: {totalStudentScripts} ({totalStudentScripts} টি খাতা)
+                      Total Review Request Found: {totalStudentScripts}
                     </span>
                   </div>
                   <div className="overflow-x-auto relative">
@@ -9144,7 +9146,7 @@ export default function App() {
                       Admin Review Request
                     </h3>
                     <span className="bg-purple-100 text-purple-800 text-[10.5px] font-extrabold font-mono px-2.5 py-0.5 rounded">
-                      Total Review Request Found: {totalAdminScripts} ({totalAdminScripts} টি খাতা)
+                      Total Review Request Found: {totalAdminScripts}
                     </span>
                   </div>
                   <div className="overflow-x-auto relative">
