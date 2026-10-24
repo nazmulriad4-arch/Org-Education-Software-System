@@ -48,7 +48,8 @@ import {
   ChevronRight,
   Menu,
   AlertTriangle,
-  Check
+  Check,
+  ArrowUpDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { evaluateScript, type Annotation, type EvaluationResult as AIEvaluationResult } from './services/geminiService';
@@ -403,6 +404,27 @@ const getPendingDuration = (dateStr: string) => {
     return `${diffMins}m`;
   } catch (err) {
     return '2h 15m';
+  }
+};
+
+const parsePendingTimestamp = (dateStr: string): number => {
+  if (!dateStr) return 0;
+  try {
+    const parts = dateStr.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})\s*(AM|PM)?/i);
+    if (!parts) return 0;
+    const year = parseInt(parts[1]);
+    const month = parseInt(parts[2]) - 1;
+    const day = parseInt(parts[3]);
+    let hour = parseInt(parts[4]);
+    const minute = parseInt(parts[5]);
+    const ampm = parts[6];
+    if (ampm) {
+      if (ampm.toUpperCase() === 'PM' && hour < 12) hour += 12;
+      if (ampm.toUpperCase() === 'AM' && hour === 12) hour = 0;
+    }
+    return new Date(year, month, day, hour, minute).getTime();
+  } catch {
+    return 0;
   }
 };
 
@@ -2103,6 +2125,76 @@ export default function App() {
   const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
   const [adminDashExamType, setAdminDashExamType] = useState('All Exam Type');
   const [adminDashTime, setAdminDashTime] = useState('Last 30 Minute');
+
+  // Sorting states for Students' Review Request, Admin Review Request & Regular Summary
+  const [stuReqSortField, setStuReqSortField] = useState<'course' | 'subject' | 'requests' | 'pending' | null>(null);
+  const [stuReqSortDir, setStuReqSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const [adminReqSortField, setAdminReqSortField] = useState<'course' | 'subject' | 'scripts' | 'pending' | null>(null);
+  const [adminReqSortDir, setAdminReqSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const [regularCourseSortDir, setRegularCourseSortDir] = useState<'asc' | 'desc' | null>(null);
+
+  const toggleStuSort = (field: 'course' | 'subject' | 'requests' | 'pending') => {
+    if (stuReqSortField === field) {
+      setStuReqSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setStuReqSortField(field);
+      setStuReqSortDir('asc');
+    }
+  };
+
+  const toggleAdminSort = (field: 'course' | 'subject' | 'scripts' | 'pending') => {
+    if (adminReqSortField === field) {
+      setAdminReqSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setAdminReqSortField(field);
+      setAdminReqSortDir('asc');
+    }
+  };
+
+  const toggleRegularSort = () => {
+    setRegularCourseSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
+
+  // Sorting states for Evaluation Report
+  const [evalReportSortField, setEvalReportSortField] = useState<'totalParticipant' | 'writtenEvaluated' | 'writtenPending' | 'reviewRequest' | 'reviewAccepted' | null>(null);
+  const [evalReportSortDir, setEvalReportSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const toggleEvalReportSort = (field: 'totalParticipant' | 'writtenEvaluated' | 'writtenPending' | 'reviewRequest' | 'reviewAccepted') => {
+    if (evalReportSortField === field) {
+      setEvalReportSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setEvalReportSortField(field);
+      setEvalReportSortDir('asc');
+    }
+  };
+
+  // Sorting states for Admin Review
+  const [adminReviewSortField, setAdminReviewSortField] = useState<'examSubject' | 'minMarks' | 'maxMarks' | 'totalScript' | null>(null);
+  const [adminReviewSortDir, setAdminReviewSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const toggleAdminReviewSort = (field: 'examSubject' | 'minMarks' | 'maxMarks' | 'totalScript') => {
+    if (adminReviewSortField === field) {
+      setAdminReviewSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setAdminReviewSortField(field);
+      setAdminReviewSortDir('asc');
+    }
+  };
+
+  // Reset sorting states whenever user navigates to another menu
+  useEffect(() => {
+    setStuReqSortField(null);
+    setStuReqSortDir('asc');
+    setAdminReqSortField(null);
+    setAdminReqSortDir('asc');
+    setRegularCourseSortDir(null);
+    setEvalReportSortField(null);
+    setEvalReportSortDir('asc');
+    setAdminReviewSortField(null);
+    setAdminReviewSortDir('asc');
+  }, [activeTab, activeSidebarItem, activeSubItem]);
 
   const handleCancelRequest = (id: string) => {
     setAdminForwardedRequests(prev => prev.filter(req => req.id !== id));
@@ -4217,7 +4309,7 @@ export default function App() {
         default: timeMultiplier = 1.0;
       }
 
-      const regularSummary = rawRegularSummary.map(group => {
+      let regularSummary = rawRegularSummary.map(group => {
         let subjects = group.subjects;
         if (adminDashExamType === 'Templated Written') {
           subjects = subjects.filter(subj => subj.name.includes('[TW]'));
@@ -4235,8 +4327,15 @@ export default function App() {
         };
       }).filter(group => group.subjects.length > 0);
 
+      if (regularCourseSortDir) {
+        regularSummary = [...regularSummary].sort((a, b) => {
+          const cmp = a.course.trim().toLowerCase().localeCompare(b.course.trim().toLowerCase());
+          return regularCourseSortDir === 'asc' ? cmp : -cmp;
+        });
+      }
+
       // Filter adminForwardedRequests into Student and Admin requests for the dashboard
-      const dashboardStudentRequests = adminForwardedRequests.filter(isStudentRequest).map(req => ({
+      let dashboardStudentRequests = adminForwardedRequests.filter(isStudentRequest).map(req => ({
         examiner: req.examiner,
         course: req.course,
         subject: req.subject,
@@ -4248,7 +4347,79 @@ export default function App() {
         originalData: req
       }));
 
-      const dashboardAdminRequests = adminForwardedRequests.filter(req => !isStudentRequest(req));
+      if (stuReqSortField === 'course') {
+        dashboardStudentRequests.sort((a, b) => {
+          const courseA = (a.course || '').trim().toLowerCase();
+          const courseB = (b.course || '').trim().toLowerCase();
+          const cmp = courseA.localeCompare(courseB);
+          if (cmp !== 0) {
+            return stuReqSortDir === 'asc' ? cmp : -cmp;
+          }
+          return (a.subject || '').localeCompare(b.subject || '');
+        });
+      } else if (stuReqSortField === 'subject') {
+        dashboardStudentRequests.sort((a, b) => {
+          const subjA = (a.subject || '').trim().toLowerCase();
+          const subjB = (b.subject || '').trim().toLowerCase();
+          const cmp = subjA.localeCompare(subjB);
+          if (cmp !== 0) {
+            return stuReqSortDir === 'asc' ? cmp : -cmp;
+          }
+          return (a.course || '').localeCompare(b.course || '');
+        });
+      } else if (stuReqSortField === 'requests') {
+        dashboardStudentRequests.sort((a, b) => {
+          const valA = a.requests || 0;
+          const valB = b.requests || 0;
+          return stuReqSortDir === 'asc' ? valA - valB : valB - valA;
+        });
+      } else if (stuReqSortField === 'pending') {
+        dashboardStudentRequests.sort((a, b) => {
+          const timeA = parsePendingTimestamp(a.originalData?.date || '');
+          const timeB = parsePendingTimestamp(b.originalData?.date || '');
+          return stuReqSortDir === 'asc' ? timeB - timeA : timeA - timeB;
+        });
+      }
+
+      let dashboardAdminRequests = adminForwardedRequests.filter(req => !isStudentRequest(req));
+
+      if (adminReqSortField === 'course') {
+        dashboardAdminRequests = [...dashboardAdminRequests].sort((a, b) => {
+          const courseA = (a.course || '').trim().toLowerCase();
+          const courseB = (b.course || '').trim().toLowerCase();
+          const cmp = courseA.localeCompare(courseB);
+          if (cmp !== 0) {
+            return adminReqSortDir === 'asc' ? cmp : -cmp;
+          }
+          return (a.subject || '').localeCompare(b.subject || '');
+        });
+      } else if (adminReqSortField === 'subject') {
+        dashboardAdminRequests = [...dashboardAdminRequests].sort((a, b) => {
+          const subjA = (a.subject || '').trim().toLowerCase();
+          const subjB = (b.subject || '').trim().toLowerCase();
+          const cmp = subjA.localeCompare(subjB);
+          if (cmp !== 0) {
+            return adminReqSortDir === 'asc' ? cmp : -cmp;
+          }
+          return (a.course || '').localeCompare(b.course || '');
+        });
+      } else if (adminReqSortField === 'scripts') {
+        dashboardAdminRequests = [...dashboardAdminRequests].sort((a, b) => {
+          const countA = a.isMultiple ? (a.totalScriptsCount || 1) : (a.reviewCount || 1);
+          const countB = b.isMultiple ? (b.totalScriptsCount || 1) : (b.reviewCount || 1);
+          return adminReqSortDir === 'asc' ? countA - countB : countB - countA;
+        });
+      } else if (adminReqSortField === 'pending') {
+        dashboardAdminRequests = [...dashboardAdminRequests].sort((a, b) => {
+          const isACompleted = a.status === 'Resolved by Teacher' || a.status === 'Completed' || a.status === 'Reviewed' || a.status === 'Resolved' || (a.isMultiple && (a.checkedScriptsCount || 0) >= (a.totalScriptsCount || 0));
+          const isBCompleted = b.status === 'Resolved by Teacher' || b.status === 'Completed' || b.status === 'Reviewed' || b.status === 'Resolved' || (b.isMultiple && (b.checkedScriptsCount || 0) >= (b.totalScriptsCount || 0));
+          if (isACompleted && !isBCompleted) return 1;
+          if (!isACompleted && isBCompleted) return -1;
+          const timeA = parsePendingTimestamp(a.date || '');
+          const timeB = parsePendingTimestamp(b.date || '');
+          return adminReqSortDir === 'asc' ? timeB - timeA : timeA - timeB;
+        });
+      }
 
       const reviewRequests = dashboardStudentRequests;
 
@@ -4451,7 +4622,29 @@ export default function App() {
               <table className="w-full border-collapse text-[11.5px] font-sans">
                 <thead>
                   <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-200">
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[32%]">Course [Program-Session]</th>
+                    <th 
+                      className="border-r border-gray-200 px-3 py-2.5 text-left w-[32%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={toggleRegularSort}
+                    >
+                      <div className="inline-flex items-center justify-between w-full">
+                        <span>Course [Program-Session]</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleRegularSort();
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            regularCourseSortDir 
+                              ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={regularCourseSortDir ? `Sorted ${regularCourseSortDir === 'asc' ? 'Ascending (A→Z)' : 'Descending (Z→A)'}` : 'Sort by Course'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[24%]">Subject</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[11%]">Evaluation Pending</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[11%]">Active Examiner(s)</th>
@@ -4649,12 +4842,100 @@ export default function App() {
               <table className="w-full border-collapse text-[11.5px] font-sans">
                 <thead>
                   <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-200">
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[22%]">Teacher</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[26%]">Course [Program-Session]</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[16%]">Subject</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[20%]">Exam</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[8%]">Review Requests</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[8%]">Pending From</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[21%]">Teacher</th>
+                    <th 
+                      className="border-r border-gray-200 px-3 py-2.5 text-left w-[25%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={() => toggleStuSort('course')}
+                    >
+                      <div className="inline-flex items-center justify-between w-full">
+                        <span>Course [Program-Session]</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStuSort('course');
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            stuReqSortField === 'course' 
+                              ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={stuReqSortField === 'course' ? `Sorted ${stuReqSortDir === 'asc' ? 'Ascending (A→Z)' : 'Descending (Z→A)'}` : 'Sort by Course'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
+                    <th 
+                      className="border-r border-gray-200 px-3 py-2.5 text-left w-[15%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={() => toggleStuSort('subject')}
+                    >
+                      <div className="inline-flex items-center justify-between w-full">
+                        <span>Subject</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStuSort('subject');
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            stuReqSortField === 'subject' 
+                              ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={stuReqSortField === 'subject' ? `Sorted ${stuReqSortDir === 'asc' ? 'Ascending (A→Z)' : 'Descending (Z→A)'}` : 'Sort by Subject'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[19%]">Exam</th>
+                    <th 
+                      className="border-r border-gray-200 px-2 py-2.5 text-center w-[10%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={() => toggleStuSort('requests')}
+                    >
+                      <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <span>Review Requests</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStuSort('requests');
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            stuReqSortField === 'requests' 
+                              ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={stuReqSortField === 'requests' ? `Sorted ${stuReqSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
+                    <th 
+                      className="border-r border-gray-200 px-2 py-2.5 text-center w-[9%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={() => toggleStuSort('pending')}
+                    >
+                      <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <span>Pending From</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStuSort('pending');
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            stuReqSortField === 'pending' 
+                              ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={stuReqSortField === 'pending' ? `Sorted ${stuReqSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
                     <th className="px-3 py-2.5 text-center w-[5%]">Action</th>
                   </tr>
                 </thead>
@@ -4742,16 +5023,104 @@ export default function App() {
               <table className="w-full border-collapse text-[11.5px] font-sans">
                 <thead>
                   <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-200">
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[14%]">Teacher</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[17%]">Course [Program-Session]</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[8%]">Subject</th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[13%]">Teacher</th>
+                    <th 
+                      className="border-r border-gray-200 px-3 py-2.5 text-left w-[16%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={() => toggleAdminSort('course')}
+                    >
+                      <div className="inline-flex items-center justify-between w-full">
+                        <span>Course [Program-Session]</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleAdminSort('course');
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            adminReqSortField === 'course' 
+                              ? 'text-purple-600 bg-purple-50 ring-1 ring-purple-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={adminReqSortField === 'course' ? `Sorted ${adminReqSortDir === 'asc' ? 'Ascending (A→Z)' : 'Descending (Z→A)'}` : 'Sort by Course'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
+                    <th 
+                      className="border-r border-gray-200 px-2.5 py-2.5 text-left w-[8.5%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={() => toggleAdminSort('subject')}
+                    >
+                      <div className="inline-flex items-center justify-between w-full">
+                        <span>Subject</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleAdminSort('subject');
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            adminReqSortField === 'subject' 
+                              ? 'text-purple-600 bg-purple-50 ring-1 ring-purple-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={adminReqSortField === 'subject' ? `Sorted ${adminReqSortDir === 'asc' ? 'Ascending (A→Z)' : 'Descending (Z→A)'}` : 'Sort by Subject'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[12%]">Exam</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[9%]">Unique Set and Question Serial</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[13%]">Admin Note</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[12%]">Reviewed By:</th>
-                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[6%]">Review Scripts</th>
-                    <th className="border-r border-gray-200 px-3 py-2.5 text-center w-[8%]">Pending From</th>
-                    <th className="px-3 py-2.5 text-center w-[7%]">Action</th>
+                    <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[11%]">Reviewed By:</th>
+                    <th 
+                      className="border-r border-gray-200 px-2 py-2.5 text-center w-[8%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={() => toggleAdminSort('scripts')}
+                    >
+                      <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <span>Review Scripts</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleAdminSort('scripts');
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            adminReqSortField === 'scripts' 
+                              ? 'text-purple-600 bg-purple-50 ring-1 ring-purple-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={adminReqSortField === 'scripts' ? `Sorted ${adminReqSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
+                    <th 
+                      className="border-r border-gray-200 px-2 py-2.5 text-center w-[8%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                      onClick={() => toggleAdminSort('pending')}
+                    >
+                      <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <span>Pending From</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleAdminSort('pending');
+                          }}
+                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                            adminReqSortField === 'pending' 
+                              ? 'text-purple-600 bg-purple-50 ring-1 ring-purple-300' 
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                          }`}
+                          title={adminReqSortField === 'pending' ? `Sorted ${adminReqSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                        >
+                          <ArrowUpDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </th>
+                    <th className="px-3 py-2.5 text-center w-[6%]">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -6342,11 +6711,37 @@ export default function App() {
           return true;
         });
 
-        // Apply Order By sorting
-        if (evalReportFilters.orderBy === 'Highest Review Accepted %') {
-          list.sort((a, b) => (b.reviewRequest ?? 0) - (a.reviewRequest ?? 0));
-        } else if (evalReportFilters.orderBy === 'Lowest Review Accepted %') {
-          list.sort((a, b) => (a.reviewRequest ?? 0) - (b.reviewRequest ?? 0));
+        // Apply Column Sorting (Total Participant, Written Evaluated, Written Pending, Review Request, Review Accepted %)
+        if (evalReportSortField === 'totalParticipant') {
+          list.sort((a, b) => {
+            const valA = a.totalParticipant ?? 0;
+            const valB = b.totalParticipant ?? 0;
+            return evalReportSortDir === 'asc' ? valA - valB : valB - valA;
+          });
+        } else if (evalReportSortField === 'writtenEvaluated') {
+          list.sort((a, b) => {
+            const valA = a.writtenEvaluated ?? 0;
+            const valB = b.writtenEvaluated ?? 0;
+            return evalReportSortDir === 'asc' ? valA - valB : valB - valA;
+          });
+        } else if (evalReportSortField === 'writtenPending') {
+          list.sort((a, b) => {
+            const valA = a.writtenPending ?? 0;
+            const valB = b.writtenPending ?? 0;
+            return evalReportSortDir === 'asc' ? valA - valB : valB - valA;
+          });
+        } else if (evalReportSortField === 'reviewRequest') {
+          list.sort((a, b) => {
+            const valA = a.reviewRequest ?? 0;
+            const valB = b.reviewRequest ?? 0;
+            return evalReportSortDir === 'asc' ? valA - valB : valB - valA;
+          });
+        } else if (evalReportSortField === 'reviewAccepted') {
+          list.sort((a, b) => {
+            const pctA = a.writtenEvaluated && a.writtenEvaluated > 0 ? ((a.reviewRequest || 0) / a.writtenEvaluated) * 100 : 0;
+            const pctB = b.writtenEvaluated && b.writtenEvaluated > 0 ? ((b.reviewRequest || 0) / b.writtenEvaluated) * 100 : 0;
+            return evalReportSortDir === 'asc' ? pctA - pctB : pctB - pctA;
+          });
         }
 
         return list.slice(0, parseInt(evalReportFilters.noOfRows) || 100);
@@ -6661,21 +7056,7 @@ export default function App() {
                         </div>
 
 
-                        {/* Order by Option */}
-                        <div className="grid grid-cols-12 items-center gap-2">
-                          <label className="col-span-4 text-right pr-4 font-bold text-red-600 text-[13px]">Order by</label>
-                          <div className="col-span-8">
-                            <select
-                              value={evalReportFilters.orderBy || 'All'}
-                              onChange={e => setEvalReportFilters({...evalReportFilters, orderBy: e.target.value})}
-                              className="w-full border border-blue-400 rounded px-2.5 py-1.5 text-xs text-gray-700 bg-white shadow-sm focus:outline-none focus:border-[#002d5b] font-semibold"
-                            >
-                              <option value="All">All</option>
-                              <option value="Highest Review Accepted %">Highest Review Accepted %</option>
-                              <option value="Lowest Review Accepted %">Lowest Review Accepted %</option>
-                            </select>
-                          </div>
-                        </div>
+
                       </div>
                     </div>
 
@@ -6729,15 +7110,125 @@ export default function App() {
                       <th className="p-3 border border-gray-300 text-center min-w-[160px]">Course</th>
                       <th className="p-3 border border-gray-300 text-center min-w-[220px]">[Code] Exam</th>
                       <th className="p-3 border border-gray-300 text-center min-w-[110px]">Exam Type</th>
-                      <th className="p-3 border border-gray-300 text-center">Total Participant</th>
+                      <th 
+                        className="p-3 border border-gray-300 text-center cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                        onClick={() => toggleEvalReportSort('totalParticipant')}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>Total Participant</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleEvalReportSort('totalParticipant');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              evalReportSortField === 'totalParticipant' 
+                                ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                            }`}
+                            title={evalReportSortField === 'totalParticipant' ? `Sorted ${evalReportSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
                       <th className="p-3 border border-gray-300 text-center">MCQ Submitted</th>
                       <th className="p-3 border border-gray-300 text-center">Written Submitted</th>
-                      <th className="p-3 border border-gray-300 text-center">Written Evaluated</th>
+                      <th 
+                        className="p-3 border border-gray-300 text-center cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                        onClick={() => toggleEvalReportSort('writtenEvaluated')}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>Written Evaluated</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleEvalReportSort('writtenEvaluated');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              evalReportSortField === 'writtenEvaluated' 
+                                ? 'text-emerald-600 bg-emerald-50 ring-1 ring-emerald-300' 
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                            }`}
+                            title={evalReportSortField === 'writtenEvaluated' ? `Sorted ${evalReportSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
                       <th className="p-3 border border-gray-300 text-center">Blank Script</th>
-                      <th className="p-3 border border-gray-300 text-center">Written Pending</th>
-                      <th className="p-3 border border-gray-300 text-center">Review Request</th>
+                      <th 
+                        className="p-3 border border-gray-300 text-center cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                        onClick={() => toggleEvalReportSort('writtenPending')}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>Written Pending</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleEvalReportSort('writtenPending');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              evalReportSortField === 'writtenPending' 
+                                ? 'text-amber-600 bg-amber-50 ring-1 ring-amber-300' 
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                            }`}
+                            title={evalReportSortField === 'writtenPending' ? `Sorted ${evalReportSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
+                      <th 
+                        className="p-3 border border-gray-300 text-center cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                        onClick={() => toggleEvalReportSort('reviewRequest')}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>Review Request</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleEvalReportSort('reviewRequest');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              evalReportSortField === 'reviewRequest' 
+                                ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                            }`}
+                            title={evalReportSortField === 'reviewRequest' ? `Sorted ${evalReportSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
                       <th className="p-3 border border-gray-300 text-center">Review Pending</th>
-                      <th className="p-3 border border-gray-300 text-center text-teal-800 bg-teal-50 min-w-[130px]">Review Accepted (%)</th>
+                      <th 
+                        className="p-3 border border-gray-300 text-center text-teal-800 bg-teal-50 min-w-[145px] cursor-pointer select-none hover:bg-teal-100/70 transition-colors group"
+                        onClick={() => toggleEvalReportSort('reviewAccepted')}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>Review Accepted (%)</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleEvalReportSort('reviewAccepted');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              evalReportSortField === 'reviewAccepted' 
+                                ? 'text-teal-700 bg-teal-100 ring-1 ring-teal-400' 
+                                : 'text-teal-500 hover:text-teal-700 hover:bg-teal-100/60'
+                            }`}
+                            title={evalReportSortField === 'reviewAccepted' ? `Sorted ${evalReportSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
                       <th className="p-3 border border-gray-300 text-center">Total Eva. Time</th>
                       <th className="p-3 border border-gray-300 text-center">Max Eva. Time</th>
                       <th className="p-3 border border-gray-300 text-center">Min Eva. Time</th>
@@ -7994,33 +8485,35 @@ export default function App() {
         if (reviewFilters.reviewStatus !== 'All' && row.reviewStatus !== reviewFilters.reviewStatus) return false;
         return true;
       });
-      if (reviewFilters.orderBy === 'Question Serial') {
+      // Sort rows based on adminReviewSortField and adminReviewSortDir
+      if (adminReviewSortField === 'examSubject') {
         filteredSearchRows.sort((a, b) => {
-          const matchQA = a.question.match(/Question Serial:\s*(\d+)/i);
-          const matchQB = b.question.match(/Question Serial:\s*(\d+)/i);
-          const qA = matchQA ? parseInt(matchQA[1], 10) : 0;
-          const qB = matchQB ? parseInt(matchQB[1], 10) : 0;
-          
-          if (qA !== qB) {
-            return qA - qB;
-          }
-          
-          const matchSA = a.question.match(/Unique Set:\s*(\d+)/i);
-          const matchSB = b.question.match(/Unique Set:\s*(\d+)/i);
-          const sA = matchSA ? parseInt(matchSA[1], 10) : 0;
-          const sB = matchSB ? parseInt(matchSB[1], 10) : 0;
-          return sA - sB;
+          const cmp = (a.examSubject || '').localeCompare(b.examSubject || '', undefined, { numeric: true, sensitivity: 'base' });
+          return adminReviewSortDir === 'asc' ? cmp : -cmp;
+        });
+      } else if (adminReviewSortField === 'minMarks') {
+        filteredSearchRows.sort((a, b) => {
+          const valA = parseFloat(a.minMarks || '0') || 0;
+          const valB = parseFloat(b.minMarks || '0') || 0;
+          return adminReviewSortDir === 'asc' ? valA - valB : valB - valA;
+        });
+      } else if (adminReviewSortField === 'maxMarks') {
+        filteredSearchRows.sort((a, b) => {
+          const valA = parseFloat(a.maxMarks || '0') || 0;
+          const valB = parseFloat(b.maxMarks || '0') || 0;
+          return adminReviewSortDir === 'asc' ? valA - valB : valB - valA;
+        });
+      } else if (adminReviewSortField === 'totalScript') {
+        filteredSearchRows.sort((a, b) => {
+          const valA = typeof a.totalScript === 'number' ? a.totalScript : (parseInt(String(a.totalScript || 0), 10) || 0);
+          const valB = typeof b.totalScript === 'number' ? b.totalScript : (parseInt(String(b.totalScript || 0), 10) || 0);
+          return adminReviewSortDir === 'asc' ? valA - valB : valB - valA;
         });
       }
 
       const handleSearch = () => {
-        if (reviewFilters.orderBy === 'Individual' && !reviewFilters.rollNumber.trim()) {
-          setRollError(true);
-          setReviewSearchTriggered(false);
-        } else {
-          setRollError(false);
-          setReviewSearchTriggered(true);
-        }
+        setRollError(false);
+        setReviewSearchTriggered(true);
       };
 
       const handleExport = () => {
@@ -8347,29 +8840,6 @@ export default function App() {
                       <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <label className="w-40 text-[13px] font-bold text-red-600 text-right mr-4 leading-tight font-sans">Order by</label>
-                    <div className="flex-1 relative">
-                      <select 
-                        value={reviewFilters.orderBy}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setReviewFilters(prev => ({ ...prev, orderBy: val }));
-                          if (val === 'Individual' && !reviewFilters.rollNumber.trim()) {
-                            setRollError(true);
-                          } else {
-                            setRollError(false);
-                          }
-                        }}
-                        className="w-full border border-gray-300 rounded px-2 py-1.5 text-[13px] text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400 appearance-none bg-white font-sans"
-                      >
-                        <option value="All">All</option>
-                        <option value="Individual">Individual</option>
-                        <option value="Question Serial">Question Serial</option>
-                      </select>
-                      <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -8405,14 +8875,102 @@ export default function App() {
                       <th className="py-2.5 px-2 border-r border-gray-200 text-center font-bold font-sans w-12">SI</th>
                       <th className="py-2.5 px-3 border-r border-gray-200 text-left font-bold font-sans">Program Session</th>
                       <th className="py-2.5 px-3 border-r border-gray-200 text-left font-bold font-sans">Course</th>
-                      <th className="py-2.5 px-3 border-r border-gray-200 text-left font-bold font-sans">[Code] Exam & Subject</th>
+                      <th 
+                        className="py-2.5 px-3 border-r border-gray-200 text-left font-bold font-sans cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                        onClick={() => toggleAdminReviewSort('examSubject')}
+                      >
+                        <div className="inline-flex items-center justify-between w-full gap-1.5 whitespace-nowrap">
+                          <span>[Code] Exam &amp; Subject</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleAdminReviewSort('examSubject');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              adminReviewSortField === 'examSubject' 
+                                ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                            }`}
+                            title={adminReviewSortField === 'examSubject' ? `Sorted ${adminReviewSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
                       <th className="py-2.5 px-3 border-r border-gray-200 text-center font-bold font-sans">Exam Type</th>
                       <th className="py-2.5 px-3 border-r border-gray-200 text-center font-bold font-sans">Evaluation Type</th>
                       <th className="py-2.5 px-3 border-r border-gray-200 text-center font-bold font-sans">Version</th>
                       <th className="py-2.5 px-3 border-r border-gray-200 text-center font-bold font-sans">Question</th>
-                      <th className="py-2.5 px-2 border-r border-gray-200 text-center font-bold font-sans">Minimum Marks</th>
-                      <th className="py-2.5 px-2 border-r border-gray-200 text-center font-bold font-sans">Maximum Marks</th>
-                      <th className="py-2.5 px-2 border-r border-gray-200 text-center font-bold font-sans">Total Script</th>
+                      <th 
+                        className="py-2.5 px-2 border-r border-gray-200 text-center font-bold font-sans cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                        onClick={() => toggleAdminReviewSort('minMarks')}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>Minimum Marks</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleAdminReviewSort('minMarks');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              adminReviewSortField === 'minMarks' 
+                                ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                            }`}
+                            title={adminReviewSortField === 'minMarks' ? `Sorted ${adminReviewSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
+                      <th 
+                        className="py-2.5 px-2 border-r border-gray-200 text-center font-bold font-sans cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                        onClick={() => toggleAdminReviewSort('maxMarks')}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>Maximum Marks</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleAdminReviewSort('maxMarks');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              adminReviewSortField === 'maxMarks' 
+                                ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                            }`}
+                            title={adminReviewSortField === 'maxMarks' ? `Sorted ${adminReviewSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
+                      <th 
+                        className="py-2.5 px-2 border-r border-gray-200 text-center font-bold font-sans cursor-pointer select-none hover:bg-gray-100 transition-colors group"
+                        onClick={() => toggleAdminReviewSort('totalScript')}
+                      >
+                        <div className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>Total Script</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleAdminReviewSort('totalScript');
+                            }}
+                            className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
+                              adminReviewSortField === 'totalScript' 
+                                ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
+                                : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
+                            }`}
+                            title={adminReviewSortField === 'totalScript' ? `Sorted ${adminReviewSortDir === 'asc' ? 'Ascending' : 'Descending'}` : 'Sort Ascending/Descending'}
+                          >
+                            <ArrowUpDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </th>
                       <th className="py-2.5 px-3 text-center font-bold font-sans">Action</th>
                     </tr>
                   </thead>
@@ -8497,6 +9055,17 @@ export default function App() {
                             </td>
                         </tr>
                       ))
+                    )}
+                    {filteredSearchRows.length > 0 && (
+                      <tr className="bg-[#f1f3f5] border-t-2 border-gray-300 font-bold">
+                        <td colSpan={10} className="py-2.5 px-3 border-r border-gray-200 text-right font-bold text-gray-800 font-sans text-[12px]">
+                          Total
+                        </td>
+                        <td className="py-2.5 px-2 border-r border-gray-200 text-center font-extrabold text-gray-900 bg-gray-100/60 font-mono text-[12px]">
+                          {filteredSearchRows.reduce((sum, r) => sum + (parseInt(String(r.totalScript), 10) || 0), 0).toLocaleString()}
+                        </td>
+                        <td className="py-2.5 px-3 text-center"></td>
+                      </tr>
                     )}
                   </tbody>
                 </table>
