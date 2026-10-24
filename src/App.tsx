@@ -2133,8 +2133,6 @@ export default function App() {
   const [adminReqSortField, setAdminReqSortField] = useState<'course' | 'subject' | 'scripts' | 'pending' | null>(null);
   const [adminReqSortDir, setAdminReqSortDir] = useState<'asc' | 'desc'>('asc');
 
-  const [regularCourseSortDir, setRegularCourseSortDir] = useState<'asc' | 'desc' | null>(null);
-
   const toggleStuSort = (field: 'course' | 'subject' | 'requests' | 'pending') => {
     if (stuReqSortField === field) {
       setStuReqSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -2151,10 +2149,6 @@ export default function App() {
       setAdminReqSortField(field);
       setAdminReqSortDir('asc');
     }
-  };
-
-  const toggleRegularSort = () => {
-    setRegularCourseSortDir(prev => prev === 'asc' ? 'desc' : 'asc');
   };
 
   // Sorting states for Evaluation Report
@@ -2189,7 +2183,6 @@ export default function App() {
     setStuReqSortDir('asc');
     setAdminReqSortField(null);
     setAdminReqSortDir('asc');
-    setRegularCourseSortDir(null);
     setEvalReportSortField(null);
     setEvalReportSortDir('asc');
     setAdminReviewSortField(null);
@@ -4327,13 +4320,6 @@ export default function App() {
         };
       }).filter(group => group.subjects.length > 0);
 
-      if (regularCourseSortDir) {
-        regularSummary = [...regularSummary].sort((a, b) => {
-          const cmp = a.course.trim().toLowerCase().localeCompare(b.course.trim().toLowerCase());
-          return regularCourseSortDir === 'asc' ? cmp : -cmp;
-        });
-      }
-
       // Filter adminForwardedRequests into Student and Admin requests for the dashboard
       let dashboardStudentRequests = adminForwardedRequests.filter(isStudentRequest).map(req => ({
         examiner: req.examiner,
@@ -4622,29 +4608,7 @@ export default function App() {
               <table className="w-full border-collapse text-[11.5px] font-sans">
                 <thead>
                   <tr className="bg-[#f8f9fa] text-gray-700 font-bold border-b border-gray-200">
-                    <th 
-                      className="border-r border-gray-200 px-3 py-2.5 text-left w-[32%] cursor-pointer select-none hover:bg-gray-100 transition-colors group"
-                      onClick={toggleRegularSort}
-                    >
-                      <div className="inline-flex items-center justify-between w-full">
-                        <span>Course [Program-Session]</span>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleRegularSort();
-                          }}
-                          className={`p-0.5 rounded transition-all inline-flex items-center justify-center ${
-                            regularCourseSortDir 
-                              ? 'text-blue-600 bg-blue-50 ring-1 ring-blue-300' 
-                              : 'text-slate-400 hover:text-slate-600 hover:bg-gray-200/60'
-                          }`}
-                          title={regularCourseSortDir ? `Sorted ${regularCourseSortDir === 'asc' ? 'Ascending (A→Z)' : 'Descending (Z→A)'}` : 'Sort by Course'}
-                        >
-                          <ArrowUpDown className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </th>
+                    <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[32%]">Course [Program-Session]</th>
                     <th className="border-r border-gray-200 px-3 py-2.5 text-left w-[24%]">Subject</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[11%]">Evaluation Pending</th>
                     <th className="border-r border-gray-200 px-2.5 py-2.5 text-center w-[11%]">Active Examiner(s)</th>
