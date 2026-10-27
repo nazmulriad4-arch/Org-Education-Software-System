@@ -451,6 +451,45 @@ const isStudentRequest = (req: any) => {
   return false;
 };
 
+const getProgramCode = (item: any): string => {
+  if (!item) return 'Other';
+  const p = (item.program || '').toLowerCase();
+  const c = (item.course || '').toLowerCase();
+  const s = item.session || '2026';
+
+  const bracketMatch = (item.course || '').match(/\[([A-Z\s]+)\s*-\s*(\d{4})\]/i);
+  if (bracketMatch) {
+    const code = bracketMatch[1].trim().replace(/\s+/g, '');
+    const yr = bracketMatch[2].trim();
+    if (code === 'CAP') return `CAP-${yr}`;
+    if (code === 'EAP') return `EAP-${yr}`;
+    if (code === 'VAP') return `VAP-${yr}`;
+    if (code === 'HSC') return `HSC-${yr}`;
+  }
+
+  if (p.includes('engineering') || c.includes('engineering') || c.includes('eap')) {
+    return `EAP-${s}`;
+  }
+  if (p.includes('varsity') || c.includes('varsity') || c.includes('vap')) {
+    return `VAP-${s}`;
+  }
+  if (p.includes('college') || c.includes('college') || c.includes('cap') || c.includes('ndc') || c.includes('hcc')) {
+    return `CAP-${s}`;
+  }
+  if (p.includes('hsc') || c.includes('hsc')) {
+    return `HSC-${s}`;
+  }
+  if (p.includes('medical') || c.includes('medical') || c.includes('map')) {
+    return `MAP-${s}`;
+  }
+
+  if (/^[A-Z]{2,5}-\d{4}$/i.test(item.program)) {
+    return item.program.toUpperCase();
+  }
+
+  return `${item.program || 'Program'} (${s})`;
+};
+
 export default function App() {
   // --- New authentication and view states ---
   const [currentUser, setCurrentUser] = useState<any>(() => {
@@ -2125,6 +2164,8 @@ export default function App() {
   const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
   const [adminDashExamType, setAdminDashExamType] = useState('All Exam Type');
   const [adminDashTime, setAdminDashTime] = useState('Last 30 Minute');
+  const [stuDashProgramFilter, setStuDashProgramFilter] = useState<string>('All');
+  const [adminDashProgramFilter, setAdminDashProgramFilter] = useState<string>('All');
 
   // Sorting states for Students' Review Request, Admin Review Request & Regular Summary
   const [stuReqSortField, setStuReqSortField] = useState<'course' | 'subject' | 'requests' | 'pending' | null>(null);
@@ -2187,6 +2228,8 @@ export default function App() {
     setEvalReportSortDir('asc');
     setAdminReviewSortField(null);
     setAdminReviewSortDir('asc');
+    setStuDashProgramFilter('All');
+    setAdminDashProgramFilter('All');
   }, [activeTab, activeSidebarItem, activeSubItem]);
 
   const handleCancelRequest = (id: string) => {
@@ -4320,6 +4363,16 @@ export default function App() {
         };
       }).filter(group => group.subjects.length > 0);
 
+      const preferredPrograms = ['EAP-2026', 'VAP-2026', 'CAP-2026', 'HSC-2027'];
+      const extractedPrograms = Array.from(new Set<string>(adminForwardedRequests.map(r => getProgramCode(r))));
+      const availablePrograms: string[] = ['All'];
+      for (const p of preferredPrograms) {
+        if (!availablePrograms.includes(p)) availablePrograms.push(p);
+      }
+      for (const p of extractedPrograms) {
+        if (!availablePrograms.includes(p)) availablePrograms.push(p);
+      }
+
       // Filter adminForwardedRequests into Student and Admin requests for the dashboard
       let dashboardStudentRequests = adminForwardedRequests.filter(isStudentRequest).map(req => ({
         examiner: req.examiner,
@@ -4332,6 +4385,10 @@ export default function App() {
         status: req.status,
         originalData: req
       }));
+
+      if (stuDashProgramFilter !== 'All') {
+        dashboardStudentRequests = dashboardStudentRequests.filter(req => getProgramCode(req.originalData) === stuDashProgramFilter);
+      }
 
       if (stuReqSortField === 'course') {
         dashboardStudentRequests.sort((a, b) => {
@@ -4368,6 +4425,10 @@ export default function App() {
       }
 
       let dashboardAdminRequests = adminForwardedRequests.filter(req => !isStudentRequest(req));
+
+      if (adminDashProgramFilter !== 'All') {
+        dashboardAdminRequests = dashboardAdminRequests.filter(req => getProgramCode(req) === adminDashProgramFilter);
+      }
 
       if (adminReqSortField === 'course') {
         dashboardAdminRequests = [...dashboardAdminRequests].sort((a, b) => {
@@ -4785,11 +4846,26 @@ export default function App() {
 
           {/* Students' Review Request Section */}
           <div className="mb-5 bg-white border border-gray-200 rounded-lg shadow-xs p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-sm font-bold text-[#002d5b] flex items-center">
-                <span className="w-1.5 h-4 bg-[#4395d1] rounded-sm mr-2.5 inline-block"></span>
-                Students' Review Request
-              </h2>
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+              <div className="flex items-center space-x-3">
+                <h2 className="text-sm font-bold text-[#002d5b] flex items-center">
+                  <span className="w-1.5 h-4 bg-[#4395d1] rounded-sm mr-2.5 inline-block"></span>
+                  Students' Review Request
+                </h2>
+                <div className="relative">
+                  <select 
+                    value={stuDashProgramFilter}
+                    onChange={(e) => setStuDashProgramFilter(e.target.value)}
+                    className="border border-gray-300 rounded px-2.5 py-1 text-[11.5px] font-semibold text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-[#4395d1] min-w-[125px] appearance-none pr-7 cursor-pointer shadow-3xs"
+                    title="Filter by Program"
+                  >
+                    {availablePrograms.map(prog => (
+                      <option key={prog} value={prog}>{prog}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
               <button 
                 onClick={() => {
                   setActiveSidebarItem('online-script-eval');
@@ -4904,61 +4980,71 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {reviewRequests.map((req, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
-                        <div className="font-bold text-blue-700 text-[11px] leading-tight">[{req.examiner.id}] - {req.examiner.name}</div>
-                        <div className="text-[10px] text-gray-500 mt-0.5">{req.examiner.phone}</div>
-                      </td>
-                      <td className="border-r border-gray-200 px-3 py-3 text-gray-800 font-medium">{req.course}</td>
-                      <td className="border-r border-gray-200 px-3 py-3 text-gray-700">{req.subject}</td>
-                      <td className="border-r border-gray-200 px-3 py-3 text-gray-700">{req.exam}</td>
-                      <td className="border-r border-gray-200 px-2.5 py-3 text-center font-bold text-gray-800 font-mono">{req.requests}</td>
-                      <td className="border-r border-gray-200 px-2.5 py-3 text-center text-gray-600 font-mono">{req.pending}</td>
-                      <td className="px-3 py-3 text-center">
-                        <button 
-                          onClick={() => {
-                            const constructed = {
-                              id: `STU-REV-${idx}`,
-                              rollNumber: '37180701100',
-                              studentName: 'Tahmid Rahman',
-                              examSubject: `${req.exam} - ${req.subject}`,
-                              program: req.course.split(' [')[0] || 'NDC All Service',
-                              course: req.course,
-                              question: 'Unique Set: 2, Question Serial: 12',
-                              questionSerial: '12',
-                              uniqueSet: '2',
-                              obtainedMarks: '0.00',
-                              maxMarks: '1.00',
-                              examinerName: `${req.examiner.name} (${req.examiner.id})`,
-                              evaluationType: 'Regular',
-                              examName: req.exam,
-                              subject: req.subject.replace(/\[.*\]/, '').trim(),
-                              studentDoubt: req.studentDoubt || "Anode manei toh rinattok pranto",
-                              studentDoubtText: req.studentDoubt || "Anode manei toh rinattok pranto",
-                              isFromStudent: true,
-                              totalScript: '124',
-                              minMarks: '0.5',
-                              reviewStatus: (req as any).reviewRequest || (req as any).status || 'Not Reviewed',
-                              suppressNotes: false
-                            };
-                            setShowingAdminDetailRow(constructed);
-                            setShowReviewWorkspace(false);
-                          }}
-                          className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-2.5 py-0.5 rounded text-[10px] font-bold transition-all shadow-xs"
-                        >
-                          Details
-                        </button>
+                  {reviewRequests.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-3 py-6 text-center text-gray-400 font-medium italic">
+                        No review requests found{stuDashProgramFilter !== 'All' ? ` for ${stuDashProgramFilter}` : ''}.
                       </td>
                     </tr>
-                  ))}
-                  <tr className="bg-[#f1f3f5] font-bold">
-                    <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total</td>
-                    <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono">
-                      {reviewRequests.reduce((sum, r) => sum + (r.requests || 1), 0)}
-                    </td>
-                    <td className="px-3 py-2" colSpan={2}></td>
-                  </tr>
+                  ) : (
+                    reviewRequests.map((req, idx) => (
+                      <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="border-r border-gray-200 px-3 py-3 text-gray-700">
+                          <div className="font-bold text-blue-700 text-[11px] leading-tight">[{req.examiner.id}] - {req.examiner.name}</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">{req.examiner.phone}</div>
+                        </td>
+                        <td className="border-r border-gray-200 px-3 py-3 text-gray-800 font-medium">{req.course}</td>
+                        <td className="border-r border-gray-200 px-3 py-3 text-gray-700">{req.subject}</td>
+                        <td className="border-r border-gray-200 px-3 py-3 text-gray-700">{req.exam}</td>
+                        <td className="border-r border-gray-200 px-2.5 py-3 text-center font-bold text-gray-800 font-mono">{req.requests}</td>
+                        <td className="border-r border-gray-200 px-2.5 py-3 text-center text-gray-600 font-mono">{req.pending}</td>
+                        <td className="px-3 py-3 text-center">
+                          <button 
+                            onClick={() => {
+                              const constructed = {
+                                id: `STU-REV-${idx}`,
+                                rollNumber: '37180701100',
+                                studentName: 'Tahmid Rahman',
+                                examSubject: `${req.exam} - ${req.subject}`,
+                                program: req.course.split(' [')[0] || 'NDC All Service',
+                                course: req.course,
+                                question: 'Unique Set: 2, Question Serial: 12',
+                                questionSerial: '12',
+                                uniqueSet: '2',
+                                obtainedMarks: '0.00',
+                                maxMarks: '1.00',
+                                examinerName: `${req.examiner.name} (${req.examiner.id})`,
+                                evaluationType: 'Regular',
+                                examName: req.exam,
+                                subject: req.subject.replace(/\[.*\]/, '').trim(),
+                                studentDoubt: req.studentDoubt || "Anode manei toh rinattok pranto",
+                                studentDoubtText: req.studentDoubt || "Anode manei toh rinattok pranto",
+                                isFromStudent: true,
+                                totalScript: '124',
+                                minMarks: '0.5',
+                                reviewStatus: (req as any).reviewRequest || (req as any).status || 'Not Reviewed',
+                                suppressNotes: false
+                              };
+                              setShowingAdminDetailRow(constructed);
+                              setShowReviewWorkspace(false);
+                            }}
+                            className="bg-[#4395d1] hover:bg-[#3484c0] text-white px-2.5 py-0.5 rounded text-[10px] font-bold transition-all shadow-xs"
+                          >
+                            Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                  {reviewRequests.length > 0 && (
+                    <tr className="bg-[#f1f3f5] font-bold">
+                      <td className="border-r border-gray-200 px-3 py-2 text-right text-gray-800" colSpan={4}>Total</td>
+                      <td className="border-r border-gray-200 px-2.5 py-2 text-center text-gray-900 font-extrabold font-mono">
+                        {reviewRequests.reduce((sum, r) => sum + (r.requests || 1), 0)}
+                      </td>
+                      <td className="px-3 py-2" colSpan={2}></td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -4966,11 +5052,26 @@ export default function App() {
 
           {/* Admin Review Request Section */}
           <div className="mb-5 bg-white border border-gray-200 rounded-lg shadow-xs p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-sm font-bold text-[#002d5b] flex items-center">
-                <span className="w-1.5 h-4 bg-purple-600 rounded-sm mr-2.5 inline-block"></span>
-                Admin Review Request
-              </h2>
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+              <div className="flex items-center space-x-3">
+                <h2 className="text-sm font-bold text-[#002d5b] flex items-center">
+                  <span className="w-1.5 h-4 bg-purple-600 rounded-sm mr-2.5 inline-block"></span>
+                  Admin Review Request
+                </h2>
+                <div className="relative">
+                  <select 
+                    value={adminDashProgramFilter}
+                    onChange={(e) => setAdminDashProgramFilter(e.target.value)}
+                    className="border border-gray-300 rounded px-2.5 py-1 text-[11.5px] font-semibold text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-400 min-w-[125px] appearance-none pr-7 cursor-pointer shadow-3xs"
+                    title="Filter by Program"
+                  >
+                    {availablePrograms.map(prog => (
+                      <option key={prog} value={prog}>{prog}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
               <button 
                 onClick={() => {
                   setActiveSidebarItem('online-script-eval');
@@ -5090,8 +5191,8 @@ export default function App() {
                 <tbody className="divide-y divide-gray-200">
                   {dashboardAdminRequests.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="px-3 py-5 text-center text-gray-400 font-medium italic">
-                        No forwarded reviews at this moment.
+                      <td colSpan={10} className="px-3 py-6 text-center text-gray-400 font-medium italic">
+                        No review requests found{adminDashProgramFilter !== 'All' ? ` for ${adminDashProgramFilter}` : ''}.
                       </td>
                     </tr>
                   ) : (
